@@ -36,13 +36,32 @@ angular.module('starter', ['ionic', 'starter.profile', 'starter.craze',
     // Abstract state for the basic tabs of the application, it will
     // contain the views in which to render the tabs, and rendering
     // a tab implies rendering this view, containing the tab.
-    
-    .state('craze', {
-        'url' : '/craze',     
+    .state('tabs', {
+        'url' : '/tabs',
+        'abstract' : true,
         'templateUrl' : 'templates/tabs.html',
-        'controller' : 'CraZeCtrl'
+        'controller' : 'TabsCtrl'
     })
 
+    .state('tabs.craze', {
+        'url' : '/craze',
+        'views' : {
+            'tab-craze' : {
+                'templateUrl' : 'templates/tab-craze.html',
+                'controller' : 'CraZeCtrl'
+            }
+        }
+    })
+
+    .state('tabs.profile', {
+        'url' : '/profile',
+        'views' : {
+            'tab-profile' : {
+                'templateUrl' : 'templates/tab-profile.html',
+                'controller' : 'ProfileCtrl'
+            }
+        }
+    })
 
     // Default router. I'll look up later some way to route to an initial
     // temporal state which will check for the token and then redirect to
@@ -51,5 +70,5 @@ angular.module('starter', ['ionic', 'starter.profile', 'starter.craze',
     // But then it could hang in a signin screen whereas we could have a pse-
     // udo 'splash' screen that will be there only when resolving whether to
     // go to signin view or check the token and go to home view.
-    $urlRouterProvider.otherwise('craze');
+    $urlRouterProvider.otherwise('tabs/craze');
 }]);

@@ -193,7 +193,7 @@ angular.module('starter.craze', [])
     setTimeout(function() {
         $scope.variableInitializer();
         $scope.newImage();
-    }, 1000);
+    }, 2500);
 
     $scope.toggleMenu = function() {
         $ionicSideMenuDelegate.toggleLeft();

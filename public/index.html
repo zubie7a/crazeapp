@@ -48,10 +48,6 @@
       <!-- Google Maps Javascript
            THIS IS NOT MY API KEY! WHOM IS IT? Found it in a JSFiddle.
            I haven't been able yet to create one, whatever :-P -->
-      <script src="js/camera.js"></script>
-      <!-- Browser Camera API stuff -->
-
-
 
       <script src="lib/ngCordova/dist/ng-cordova.js"></script>
       <!-- $ cordova plugin add org.apache.cordova.geolocation
@@ -63,10 +59,10 @@
 
   </head>
     <body ng-app="starter">
-      <ion-nav-bar class='bar-dark' ng-controller='CraZeCtrl'>
-            <ion-nav-buttons side="left">
-                    <button class="button button-icon icon ion-navicon" ng-click="toggleMenu()"> Menu</button>
-            </ion-nav-buttons>
+        <ion-nav-bar class="bar-dark">
+            <ion-nav-back-button>
+            </ion-nav-back-button>
+            <!-- For now empty, but its there so we can return from the signup view -->
         </ion-nav-bar>
         <ion-nav-view></ion-nav-view>
     </body>

@@ -66,6 +66,7 @@ var CrazeCanvas = function() {
 
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
+        alert(canvas);
         canvas.height = window.innerHeight;
         canvas.width  = window.innerWidth;
         cenX = canvas.width  / 2;
@@ -76,7 +77,7 @@ var CrazeCanvas = function() {
         // Set up the handlers for all the DOM events.
         canvas.drawNewImage();
 
-    }, 1000);
+    }, 2000);
     
     this.setStrokeColor = function(color) {
     // A function for setting the stroke color.
