@@ -1,0 +1,198 @@
+<ion-side-menus enable-menu-with-back-views="false">
+    <ion-side-menu-content drag-content='false'>   
+        <ion-content scroll='false'>
+            <canvas id='myCanvas' style="margin-top: 0px;">
+            </canvas>
+        </ion-content>            
+    </ion-side-menu-content>     
+    <ion-side-menu side='left'>
+        <ion-header-bar class="bar-stable">
+          <h1 class="title">Left</h1>
+        </ion-header-bar>
+        <ion-content id='menucontent'>
+            <table class='butable'>
+                <tr>
+                    <td class='half'>
+                        <button class='button button-calm butn' ng-click='newImage()'>
+                            <strong>New</strong> Image
+                        </button>
+                    </td>
+                    <td class='half'>
+                        <button class='button button-balanced butn' ng-click='saveImage()'>
+                            <strong>Save</strong> Image
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class='entire' colspan='2'>
+                        <button class='button button-assertive butn' ng-click='crazeMode()'>
+                            <strong>CraZe</strong> Mode
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class='entire' colspan='2'>
+                        <button class='button button-stable butn' ng-click='toggleHints()'>
+                            <div ng-if='(hints == false)'>
+                                <strong>Hints</strong> Disabled
+                            </div>
+                            <div ng-if='(hints == true)'>
+                                <strong>Hints</strong> Enabled
+                            </div>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <label class='item item-dark item-input'>
+                <span class='input-label stable'><strong>Brush</strong></span>
+                <select ng-model='crazeData.brush' class='selector'
+                        ng-change='updateBrush()'>
+                    <option value='1'>Regular Line</option>
+                    <option value='2'>Lines From Start</option>
+                    <option value='3'>Vertical Lines</option>
+                    <option value='4'>Horizontal Lines</option>
+                    <option value='5'>Great Cross</option>
+                    <option value='6'>Triangles</option>
+                    <option value='7'>Squares</option>
+                    <option value='8'>Circles</option>
+                    <option value='9'>Chain</option>
+                </select>
+            </label>
+            <label class='item item-dark item-input'>
+                <span class='input-label stable'><strong>Palette</strong></span>
+                <select ng-model='crazeData.palette' class='selector'
+                        ng-change='updatePalette()'>
+                    <option value='1'>Manual</option>
+                    <option value='2'>Rainbow</option>
+                    <option value='3'>Fire</option>
+                    <option value='4'>Ice</option>
+                    <option value='5'>Nature</option>
+                    <option value='6'>Mystic</option>
+                    <option value='7'>Borealis</option>
+                    <option value='8'>Grayscale</option>
+                    <option value='9'>Foxes</option>
+                </select>
+            </label>
+            <label ng-if='(crazeData.palette == 1)' class='item range range-assertive item-dark'>
+                <strong>  R</strong>
+                <input type='range' value='{{crazeData.colors[0]}}'
+                min='0' max='255' step='1' ng-model='crazeData.colors[0]' ng-change='colorChanged(0)'>
+                {{crazeData.colors[0]}} 
+            </label>
+
+            <label ng-if='(crazeData.palette == 1)' class='item range range-balanced item-dark'>
+                <strong>  G</strong>
+                <input type='range' value='{{crazeData.colors[1]}}'
+                min='0' max='255' step='1' ng-model='crazeData.colors[1]' ng-change='colorChanged(1)'>
+                {{crazeData.colors[1]}} 
+            </label>
+
+            <label ng-if='(crazeData.palette == 1)' class='item range range-positive item-dark'>
+                <strong>  B</strong>
+                <input type='range' value='{{crazeData.colors[2]}}'
+                min='0' max='255' step='1' ng-model='crazeData.colors[2]' ng-change='colorChanged(2)'>
+                {{crazeData.colors[2]}} 
+            </label>
+
+            <label class='item item-dark item-input'>
+                <span class='input-label stable'><strong>Color</strong></span>
+                <input type='text' id='coltxt' readonly/>
+            </label>
+            
+            <label class='item range range-energized item-dark'>
+                <strong>  Transparency</strong>
+                <input type='range' value='{{crazeData.alpha}}'
+                min='0' max='100' step='1' ng-model='crazeData.alpha' ng-change='alphaChanged()'>
+                {{crazeData.alpha}} 
+            </label>
+
+            <ul class="list">
+                
+                <li class="item item-toggle item-dark">
+                    <strong>Symmetry</strong> Axis
+                    <label class="toggle toggle-positive">
+                        <input type="checkbox" ng-model='crazeData.symmetry' ng-change='updateSymmetry()'>
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle item-dark">
+                    <strong>Variable</strong> Size
+                    <label class="toggle toggle-calm">
+                        <input type="checkbox" ng-model='crazeData.variable' ng-change='updateVariable()'>
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle item-dark">
+                    <strong>Rotating</strong> Shape
+                    <label class="toggle toggle-balanced">
+                        <input type="checkbox" ng-model='crazeData.rotating' ng-change='updateRotating()'>
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+                
+                <li class="item item-toggle item-dark">
+                    <strong>Connect</strong> Borders
+                    <label class="toggle toggle-energized">
+                        <input type="checkbox" ng-model='crazeData.connect' ng-change='updateConnect()'>
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle item-dark">
+                    <strong>Fill</strong> Shape
+                    <label class="toggle toggle-assertive">
+                        <input type="checkbox" ng-model='crazeData.fill' ng-change='updateFill()'>
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle item-dark">
+                    <strong>Fading</strong> Image
+                    <label class="toggle toggle-royal">
+                        <input type="checkbox" ng-model='crazeData.fade' ng-change='updateFade()'>
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle item-dark">
+                    <strong>Fit</strong> to Grid
+                    <label class="toggle toggle-positive">
+                        <input type="checkbox" ng-model='crazeData.grid' ng-change='updateGrid()'>
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+            </ul>
+
+            <table>
+                <tr>
+                    <td>Brush Size</td>
+                    <td><input type='number' ng-model='crazeData.bsize' ng-change='updateSize()' min='1' max='1742' step='1'/></td>
+                </tr>
+                <tr>
+                    <td>Number of Rotations</td>
+                    <td><input type='number' ng-model='crazeData.rotnum' ng-change='updateRotNum()' min='1' max='360' step='1'/></td>
+                </tr>
+                <tr>
+                    <td>Brush Thickness</td>
+                    <td><input type='number' ng-model='crazeData.thickness' ng-change='updateThick()' min='1' max='7' step='1'/></td>
+                </tr>
+            </table>
+        </ion-content>
+    </ion-side-menu>    
+</ion-side-menus>
