@@ -1,5 +1,8 @@
+//var server = 'https://urblancer.herokuapp.com';
+var server = 'http://localhost:3000';
+// var server = 'http://52.26.101.129:3000';
 
-angular.module('starter.services', [])
+angular.module('starter.services', ['btford.socket-io'])
 
 .factory('System', ['$ionicPopup', 
          function($ionicPopup) {
@@ -154,4 +157,51 @@ angular.module('starter.services', [])
             })
         }
     };
+}])
+
+.factory('Camera', ['$q', '$http', 'System', function($q, $http, System) {
+// For accessing the camera hardware.
+    return {
+        getPhoto : function(options) {
+            var q = $q.defer();
+            navigator.camera.getPicture(function(result) {
+                // Do any magic you need
+                q.resolve(result);
+            },
+            function(err) {
+                q.reject(err);
+            },
+            options);
+            return q.promise;
+        }
+    };
+}])
+
+
+.factory('Socket', ['socketFactory', 'User', '$rootScope', 
+         function(socketFactory, User, $rootScope){
+// For dealing with Socket.io connections with the server
+
+    //var myIoSocket = io.connect('http://chat.socket.io');
+    var myIoSocket = io.connect(server);
+    //Create socket and connect to our desired server.
+
+    var mySocket = socketFactory({
+        'ioSocket' : myIoSocket
+    });
+
+    var user = User.getUser();
+
+    mySocket.on('connect', function() {
+    // When the application connects with the server, send the email of this particular
+    // user so that the server relates it to the socket used in this connection.
+        mySocket.emit('register', user.email);
+    });
+
+    mySocket.on('message', function(data) {
+    // When a message is received, store it in the array where it belongs.
+        $rootScope.$broadcast('receiveMessage', data);
+    });
+
+    return mySocket;
 }]);

@@ -169,6 +169,25 @@ angular.module('starter.craze', [])
         $scope.alphaChanged();
     }
 
+    $ionicModal.fromTemplateUrl('templates/craze-modal.html', {
+    // Set up a modal for displaying more specific information about
+    // a request than the 'contracted' view.
+        scope: $scope
+        //backdropClickToClose: false
+    }).then(function(modal) {
+        $scope.crazemodal = modal;
+    });
+
+    $scope.menu = function() {
+    // Open the menu modal.
+        $scope.crazemodal.show();
+    }
+
+    $scope.close = function() {
+    // Close the menu modal.
+        $scope.crazemodal.hide();
+    }
+
     $scope.user = User.getUser();
 
     setTimeout(function() {

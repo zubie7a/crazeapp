@@ -1,5 +1,5 @@
-angular.module('starter', ['ionic', 'starter.craze',
-               'starter.services'])
+angular.module('starter', ['ionic', 'starter.profile', 'starter.craze',
+               'starter.services', 'starter.tabs', 'ngCordova', 'btford.socket-io'])
 // $ cordova plugin add org.apache.cordova.geolocation
 // $ bower install ngCordova
 // $ bower install angular-socket-io
