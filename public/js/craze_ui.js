@@ -66,7 +66,6 @@ var CrazeCanvas = function() {
 
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
-        alert(canvas);
         canvas.height = window.innerHeight;
         canvas.width  = window.innerWidth;
         cenX = canvas.width  / 2;
