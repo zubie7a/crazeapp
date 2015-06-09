@@ -188,8 +188,6 @@ angular.module('starter.craze', [])
         $scope.crazemodal.hide();
     }
 
-    $scope.user = User.getUser();
-
     setTimeout(function() {
         $scope.variableInitializer();
         $scope.newImage();
