@@ -61,6 +61,7 @@ var TRIANGLES        = 6;
 var SQUARES          = 7;
 var CIRCLES          = 8;
 var CHAIN            = 9;
+var PARALLEL         = 10;
 
 //Values for different varying color palettes
 var NORMAL    = 1;
@@ -273,7 +274,7 @@ function drawLine(xi, yi, xf, yf, fill, user, oldcenX, oldcenY) {
     yi = yi - oldcenY + canvas.getCenter().y;
     yf = yf - oldcenY + canvas.getCenter().y;
     var ctx = canvas.getContext();
-    ctx.shadowBlur = (fill)? 4 : 0;
+    ctx.shadowBlur = (fill)? 0 : 0;
     ctx.shadowColor = canvas.getStrokeColor();
     ctx.beginPath();
     ctx.moveTo(xi,yi);
@@ -679,11 +680,114 @@ function doMouseMove(event) {
                 liner();
                 setSeed(0, 0, 0, 0);
                 break;
+            case PARALLEL:
+                backup();
+                parallels(true);
+                liner();
+                restore();
+                setSeed(0, 0, 0, 0);
+                break;
         }
         rotable = false;
         variable = false;
         connectable = false;
     }
+}
+
+var prevSlope = -777;
+function parallels(dir) {
+    var d = 0;
+    // The distance we want to use for separating lines.
+    var sign = (dir)? 1 : -1;
+    // Whether its the line at one side or the other.
+    var pt = {
+    // The initial point to use as reference.
+        'x' : x1,
+        'y' : y1
+    };
+    var sl = 0;
+    // The slope between the current and last point for determining direction.
+    if(y1 == y2) {
+    // Horizontal Movement.
+        sl = 100000;
+    }
+    else if(x1 == x2) {
+    // Vertical Movement.
+        sl = -100000;
+    }
+    else {
+        sl = (y1 - y2) / (x1 - x2);
+    }
+    if(prevSlope = -777) {
+        prevSlope = sl;
+    }
+    else {
+        sl = (prevSlope + sl) / 2;
+    }
+    prevSlope = sl;
+    var point = alongLine(d, sl, pt, sign, true);
+    var p1 = alongLine(bSize, sl, point, 1, false);
+    var p2 = alongLine(bSize, sl, point, -1, false);
+    x1 = p1.x; y1 = p1.y;
+    x2 = p2.x; y2 = p2.y;
+}
+
+function alongLine(distance, slope, point, sign, part) {
+// Get a point along a line at a given distance.
+// We'll use an initial point and the slope for defining such line.
+    var p = {
+        'x' : null,
+        'y' : null
+    }
+    if(slope != Math.abs(100000)) {
+        if(part) { slope = 1/slope; }
+        p.x = point.x - (sign * distance) / Math.sqrt(1 + (slope * slope));
+        p.y = slope * (p.x - point.x) + point.y;
+    }
+    else {
+        if(part) {
+            if(slope > 0) {
+            // Horizontal Movement.
+                p.x = point.x;
+                p.y = point.y + (sign * distance);
+            }
+            else if(slope < 0) {
+            // Vertical Movement.
+                p.y = point.y;
+                p.x = point.x + (sign * distance);
+            }
+        }
+        else {
+            if(slope > 0) {
+            // Horizontal Direction
+                p.y = point.y;
+                p.x = point.x + (sign * distance);
+            }
+            else {
+            // Vertical Direction.
+                p.x = point.x;
+                p.y = point.y + (sign * distance);
+            }
+        }
+        
+    }
+    return p;
+}
+
+
+var _x1, _y1, _x2, _y2;
+function backup() {
+    _x1 = x1;
+    _y1 = y1;
+    _x2 = x2;
+    _y2 = y2;
+}
+
+function restore() {
+    x1 = _x1;
+    y1 = _y1;
+    x2 = _x2;
+    y2 = _y2;
 }
 
 function setSeed(h1, w1, h2, w2){
