@@ -1,4 +1,4 @@
-var offset = window.innerHeight / 2;
+var offset;
 
 var menuOpen = false;
 
@@ -63,14 +63,14 @@ function setupEventHandlers() {
     $(document).keydown(function(event) {
         if(event.which == 40) {
         // Going down.
-            if(menuOpen) return;
+            //if(menuOpen) return;
             offset += 20;
             if(offset > window.innerWidth / 2) { offset = window.innerWidth / 2; }
             $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         }
         if(event.which == 38) {
         // Going up.
-            if(menuOpen) return;
+            //if(menuOpen) return;
             offset -= 20;
             if(offset < 0) { offset = 0; }
             $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
@@ -83,27 +83,14 @@ var CrazeCanvas = function() {
 
     var cenX, cenY;
     var canvas;
-    setTimeout(function() {
-        canvas = document.getElementById('myCanvas');
-        canvas.height = window.innerWidth;
-        canvas.width  = window.innerWidth;
-        cenX = canvas.width  / 2;
-        cenY = canvas.height / 2;
-        $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
-        variableInitializer();
-        // Initialize the variables of the application.
-        setupEventHandlers();
-        // Set up the handlers for all the DOM events.
-        canvas.drawNewImage();
 
-    }, 2000);
-    
     this.setStrokeColor = function(color) {
     // A function for setting the stroke color.
         this.getContext().strokeStyle = color;
     }
 
     this.getStrokeColor = function() {
+    // For getting the current stroke color.
         return this.getContext().strokeStyle;
     }
 
@@ -116,6 +103,8 @@ var CrazeCanvas = function() {
     // A function for cleaning the slate and also stop the Craze Mode.
         killCrazeMode();
         this.clearImage();
+        this.resetCenter();
+        this.resetPosition();
     }
 
     this.clearImage = function() {
@@ -137,15 +126,45 @@ var CrazeCanvas = function() {
         }
     }
 
+    this.resetCenter = function() {
+        cenX = canvas.width  / 2;
+        cenY = canvas.height / 2;
+    }
+
     this.setCenter = function(x,y){
     // A function for setting a new center to the canvas.
         cenX = x;
         cenY = y;
     }
-    
+
+    this.resetPosition = function() {
+        offset = window.innerHeight / 2;
+        $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
+    }
+
     this.width  = function() { return canvas.width;  }
     this.height = function() { return canvas.height; }
     // A couple functions for retrieving the dimensions of the canvas.
+
+    setTimeout(function() {
+        canvas = document.getElementById('myCanvas');
+        canvas.height = window.innerWidth;
+        canvas.width  = window.innerWidth;
+        this.resetCenter();
+        offset = window.innerHeight / 2;
+        $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
+        variableInitializer();
+        // Initialize the variables of the application.
+        setupEventHandlers();
+        // Set up the handlers for all the DOM events.
+        canvas.drawNewImage();
+
+    }, 500);
+}
+
+function resetCenter() {
+// To reset the center of the canvas.
+    canvas.resetCenter();
 }
 
 function mousedown(e) {

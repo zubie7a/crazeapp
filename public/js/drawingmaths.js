@@ -273,7 +273,7 @@ function drawLine(xi, yi, xf, yf, fill, user, oldcenX, oldcenY) {
     yi = yi - oldcenY + canvas.getCenter().y;
     yf = yf - oldcenY + canvas.getCenter().y;
     var ctx = canvas.getContext();
-    ctx.shadowBlur = fill? 0 : 0;
+    ctx.shadowBlur = (fill)? 4 : 0;
     ctx.shadowColor = canvas.getStrokeColor();
     ctx.beginPath();
     ctx.moveTo(xi,yi);

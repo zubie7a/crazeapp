@@ -30,7 +30,7 @@ angular.module('starter.craze', [])
         'rotnum' : 6,
         'thickness' : 1,
         'colors' : [255, 255, 255],
-        'alpha' : 100
+        'alpha' : 50
     };
 
     $scope.mouseDown = function() {
@@ -146,7 +146,7 @@ angular.module('starter.craze', [])
 
     $scope.alphaChanged = function() {
     // Update the inputted alpha value.
-        alphaChanged($scope.crazeData.alpha);
+        alphaChanged(100 - $scope.crazeData.alpha);
     }
 
     $scope.variableInitializer = function() {
@@ -191,19 +191,67 @@ angular.module('starter.craze', [])
     setTimeout(function() {
         $scope.variableInitializer();
         $scope.newImage();
-    }, 2500);
+    }, 1000);
 
     $scope.toggleMenu = function() {
         menuOpen = !menuOpen;
         $ionicSideMenuDelegate.toggleLeft();
     }
 
-    $scope.randomizer = function() {
+    function randInt(min, max) {
+    // Random Integer between min and max inclusive.
+        max = max + 1;
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
 
+    function randBool() {
+    // Random Boolean.
+        return (randInt(0, 1) == 0);
+    }
+
+    function randPalette() {
+    // Returns a random palette, but the manual palette has 50% chances.
+        if(randBool()) {
+            return 1;
+        }
+        else {
+            return randInt(2, 9);
+        }
+    }
+
+    $scope.randomizer = function() {
+        $scope.crazeData = {
+            'brush'   : randInt(1, 9),
+            'palette' : randPalette(),
+            'colors' : [randInt(0, 255), randInt(0, 255), randInt(0, 255)],
+            'symmetry' : randBool(),
+            'variable' : randBool(),
+            'rotating' : randBool(),
+            'connect' : randBool(),
+            'fill' : randBool(),
+            'fade' : randBool(),
+            'grid' : randBool(),
+            'bsize' : randInt(42, 142),
+            'rotnum' : randInt(2, 10),
+            'thickness' : 1,
+            'alpha' : randInt(50, 90)
+        };
+        $scope.variableInitializer();
     }
 
     $scope.changeCenter = function() {
         changeCenter = true;
+        System.alert("Please click on the new center's location!");
+        $ionicSideMenuDelegate.toggleLeft();
+        menuOpen = false;
+    }
+
+    $scope.resetCenter = function() {
+          var plat = ionic.Platform.platform();
+          System.alert(plat);
+        $ionicSideMenuDelegate.toggleLeft();
+        menuOpen = false;
+        resetCenter();
     }
 
 }]);

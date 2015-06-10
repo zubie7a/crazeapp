@@ -1,6 +1,4 @@
-//var server = 'https://urblancer.herokuapp.com';
 var server = 'http://localhost:3000';
-// var server = 'http://52.26.101.129:3000';
 
 angular.module('starter.services', ['btford.socket-io'])
 
