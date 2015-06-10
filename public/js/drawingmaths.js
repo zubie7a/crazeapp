@@ -46,9 +46,10 @@ var angle, brushRotD, brushRotR;              // several numbers used forseveral
 var posX,posY,preX,preY;                      // several arrays forstoring previous and current coordinates
                                               // .. for shape drawing purposes
 
-var fadeCount; // counter for the fading
-var triDir;    // direction of the triangle for the alternating triangle fillings
-var stage;     // variable for storing in Craze Mode the alternating line and circle drawings
+var fadeCount;    // counter for the fading
+var triDir;       // direction of the triangle for the alternating triangle fillings
+var stage;        // variable for storing in Craze Mode the alternating line and circle drawings
+var changeCenter; // variable for checking whether the center is to be changed or not.
 
 //Values for Switch/Case regarding the selected Brush
 var REGULAR_LINE     = 1;
@@ -539,7 +540,10 @@ function bresenhamCircle(xa, ya, xb, yb) {
 
 function doMouseDown(event) {
     x2 = x1 = event.pageX;
-    y2 = y1 = event.pageY;
+    y2 = y1 = event.pageY + offset - 40;
+    if(changeCenter) {
+        canvas.setCenter(x1, y1);
+    }
     bSize = bSizeTemp;
     brushRotD = 0;
     dir = true;
@@ -551,15 +555,21 @@ function doMouseDown(event) {
 }
 
 function doMouseUp(event) {
-    draw = false;;
+    if(changeCenter) {
+        changeCenter = false;
+    }
+    draw = false;
 }
 
 function doMouseMove(event) {
+    if(changeCenter) {
+        return;
+    }
     if (draw) {
         modifier();
         // The original position of the mouse pointer is stored
         aX = x1 = event.pageX;
-        aY = y1 = event.pageY;
+        aY = y1 = event.pageY + offset - 40;
         // It will then check which brush is currently selected
         switch (brush) {
             case REGULAR_LINE:
@@ -1062,12 +1072,11 @@ function variableInitializer() {
 // this function initializes variables pulling them from the original default value in the DOM
     craze = false;
     stage = true;
-    alphaValue = 1;
-    updatePalette(2);
     fadeCount = 0;
     fade = true;
     grid = false;
     triDir = 1;
+    changeCenter = false;
 }
 
 function updateSymmetry(sym) {

@@ -194,6 +194,16 @@ angular.module('starter.craze', [])
     }, 2500);
 
     $scope.toggleMenu = function() {
+        menuOpen = !menuOpen;
         $ionicSideMenuDelegate.toggleLeft();
     }
+
+    $scope.randomizer = function() {
+
+    }
+
+    $scope.changeCenter = function() {
+        changeCenter = true;
+    }
+
 }]);

@@ -1,3 +1,6 @@
+var offset = window.innerHeight / 2;
+
+var menuOpen = false;
 
 $(function() {
 // When the document is ready, execute this function.
@@ -56,6 +59,23 @@ function setupEventHandlers() {
             mouseout(e);
         }
     );
+
+    $(document).keydown(function(event) {
+        if(event.which == 40) {
+        // Going down.
+            if(menuOpen) return;
+            offset += 20;
+            if(offset > window.innerWidth / 2) { offset = window.innerWidth / 2; }
+            $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
+        }
+        if(event.which == 38) {
+        // Going up.
+            if(menuOpen) return;
+            offset -= 20;
+            if(offset < 0) { offset = 0; }
+            $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
+        }
+    });
 }
 
 var CrazeCanvas = function() {
@@ -63,13 +83,13 @@ var CrazeCanvas = function() {
 
     var cenX, cenY;
     var canvas;
-
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
-        canvas.height = window.innerHeight;
+        canvas.height = window.innerWidth;
         canvas.width  = window.innerWidth;
         cenX = canvas.width  / 2;
         cenY = canvas.height / 2;
+        $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         variableInitializer();
         // Initialize the variables of the application.
         setupEventHandlers();
@@ -118,10 +138,11 @@ var CrazeCanvas = function() {
     }
 
     this.setCenter = function(x,y){
-    // A function for setting a new center to the canvas, not used for now.
+    // A function for setting a new center to the canvas.
         cenX = x;
         cenY = y;
     }
+    
     this.width  = function() { return canvas.width;  }
     this.height = function() { return canvas.height; }
     // A couple functions for retrieving the dimensions of the canvas.

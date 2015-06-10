@@ -1,4 +1,4 @@
-angular.module('starter', ['ionic', 'starter.profile', 'starter.craze',
+angular.module('starter', ['ionic', 'starter.craze',
                'starter.services', 'starter.tabs', 'ngCordova', 'btford.socket-io'])
 // $ cordova plugin add org.apache.cordova.geolocation
 // $ bower install ngCordova
@@ -49,16 +49,6 @@ angular.module('starter', ['ionic', 'starter.profile', 'starter.craze',
             'tab-craze' : {
                 'templateUrl' : 'templates/tab-craze.html',
                 'controller' : 'CraZeCtrl'
-            }
-        }
-    })
-
-    .state('tabs.profile', {
-        'url' : '/profile',
-        'views' : {
-            'tab-profile' : {
-                'templateUrl' : 'templates/tab-profile.html',
-                'controller' : 'ProfileCtrl'
             }
         }
     })
