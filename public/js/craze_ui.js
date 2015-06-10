@@ -1,5 +1,3 @@
-var offset;
-
 var menuOpen = false;
 
 $(function() {
@@ -104,7 +102,6 @@ var CrazeCanvas = function() {
         killCrazeMode();
         this.clearImage();
         this.resetCenter();
-        this.resetPosition();
     }
 
     this.clearImage = function() {
@@ -137,22 +134,15 @@ var CrazeCanvas = function() {
         cenY = y;
     }
 
-    this.resetPosition = function() {
-        offset = window.innerHeight / 2;
-        $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
-    }
-
     this.width  = function() { return canvas.width;  }
     this.height = function() { return canvas.height; }
     // A couple functions for retrieving the dimensions of the canvas.
 
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
-        canvas.height = window.innerWidth;
+        canvas.height = window.innerHeight;
         canvas.width  = window.innerWidth;
         this.resetCenter();
-        offset = window.innerHeight / 2;
-        $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         variableInitializer();
         // Initialize the variables of the application.
         setupEventHandlers();

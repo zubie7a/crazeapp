@@ -541,7 +541,7 @@ function bresenhamCircle(xa, ya, xb, yb) {
 
 function doMouseDown(event) {
     x2 = x1 = event.pageX;
-    y2 = y1 = event.pageY + offset - 40;
+    y2 = y1 = event.pageY;
     if(changeCenter) {
         canvas.setCenter(x1, y1);
     }
@@ -570,7 +570,7 @@ function doMouseMove(event) {
         modifier();
         // The original position of the mouse pointer is stored
         aX = x1 = event.pageX;
-        aY = y1 = event.pageY + offset - 40;
+        aY = y1 = event.pageY;
         // It will then check which brush is currently selected
         switch (brush) {
             case REGULAR_LINE:
@@ -694,7 +694,6 @@ function doMouseMove(event) {
     }
 }
 
-var prevSlope = -777;
 function parallels(dir) {
     var d = 0;
     // The distance we want to use for separating lines.
@@ -718,13 +717,6 @@ function parallels(dir) {
     else {
         sl = (y1 - y2) / (x1 - x2);
     }
-    if(prevSlope = -777) {
-        prevSlope = sl;
-    }
-    else {
-        sl = (prevSlope + sl) / 2;
-    }
-    prevSlope = sl;
     var point = alongLine(d, sl, pt, sign, true);
     var p1 = alongLine(bSize, sl, point, 1, false);
     var p2 = alongLine(bSize, sl, point, -1, false);
@@ -739,7 +731,7 @@ function alongLine(distance, slope, point, sign, part) {
         'x' : null,
         'y' : null
     }
-    if(slope != Math.abs(100000)) {
+    if(100000 != Math.abs(slope)) {
         if(part) { slope = 1/slope; }
         p.x = point.x - (sign * distance) / Math.sqrt(1 + (slope * slope));
         p.y = slope * (p.x - point.x) + point.y;
