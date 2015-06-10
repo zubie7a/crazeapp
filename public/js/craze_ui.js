@@ -159,7 +159,7 @@ var CrazeCanvas = function() {
         // Set up the handlers for all the DOM events.
         canvas.drawNewImage();
 
-    }, 500);
+    }, 1000);
 }
 
 function resetCenter() {

@@ -191,7 +191,7 @@ angular.module('starter.craze', [])
     setTimeout(function() {
         $scope.variableInitializer();
         $scope.newImage();
-    }, 1000);
+    }, 1500);
 
     $scope.toggleMenu = function() {
         menuOpen = !menuOpen;
@@ -247,8 +247,8 @@ angular.module('starter.craze', [])
     }
 
     $scope.resetCenter = function() {
-          var plat = ionic.Platform.platform();
-          System.alert(plat);
+        var plat = ionic.Platform.platform();
+        System.alert(plat);
         $ionicSideMenuDelegate.toggleLeft();
         menuOpen = false;
         resetCenter();
