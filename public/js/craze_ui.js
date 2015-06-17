@@ -1,4 +1,6 @@
+var offset;
 var menuOpen = false;
+var platform;
 
 $(function() {
 // When the document is ready, execute this function.
@@ -102,6 +104,7 @@ var CrazeCanvas = function() {
         killCrazeMode();
         this.clearImage();
         this.resetCenter();
+        this.resetScroll();
     }
 
     this.clearImage = function() {
@@ -111,8 +114,19 @@ var CrazeCanvas = function() {
 
     this.saveImage = function(){
     // A function to save the current image
-      killCrazeMode();
-      window.open(canvas.toDataURL());
+        killCrazeMode();
+        window.open(canvas.toDataURL());
+    }
+
+    this.resetScroll = function() {
+    // A function for resetting the scroll.
+        if(platform != 'android' && platform != 'ios') {
+            offset = window.innerHeight / 2;
+        }
+        else {
+            offset = 0;
+        }
+        $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
     }
 
     this.getCenter = function() {
@@ -140,7 +154,15 @@ var CrazeCanvas = function() {
 
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
-        canvas.height = window.innerHeight;
+        if(platform != 'android' && platform != 'ios') {
+            canvas.height = window.innerWidth;
+            offset = window.innerHeight / 2;
+        }
+        else {
+            canvas.height = window.innerHeight;
+            offset = 0;
+        }
+        $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         canvas.width  = window.innerWidth;
         this.resetCenter();
         variableInitializer();
@@ -148,7 +170,6 @@ var CrazeCanvas = function() {
         setupEventHandlers();
         // Set up the handlers for all the DOM events.
         canvas.drawNewImage();
-
     }, 1000);
 }
 

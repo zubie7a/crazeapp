@@ -541,7 +541,7 @@ function bresenhamCircle(xa, ya, xb, yb) {
 
 function doMouseDown(event) {
     x2 = x1 = event.pageX;
-    y2 = y1 = event.pageY;
+    y2 = y1 = event.pageY + offset - 42;
     if(changeCenter) {
         canvas.setCenter(x1, y1);
     }
@@ -570,7 +570,7 @@ function doMouseMove(event) {
         modifier();
         // The original position of the mouse pointer is stored
         aX = x1 = event.pageX;
-        aY = y1 = event.pageY;
+        aY = y1 = event.pageY + offset - 42;
         // It will then check which brush is currently selected
         switch (brush) {
             case REGULAR_LINE:

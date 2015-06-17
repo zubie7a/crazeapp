@@ -10,6 +10,8 @@ angular.module('starter.craze', [])
     $scope.hints = false;
     // For enabling or disabling hints.
 
+    platform = ionic.Platform.platform();
+
     $scope.toggleHints = function() {
         $scope.hints = !($scope.hints);
     }
@@ -247,8 +249,6 @@ angular.module('starter.craze', [])
     }
 
     $scope.resetCenter = function() {
-        var plat = ionic.Platform.platform();
-        System.alert(plat);
         $ionicSideMenuDelegate.toggleLeft();
         menuOpen = false;
         resetCenter();
