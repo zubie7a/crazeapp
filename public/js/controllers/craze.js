@@ -12,7 +12,7 @@ angular.module('starter.craze', [])
 
     platform = ionic.Platform.platform();
     if(platform == 'android') {
-        window.location.href = "https://play.google.com/store/apps/details?id=com.zubieta.craze";        
+        //window.location.href = "https://play.google.com/store/apps/details?id=com.zubieta.craze";        
     }
 
     $scope.toggleHints = function() {
