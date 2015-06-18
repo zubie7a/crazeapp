@@ -23,10 +23,6 @@ function setupEventHandlers() {
 // This function sets the event handlers corresponding some actions like 
 // changing things in the HTML document such as the checkboxes, number 
 // inputs, sliders, or buttons. Thx @febuiles && JQuery <3
-    $(document).bind('touchmove',
-        function(e) {
-        }
-    );
     $('#myCanvas').bind('touchmove', 
         function(e) {
             alert("ITS");
