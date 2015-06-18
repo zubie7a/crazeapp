@@ -694,6 +694,11 @@ function doMouseMove(event) {
         variable = false;
         connectable = false;
     }
+    else {
+        if(platform == 'android' || platform == 'ios') {
+            doMouseDown(event);
+        }
+    }
 }
 
 function parallels(dir) {
