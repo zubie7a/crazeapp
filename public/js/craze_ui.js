@@ -197,7 +197,7 @@ function mousedown(e) {
     }
     if(craze){ killCrazeMode(); }
     doMouseDown(e);
-    alert(JSON.stringify(e));
+    alert(e);
 }
 
 function mousemove(e) {
@@ -209,8 +209,7 @@ function mousemove(e) {
     if(!craze){
         doMouseMove(e);
     }
-    
-    alert(JSON.stringify(e));
+    alert(e);
 }
 
 function mouseup(e) {
