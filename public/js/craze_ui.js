@@ -198,7 +198,7 @@ function mousedown(e) {
     }
     if(craze){ killCrazeMode(); }
     doMouseDown(e);
-    //alert(e.pageX + " " + e.pageY);
+    alert("x1: " + x1 + ", y1: " + y1 + ", x2: " + x2 + ", y2: " + y2);
 }
 
 function mousemove(e) {
@@ -210,7 +210,7 @@ function mousemove(e) {
     if(!craze){
         doMouseMove(e);
     }
-    //alert(e.pageX + " " + e.pageY);
+    alert("x1: " + x1 + ", y1: " + y1 + ", x2: " + x2 + ", y2: " + y2);
 }
 
 function mouseup(e) {
