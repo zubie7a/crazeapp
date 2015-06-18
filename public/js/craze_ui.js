@@ -29,13 +29,12 @@ function setupEventHandlers() {
     );
     $('#myCanvas').bind('touchmove', 
         function(e) {
-            mousemove(e);
-            e.preventDefault();
+            mousemove(null);
         }
     );
     $('#myCanvas').bind('touchstart',
         function(e) {
-            mousedown(e);
+            mousedown(null);
         }
     );
 
