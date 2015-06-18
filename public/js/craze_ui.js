@@ -207,9 +207,9 @@ function mousemove(e) {
         e = event;
     }
     if(!craze){
-        doMouseMove(JSON.stringify(e));
+        doMouseMove(e);
     }
-    alert(e);
+    alert(JSON.stringify(e));
 }
 
 function mouseup(e) {
