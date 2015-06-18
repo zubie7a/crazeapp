@@ -29,12 +29,14 @@ function setupEventHandlers() {
     );
     $('#myCanvas').bind('touchmove', 
         function(e) {
+            alert("ITS");
             mousemove(null);
             e.preventDefault();
         }
     );
     $('#myCanvas').bind('touchstart',
         function(e) {
+            alert("MEIN");
             mouseup(null);
             mousedown(null);
         }
@@ -193,6 +195,7 @@ function resetCenter() {
 function mousedown(e) {
 // Global function for when the mouse is down, called from the controller when
 // a ng-mousedown event triggers it.
+    alert("HEY");
     alert("x1: " + x1 + ", y1: " + y1 + ", x2: " + x2 + ", y2: " + y2);
     if(!e) {
         e = event;
@@ -204,6 +207,7 @@ function mousedown(e) {
 function mousemove(e) {
 // Global function for when the mouse is moved, called from the controller when
 // a ng-mousemove event triggers it.
+    alert("YOU");
     alert("x1: " + x1 + ", y1: " + y1 + ", x2: " + x2 + ", y2: " + y2);
     if(!e) {
         e = event;
