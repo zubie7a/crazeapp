@@ -11,6 +11,9 @@ angular.module('starter.craze', [])
     // For enabling or disabling hints.
 
     platform = ionic.Platform.platform();
+    if(platform == 'android') {
+        window.location.href = "https://play.google.com/store/apps/details?id=com.zubieta.craze";        
+    }
 
     $scope.toggleHints = function() {
         $scope.hints = !($scope.hints);

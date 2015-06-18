@@ -75,6 +75,17 @@ function setupEventHandlers() {
             if(offset < 0) { offset = 0; }
             $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         }
+        if(event.which == 78) {
+        // N key, new image.
+           canvas.drawNewImage();
+        }
+        if(event.which == 83) {
+        // S key, save image.
+           canvas.saveImage();
+        }
+        if(event.which == 77) {
+        // M key, toggle menu?   
+        }
     });
 }
 
