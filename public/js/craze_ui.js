@@ -32,7 +32,6 @@ function setupEventHandlers() {
     );
     $('#myCanvas').bind('touchstart',
         function(e) {
-            alert("MEIN");
             mouseup(null);
             mousedown(null);
         }
