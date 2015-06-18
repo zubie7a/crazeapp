@@ -574,6 +574,7 @@ function doMouseMove(event) {
         // It will then check which brush is currently selected
         switch (brush) {
             case REGULAR_LINE:
+                fitToGrid();
                 liner();
                 //setSeed(0,0,0,0) means that simply all of the x1,y1,x2,y2 will be set to aX and aY.
                 // this is because at the end of each stroke, the current detected mouse position will
@@ -582,7 +583,6 @@ function doMouseMove(event) {
                 // so drawing a stroke is really about drawing lines between the detected points
                 setSeed(0, 0, 0, 0);
                 //alert("x1: " + x1 + ", y1: " + y1 + ", x2: " + x2 + ", y2: " + y2);
-                fitToGrid();
                 break;
             case LINES_FROM_START:
                 connectable = true;
