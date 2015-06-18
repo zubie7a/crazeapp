@@ -198,7 +198,7 @@ function mousedown(e) {
     }
     if(craze){ killCrazeMode(); }
     doMouseDown(e);
-    alert(e.pageX + " " + e.pageY);
+    //alert(e.pageX + " " + e.pageY);
 }
 
 function mousemove(e) {
@@ -210,7 +210,7 @@ function mousemove(e) {
     if(!craze){
         doMouseMove(e);
     }
-    alert(e.pageX + " " + e.pageY);
+    //alert(e.pageX + " " + e.pageY);
 }
 
 function mouseup(e) {
