@@ -571,7 +571,6 @@ function doMouseMove(event) {
         // The original position of the mouse pointer is stored
         aX = x1 = event.pageX;
         aY = y1 = event.pageY + offset - 42;
-        alert(JSON.stringify(event));
         // It will then check which brush is currently selected
         switch (brush) {
             case REGULAR_LINE:
@@ -581,7 +580,6 @@ function doMouseMove(event) {
                 // be transferred to the old one. when drawing a stroke, the computer doesn't really 
                 // detect all the pixels where the mouse went through, it just detects a handful of points
                 // so drawing a stroke is really about drawing lines between the detected points
-                //alert("x1: " + x1 + ", y1: " + y1 + ", x2: " + y)
                 setSeed(0, 0, 0, 0);
                 break;
             case LINES_FROM_START:
