@@ -571,6 +571,7 @@ function doMouseMove(event) {
         // The original position of the mouse pointer is stored
         aX = x1 = event.pageX;
         aY = y1 = event.pageY + offset - 42;
+        alert(x1 + " " + y1 + " " + x2 + " " + y2);
         // It will then check which brush is currently selected
         switch (brush) {
             case REGULAR_LINE:
