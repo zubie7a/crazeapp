@@ -197,7 +197,7 @@ function mousedown(e) {
     }
     if(craze){ killCrazeMode(); }
     doMouseDown(e);
-    alert(e);
+    alert(JSON.stringify(e));
 }
 
 function mousemove(e) {
@@ -207,7 +207,7 @@ function mousemove(e) {
         e = event;
     }
     if(!craze){
-        doMouseMove(e);
+        doMouseMove(JSON.stringify(e));
     }
     alert(e);
 }
