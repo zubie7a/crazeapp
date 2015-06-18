@@ -196,7 +196,7 @@ angular.module('starter.craze', [])
     setTimeout(function() {
         $scope.variableInitializer();
         $scope.newImage();
-    }, 1500);
+    }, 2000);
 
     $scope.toggleMenu = function() {
         menuOpen = !menuOpen;
