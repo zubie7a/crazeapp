@@ -540,8 +540,8 @@ function bresenhamCircle(xa, ya, xb, yb) {
 }
 
 function doMouseDown(e) {
-    x2 = x1 = event.pageX;
-    y2 = y1 = event.pageY + offset - 42;
+    x2 = x1 = e.pageX;
+    y2 = y1 = e.pageY + offset - 42;
     if(changeCenter) {
         canvas.setCenter(x1, y1);
     }
