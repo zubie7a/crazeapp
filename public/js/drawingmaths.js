@@ -576,8 +576,15 @@ function doMouseMove(event) {
     if (draw) {
         modifier();
         // The original position of the mouse pointer is stored
-        aX = x1 = event.pageX;
-        aY = y1 = event.pageY + offset - 42;
+        if(platform != 'android') {
+            ax = x1 = event.pageX;
+            ay = y1 = event.pageY + offset - 42;
+        }
+        else {
+            var touch = event.touches[0];
+            ax = x1 = touch.pageX;
+            ay = y1 = touch.pageY + offset - 42;
+        }
         // It will then check which brush is currently selected
         switch (brush) {
             case REGULAR_LINE:
