@@ -581,6 +581,8 @@ function doMouseMove(event) {
                 // detect all the pixels where the mouse went through, it just detects a handful of points
                 // so drawing a stroke is really about drawing lines between the detected points
                 setSeed(0, 0, 0, 0);
+                //alert("x1: " + x1 + ", y1: " + y1 + ", x2: " + x2 + ", y2: " + y2);
+                fitToGrid();
                 break;
             case LINES_FROM_START:
                 connectable = true;
