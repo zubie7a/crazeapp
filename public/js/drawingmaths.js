@@ -540,6 +540,7 @@ function bresenhamCircle(xa, ya, xb, yb) {
 }
 
 function doMouseDown(event) {
+    alert('down');
     x2 = x1 = event.pageX;
     y2 = y1 = event.pageY + offset - 42;
     if(changeCenter) {

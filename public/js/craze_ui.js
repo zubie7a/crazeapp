@@ -25,14 +25,12 @@ function setupEventHandlers() {
 // inputs, sliders, or buttons. Thx @febuiles && JQuery <3
     $('#myCanvas').bind('touchmove', 
         function(e) {
-            alert("ITS");
             mousemove(null);
             e.preventDefault();
         }
     );
     $('#myCanvas').bind('touchstart',
         function(e) {
-            mouseup(null);
             mousedown(null);
         }
     );
