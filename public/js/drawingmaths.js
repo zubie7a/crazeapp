@@ -556,6 +556,7 @@ function doMouseDown(event) {
 }
 
 function doMouseUp(event) {
+    alert('up');
     if(changeCenter) {
         changeCenter = false;
     }
@@ -563,6 +564,7 @@ function doMouseUp(event) {
 }
 
 function doMouseMove(event) {
+    alert("move");
     if(changeCenter) {
         return;
     }
@@ -695,9 +697,9 @@ function doMouseMove(event) {
         connectable = false;
     }
     else {
-        if(platform == 'android' || platform == 'ios') {
-            doMouseDown(event);
-        }
+        //if(platform == 'android' || platform == 'ios') {
+        //    doMouseDown(event);
+        //}
     }
 }
 
