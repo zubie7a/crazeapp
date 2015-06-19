@@ -210,12 +210,13 @@ angular.module('starter.craze', [])
 
     $scope.menu = function() {
     // Open the menu modal.
-        $scope.crazemodal.show();
+        //$scope.crazemodal.show();
+        window.location = 'https://zubieta.github.io/z10z';
     }
 
     $scope.close = function() {
     // Close the menu modal.
-        $scope.crazemodal.hide();
+        //$scope.crazemodal.hide();
     }
 
     setTimeout(function() {
