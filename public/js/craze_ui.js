@@ -218,7 +218,15 @@ var CrazeCanvas = function() {
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
         cnv    = document.createElement('canvas');
-        this.drawNewImage();
+        bigdim = Math.max(window.innerHeight, window.innerWidth);
+        canvas.width = bigdim;
+        canvas.height = bigdim;
+        this.clearImage();
+        this.resetCenter();
+        this.resetOffsets();
+        this.resetMargins();
+        cnv.width = canvas.width;
+        cnv.height = canvas.height;
         variableInitializer();
         // Initialize the variables of the application.
         setupEventHandlers();
