@@ -180,12 +180,15 @@ var CrazeCanvas = function() {
         // canvas.id = 'myCanvas';
         // document.getElementById('superDiv').appendChild(canvas);
         canvas = document.getElementById('myCanvas');
+        cnv    = document.createElement('canvas');
         if(platform != 'android' && platform != 'ios') {
             canvas.height = window.innerWidth;
+            cnv.height = canvas.height;
             offset = window.innerHeight / 2;
         }
         else {
             canvas.height = window.innerHeight;
+            cnv.height = canvas.height;
             offset = 0;
         }
         $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
@@ -196,11 +199,6 @@ var CrazeCanvas = function() {
         setupEventHandlers();
         // Set up the handlers for all the DOM events.
         this.drawNewImage();
-
-        cnv    = document.createElement('canvas');
-        cnv.width = canvas.width;
-        cnv.height = canvas.height;
-
     }, 1500);
 }
 
