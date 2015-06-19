@@ -26,7 +26,7 @@ function setupEventHandlers() {
     $('#myCanvas').bind('touchmove', 
         function(e) {
             mousemove(null);
-            e.preventDefault();
+          //  e.preventDefault();
         }
     );
     $('#myCanvas').bind('touchstart',
