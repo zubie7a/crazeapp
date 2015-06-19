@@ -175,7 +175,7 @@ var CrazeCanvas = function() {
         else {
         // Canvas height is bigger than window height, canvas clipped.
             offsetY = (canvas.height - window.innerHeight) / 2;
-            $('#myCanvas').css({'margin-top' : '-' + (offsetY-42) + 'px'});
+            $('#myCanvas').css({'margin-top' : '-' + (offsetY+42) + 'px'});
         }
     }
     this.getCenter = function() {
