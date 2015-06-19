@@ -147,6 +147,7 @@ var CrazeCanvas = function() {
             offsetY = 0;
         }
         $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
+        $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
     }
 
     this.getCenter = function() {
