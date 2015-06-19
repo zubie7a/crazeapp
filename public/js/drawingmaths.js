@@ -540,9 +540,15 @@ function bresenhamCircle(xa, ya, xb, yb) {
 }
 
 function doMouseDown(event) {
-    x2 = x1 = event.pageX;
-    y2 = y1 = event.pageY + offset - 42;
-    if(changeCenter) {
+    if(platform != 'android') {
+        x2 = x1 = event.pageX;
+        y2 = y1 = event.pageY + offset - 42;
+    }
+    else {
+        var touch = event.touches[0];
+        x2 = x1 = touch.pageX;
+        y2 = y1 = touch.pageY + offset - 42;
+    }    if(changeCenter) {
         canvas.setCenter(x1, y1);
     }
     bSize = bSizeTemp;
