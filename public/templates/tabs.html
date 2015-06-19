@@ -16,13 +16,13 @@
                     <td class='half'>
                         <div ng-if='(plat != "android" && plat != "ios")'>
                             <button class='button button-balanced butn' ng-click='saveImage();'>
-                                <strong>Save</strong> Image
+                                <strong>Save</strong> {{getBase64().length}}
                             </button>
                         </div>
                         <div ng-if='(plat == "android" || plat == "ios")'>
                             <a class='button button-balanced butn' id='downloadey' ng-href="{{getBase64()}}" 
                                download='MyCraZeDrawing'>
-                                <strong>Save</strong> Image {{getBase64().length}}
+                                <strong>Save</strong> Image
                             </a>
                         </div>
                     </td>
