@@ -218,11 +218,8 @@ var CrazeCanvas = function() {
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
         cnv    = document.createElement('canvas');
-        bigdim = Math.max(window.innerHeight, window.innerWidth);
         canvas.width = bigdim;
         canvas.height = bigdim;
-        this.clearImage();
-        this.resetCenter();
         if(canvas.width < window.innerWidth) {
         // Canvas width is lesser than window width, white bars.
             offsetX = -(window.innerWidth - canvas.width) / 2;
@@ -257,6 +254,7 @@ var CrazeCanvas = function() {
         }
         cnv.width = canvas.width;
         cnv.height = canvas.height;
+        this.resetCenter();
         variableInitializer();
         // Initialize the variables of the application.
         setupEventHandlers();
