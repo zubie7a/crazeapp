@@ -1,3 +1,5 @@
+var init = false;
+
 angular.module('starter.craze', [])
 
 
@@ -194,8 +196,9 @@ angular.module('starter.craze', [])
     }
 
     setTimeout(function() {
-        if(platform == 'ios') {
+        if(platform == 'ios' && !init) {
             System.alert('Welcome to CraZe!', 'Scroll up this window to hide the URL bar.');
+            init = true;
         }
         $scope.variableInitializer();
         $scope.newImage();
