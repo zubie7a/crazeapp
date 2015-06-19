@@ -83,6 +83,10 @@ angular.module('starter.craze', [])
         });
     }
 
+    $scope.saveImage = function() {
+        System.alert('Save Image', 'Right Click on the image to save it!');
+    }
+
     $scope.crazeMode = function() {
     // Toggle the crazeMode!
         if(canvas) {
