@@ -51,7 +51,7 @@ angular.module('starter.services', ['btford.socket-io'])
             $ionicPopup.prompt({
                 'title' : title,
                 'template' : text,
-                'inputType' : text,
+                'inputType' : 'text',
                 'inputPlaceholder' : placeholder,
                 'okType' : 'button-balanced',
                 'cancelType' : 'button-assertive'
