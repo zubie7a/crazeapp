@@ -99,7 +99,7 @@ angular.module('starter.craze', [])
             )
             $scope.base64 = '';
         }
-        else if(platform == 'android') {
+        else if(platform == 'android' || true) {
             var promptPromise = System.prompt('Filename', 'Enter image\'s name for saving it.', $scope.fname);
             promptPromise.then(
                 function(res) {
