@@ -232,15 +232,17 @@ angular.module('starter.craze', [])
                 else {
                     System.alert('Welcome to CraZe!', 'Have a great time drawing!');
                 }
+                init = true;
             });
         }
-        else {
+        else if(!init){
             System.alert('Welcome to CraZe!', 
                 '<strong>n</strong> : new image, <br/>'+
                 '<strong>s</strong> : save image, <br/>'+
                 '<strong>arrows</strong> : move canvas, <br/>'+
                 '<strong>more keyboard options soon!</strong>. <br/> Have a great time drawing!'
             );
+            init = true;
         }
         $scope.variableInitializer();
         $scope.newImage();
