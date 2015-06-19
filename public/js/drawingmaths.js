@@ -540,15 +540,8 @@ function bresenhamCircle(xa, ya, xb, yb) {
 }
 
 function doMouseDown(event) {
-    if(platform != 'android') {
-        x2 = x1 = event.pageX;
-        y2 = y1 = event.pageY + offset - 42;
-    }
-    else {
-        var touch = event.touches[0];
-        x2 = x1 = touch.pageX;
-        y2 = y1 = touch.pageY + offset - 42;
-    }
+    x2 = x1 = event.pageX;
+    y2 = y1 = event.pageY + offset - 42;
     if(changeCenter) {
         canvas.setCenter(x1, y1);
     }
@@ -570,21 +563,14 @@ function doMouseUp(event) {
 }
 
 function doMouseMove(event) {
-    // if(changeCenter) {
-    //     return;
-    // }
+    if(changeCenter) {
+        return;
+    }
     if (draw) {
         modifier();
         // The original position of the mouse pointer is stored
-        if(platform != 'android') {
-            ax = x1 = event.pageX;
-            ay = y1 = event.pageY + offset - 42;
-        }
-        else {
-            var touch = event.touches[0];
-            ax = x1 = touch.pageX;
-            ay = y1 = touch.pageY + offset - 42;
-        }
+        aX = x1 = event.pageX;
+        aY = y1 = event.pageY + offset - 42;
         // It will then check which brush is currently selected
         switch (brush) {
             case REGULAR_LINE:
@@ -707,11 +693,6 @@ function doMouseMove(event) {
         rotable = false;
         variable = false;
         connectable = false;
-    }
-    else {
-        //if(platform == 'android' || platform == 'ios') {
-        //    doMouseDown(event);
-        //}
     }
 }
 
