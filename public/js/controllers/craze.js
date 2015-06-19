@@ -78,16 +78,17 @@ angular.module('starter.craze', [])
         //    canvas.saveImage();
         //}
         canvas.transcribe(); 
-        var dataUrl = canvas.getCnv().toDataURL("image/jpeg");
+        var dataUrl = canvas.getCnv().toDataURL('image/jpeg');
         return dataUrl;
     }
 
-    $scope.base64 = "";
-    $scope.updateHref = function() {
-    // To update the href of the anchor for downloading.
+    $scope.base64 = '';
+    $scope.fname = 'CrazeAppDrawing';
+    $scope.saveImage = function() {
+    // To update the href of the anchor for downloading or opening image in a new window.
         if(platform == 'ios') {
-            var confirmPromise = System.confirm("Save Image",
-                                 "Image will open in a new tab, touch and hold it to save it.");
+            var confirmPromise = System.confirm('Save Image',
+                                 'Image will open in a new tab, touch and hold it to save it.');
             confirmPromise.then(
                 function(res) {
                     if(res) {
@@ -96,16 +97,22 @@ angular.module('starter.craze', [])
                     $ionicSideMenuDelegate.toggleLeft();
                 }
             )
-            $scope.base64 = "";
+            $scope.base64 = '';
+        }
+        else if(platform == 'android') {
+            var promptPromise = System.prompt('Filename', 'Enter image\'s name for saving it.', $scope.fname);
+            promptPromise.then(
+                function(res) {
+                    if(res) {
+                        $scope.fname = res;
+                        $scope.base64 = $scope.getBase64();
+                    }
+                }
+            );
         }
         else {
             $scope.base64 = $scope.getBase64();
         }
-    }
-
-
-    $scope.saveImage = function() {
-        System.alert('Save Image', 'Right Click on the image to save it!');
     }
 
     $scope.crazeMode = function() {

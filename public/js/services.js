@@ -45,6 +45,20 @@ angular.module('starter.services', ['btford.socket-io'])
                     return false;
                 }
             })
+        },
+        prompt : function(title, message, placeholder) {
+            var text = '<p align=\'center\'>' + message + '</p>';
+            $ionicPopup.prompt({
+                'title' : title,
+                'template' : text,
+                'inputType' : text,
+                'inputPlaceholder' : placeholder,
+                'okType' : 'button-balanced',
+                'cancelType' : 'button-assertive'
+            })
+            .then(function(res) {
+                return res;
+            });
         }
     };
 }])
