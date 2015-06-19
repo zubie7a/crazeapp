@@ -79,7 +79,6 @@ angular.module('starter.craze', [])
         //}
         $scope.base64 = canvas.toDataURL();
         $("#downloadey").click(function() {
-            $scope.base64 = "";
         } );
     }
 
