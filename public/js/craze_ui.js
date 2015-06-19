@@ -1,6 +1,8 @@
-var offset;
+var offsetY;
+var offsetX;
 var menuOpen = false;
 var platform;
+var bigdim = Math.max(window.innerWidth, window.innerHeight);
 
 $(function() {
 // When the document is ready, execute this function.
@@ -60,16 +62,16 @@ function setupEventHandlers() {
         if(event.which == 40) {
         // Going down.
             //if(menuOpen) return;
-            offset += 20;
-            if(offset > window.innerWidth / 2) { offset = window.innerWidth / 2; }
-            $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
+            offsetY += 20;
+            if(offsetY > window.innerWidth / 2) { offsetY = window.innerWidth / 2; }
+            $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
         }
         if(event.which == 38) {
         // Going up.
             //if(menuOpen) return;
-            offset -= 20;
-            if(offset < 0) { offset = 0; }
-            $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
+            offsetY -= 20;
+            if(offsetY < 0) { offsetY = 0; }
+            $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
         }
         if(event.which == 78) {
         // N key, new image.
@@ -138,12 +140,12 @@ var CrazeCanvas = function() {
     this.resetScroll = function() {
     // A function for resetting the scroll.
         if(platform != 'android' && platform != 'ios') {
-            offset = window.innerHeight / 2;
+            offsetY = window.innerHeight / 2;
         }
         else {
-            offset = 0;
+            offsetY = 0;
         }
-        $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
+        $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
     }
 
     this.getCenter = function() {
@@ -175,23 +177,20 @@ var CrazeCanvas = function() {
     // A couple functions for retrieving the dimensions of the canvas.
 
     setTimeout(function() {
-        // canvas = document.createElement('canvas');
-        // canvas.id = 'myCanvas';
-        // document.getElementById('superDiv').appendChild(canvas);
         canvas = document.getElementById('myCanvas');
         cnv    = document.createElement('canvas');
         if(platform != 'android' && platform != 'ios') {
-            canvas.height = window.innerWidth;
+            canvas.height = bigdim;
             cnv.height = canvas.height;
-            offset = window.innerHeight / 2;
+            offsetY = window.innerHeight / 2;
         }
         else {
-            canvas.height = window.innerHeight;
+            canvas.height = bigdim;
             cnv.height = canvas.height;
-            offset = 0;
+            offsetY = 0;
         }
-        $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
-        canvas.width  = window.innerWidth;
+        $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
+        canvas.width  = bigdim;
         cnv.width = canvas.width;
         this.resetCenter();
         variableInitializer();
