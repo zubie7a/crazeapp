@@ -19,9 +19,9 @@
                                 <strong>Save</strong> Image
                             </button>
                         </div>
-                        <div>
+                        <div ng-if='(plat == "android" || plat == "ios")'>
                             <a class='button button-balanced butn' id='downloadey' ng-href="{{getBase64()}}" 
-                               download='MyCraZeDrawing.jpeg'>
+                               download='MyCraZeDrawing'>
                                 <strong>Save</strong> Image
                             </a>
                         </div>
