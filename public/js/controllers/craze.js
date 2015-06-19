@@ -220,8 +220,8 @@ angular.module('starter.craze', [])
 
     setTimeout(function() {
         if(platform == 'ios' && !init) {
-            System.alert('Welcome to CraZe!', 'Scroll up the banner to hide the URL bar. Have a great time drawing!');
             init = true;
+            System.alert('Welcome to CraZe!', 'Scroll up the banner to hide the URL bar. Have a great time drawing!');
         }
         else if(platform == 'android' && !init) {
             init = true;
@@ -236,13 +236,13 @@ angular.module('starter.craze', [])
             });
         }
         else if(!init){
+            init = true;
             System.alert('Welcome to CraZe!', 
                 '<strong>n</strong> : new image, <br/>'+
                 '<strong>s</strong> : save image, <br/>'+
                 '<strong>arrows</strong> : move canvas, <br/>'+
                 '<strong>more keyboard options soon!</strong>. <br/> Have a great time drawing!'
             );
-            init = true;
         }
         $scope.variableInitializer();
         $scope.newImage();
