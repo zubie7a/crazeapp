@@ -78,9 +78,6 @@ angular.module('starter.craze', [])
         //    canvas.saveImage();
         //}
         $scope.base64 = canvas.toDataURL();
-        $("#downloadey").click(function() {
-            System.alert(document.getElementById('downloadey').innerHTML);
-        } );
     }
 
     $scope.crazeMode = function() {
