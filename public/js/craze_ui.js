@@ -128,7 +128,7 @@ var CrazeCanvas = function() {
         killCrazeMode();
         this.clearImage();
         this.resetCenter();
-        this.resetOffsets():
+        this.resetOffsets();
         this.resetMargins();
     }
 
