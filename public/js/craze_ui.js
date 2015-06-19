@@ -178,7 +178,6 @@ var CrazeCanvas = function() {
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
         cnv    = document.createElement('canvas');
-        var bigdim = Math.max(window.innerWidth, window.innerHeight);
         if(platform != 'android' && platform != 'ios') {
             canvas.height = window.innerWidth;
             cnv.height = canvas.height;
