@@ -92,11 +92,6 @@ var CrazeCanvas = function() {
     var canvas;
     var cnv;
 
-    this.getCnv = function() {
-    // Get the copy canvas in JPEG
-        return cnv;
-    }
-
     this.setStrokeColor = function(color) {
     // A function for setting the stroke color.
         this.getContext().strokeStyle = color;
@@ -168,6 +163,11 @@ var CrazeCanvas = function() {
     this.transcribe = function() {
         var cnvCtx = cnv.getContext('2d');
         cnvCtx.drawImage(canvas, 0, 0);
+    }
+
+    this.getCnv = function() {
+    // Get the copy canvas in JPEG
+        return cnv;
     }
 
     this.width  = function() { return canvas.width;  }
