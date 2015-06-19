@@ -61,13 +61,15 @@ function setupEventHandlers() {
         // Going down.
             //if(menuOpen) return;
             offset += 20;
-            if(offset > canvas.height) { offset = canvas.height; }
+            alert(offset);
+            if(offset > canvas.height / 2) { offset = canvas.height / 2; }
             $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         }
         if(event.which == 38) {
         // Going up.
             //if(menuOpen) return;
             offset -= 20;
+            alert(offset);
             if(offset < 0) { offset = 0; }
             $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         }
