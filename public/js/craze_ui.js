@@ -183,15 +183,20 @@ var CrazeCanvas = function() {
             canvas.height = bigdim;
             cnv.height = canvas.height;
             offsetY = (canvas.height - window.innerHeight) / 2;
+            canvas.width  = bigdim;
+            cnv.width = canvas.width;
+            offsetX = (canvas.width - window.innerWidth) / 2;
         }
         else {
             canvas.height = bigdim;
             cnv.height = canvas.height;
-            offsetY = 0;
+            offsetY = (canvas.height - window.innerHeight) / 2;
+            canvas.width  = bigdim;
+            cnv.width = canvas.width;
+            offsetX = (canvas.width - window.innerWidth) / 2;
         }
         $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
-        canvas.width  = bigdim;
-        cnv.width = canvas.width;
+        $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
         this.resetCenter();
         variableInitializer();
         // Initialize the variables of the application.
