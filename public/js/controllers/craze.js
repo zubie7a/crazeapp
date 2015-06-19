@@ -82,7 +82,7 @@ angular.module('starter.craze', [])
         setTimeout(function() {
             var dataUrl = canvas.getCnv().toDataURL("image/jpeg");
             System.alert("Hey", dataUrl.substring(0, 20));
-        }, 2000);
+        }, 100);
         // var dataUrl = canvas.getCnv.toDataURL("image/jpeg");
         // System.alert("Hey", dataUrl.substring(0, 20));
         //return canvas.toDataURL("image/jpeg");
