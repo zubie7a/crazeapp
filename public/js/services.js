@@ -22,7 +22,8 @@ angular.module('starter.services', ['btford.socket-io'])
             var text = '<p align=\'center\'>' + message + '</p>';
             var alertPopup = $ionicPopup.alert({
                 'title' : title,
-                'template' : text
+                'template' : text,
+                'type' : 'button-energized'
             });
             alertPopup.then(function(res) {
             });
