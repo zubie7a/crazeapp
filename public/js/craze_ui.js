@@ -213,6 +213,8 @@ var CrazeCanvas = function() {
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
         cnv    = document.createElement('canvas');
+        canvas.width = bigdim;
+        canvas.height = bigdim;
         if(canvas.width < window.innerWidth) {
         // Canvas width is lesser than window width, white bars.
             offsetX = -(window.innerWidth - canvas.width) / 2;
