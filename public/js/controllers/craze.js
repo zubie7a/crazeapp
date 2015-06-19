@@ -77,7 +77,7 @@ angular.module('starter.craze', [])
         //if(canvas) {
         //    canvas.saveImage();
         //}
-        return canvas.toDataURL();
+        return canvas.toDataURL("image/jpeg", 0.5);
     }
 
     $scope.crazeMode = function() {
