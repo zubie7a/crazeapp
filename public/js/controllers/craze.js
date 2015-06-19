@@ -72,22 +72,22 @@ angular.module('starter.craze', [])
         }
     }
 
-    $scope.base64 = "";
-    $scope.ayy = "LOL.com";
-    $scope.heh = function() {
-        $scope.ayy = "MEH.com";
-    }
     $scope.getBase64 = function() {
     // Save the canvas. We may need to rework this later for saving into a device.
         //if(canvas) {
         //    canvas.saveImage();
         //}
         canvas.transcribe(); 
-        setTimeout(function() {
-            var dataUrl = canvas.getCnv().toDataURL("image/jpeg");
-            return dataUrl;
-        }, 100);
+        var dataUrl = canvas.getCnv().toDataURL("image/jpeg");
+        return dataUrl;
     }
+
+    $scope.base64 = "";
+    $scope.updateHref = function() {
+    // To update the href of the anchor for downloading.
+        $scope.base64 = $scope.getBase64();
+    }
+
 
     $scope.saveImage = function() {
         System.alert('Save Image', 'Right Click on the image to save it!');
