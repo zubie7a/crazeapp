@@ -78,7 +78,7 @@ angular.module('starter.craze', [])
         //    canvas.saveImage();
         //}
         $scope.base64 = canvas.toDataURL();
-        $("#downloadey").click(function() { return true; } );
+        document.getElementById('downloadey').click();
     }
 
     $scope.crazeMode = function() {
