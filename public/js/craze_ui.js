@@ -200,8 +200,8 @@ var CrazeCanvas = function() {
             //cnv.width = canvas.width;
             //offsetX = (canvas.width - window.innerWidth) / 2;
         }
-        $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
-        $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
+        if(offsetY) $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
+        if(offsetX) $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
         this.resetCenter();
         variableInitializer();
         // Initialize the variables of the application.
