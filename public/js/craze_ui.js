@@ -144,7 +144,8 @@ var CrazeCanvas = function() {
             offsetX = (canvas.width - window.innerWidth) / 2;
         }
         else {
-            offsetY = 0;
+            offsetY = (canvas.height - window.innerHeight) / 2;
+            offsetX = (canvas.width - window.innerWidth) / 2;
         }
         $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
         $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
@@ -193,14 +194,11 @@ var CrazeCanvas = function() {
         else {
             canvas.height = bigdim;
             cnv.height = canvas.height;
-            offsetY = 0;
-            offsetX = 0;
+            offsetY = (canvas.height - window.innerHeight) / 2;
+            
             canvas.width  = bigdim;
             cnv.width = canvas.width;
-            //offsetY = (canvas.height - window.innerHeight) / 2;
-            //canvas.width  = bigdim;
-            //cnv.width = canvas.width;
-            //offsetX = (canvas.width - window.innerWidth) / 2;
+            offsetX = (canvas.width - window.innerWidth) / 2;
         }
         $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
         $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
