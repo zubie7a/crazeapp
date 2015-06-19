@@ -78,7 +78,9 @@ angular.module('starter.craze', [])
         //    canvas.saveImage();
         //}
         $scope.base64 = canvas.toDataURL();
-        document.getElementById('downloadey').click();
+        setTimeout(function() {
+            document.getElementById('downloadey').click();
+        }, 1000);
     }
 
     $scope.crazeMode = function() {
