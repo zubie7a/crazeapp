@@ -129,10 +129,10 @@ var CrazeCanvas = function() {
         this.getContext().fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    this.saveImage = function(){
+    this.saveImage = function(dataUrl){
     // A function to save the current image
         killCrazeMode();
-        window.open(canvas.toDataURL());
+        window.open(dataUrl);
     }
 
     this.resetScroll = function() {
