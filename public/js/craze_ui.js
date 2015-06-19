@@ -165,8 +165,9 @@ var CrazeCanvas = function() {
 
     setTimeout(function() {
         canvas = document.createElement('canvas');
-        canvas.id = 'myCanvas'
-        // canvas = document.getElementById('myCanvas');
+        canvas.id = 'myCanvas';
+        document.getElementById('superDiv').appendChild(canvas);
+        canvas = document.getElementById('myCanvas');
         if(platform != 'android' && platform != 'ios') {
             canvas.height = window.innerWidth;
             offset = window.innerHeight / 2;
@@ -183,7 +184,6 @@ var CrazeCanvas = function() {
         setupEventHandlers();
         // Set up the handlers for all the DOM events.
         this.drawNewImage();
-        document.getElementById('superDiv').appendChild(canvas);
     }, 1500);
 }
 
