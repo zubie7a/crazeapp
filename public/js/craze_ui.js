@@ -167,8 +167,8 @@ var CrazeCanvas = function() {
         canvas = document.getElementById('myCanvas');
         if(platform != 'android' && platform != 'ios') {
             canvas.height = window.innerWidth / 2;
-            $('#myCanvas').css({'width' : '200%'});
-            $('#myCanvas').css({'height' : '200%'});
+            //$('#myCanvas').css({'width' : '200%'});
+            //$('#myCanvas').css({'height' : '200%'});
             offset = window.innerHeight / 2;
             canvas.width  = window.innerWidth / 2;
         }
