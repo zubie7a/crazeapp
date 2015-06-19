@@ -167,7 +167,7 @@ var CrazeCanvas = function() {
         var canvas = document.createElement('canvas');
         canvas.id = 'myCanvas'
         // canvas = document.getElementById('myCanvas');
-        document.getElementById('superDiv') = canvas;
+        document.getElementById('superDiv').appendChild(canvas);
         if(platform != 'android' && platform != 'ios') {
             canvas.height = window.innerWidth;
             offset = window.innerHeight / 2;
