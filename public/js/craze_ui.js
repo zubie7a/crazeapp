@@ -170,7 +170,7 @@ var CrazeCanvas = function() {
         if(canvas.height < window.innerHeight) {
         // Canvas height is lesser than window height, white bars.
             offsetY = -(window.innerHeight - canvas.height) / 2;
-            $('#myCanvas').css({'margin-top' : Math.abs(offsetY) + 'px'});
+            $('#myCanvas').css({'margin-top' : Math.abs(offsetY - 21) + 'px'});
         }
         else {
         // Canvas height is bigger than window height, canvas clipped.
