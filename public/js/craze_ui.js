@@ -178,7 +178,6 @@ var CrazeCanvas = function() {
             canvas.width  = window.innerWidth;
         }
         $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
-        canvas.width  = window.innerWidth;
         this.resetCenter();
         variableInitializer();
         // Initialize the variables of the application.
