@@ -243,10 +243,10 @@ angular.module('starter.craze', [])
         else if(!init){
             init = true;
             System.alert('Welcome to CraZe!', 
-                '<strong>n</strong> : new image, <br/>'+
-                '<strong>s</strong> : save image, <br/>'+
-                '<strong>arrows</strong> : move canvas, <br/>'+
-                '<strong>more keyboard options soon!</strong>. <br/> Have a great time drawing!'
+                '<strong>n</strong> : new image,<br/>'+
+                '<strong>s</strong> : save image,<br/>'+
+                '<strong>arrows</strong> : move canvas.<br/>'+
+                '<strong>more keyboard options soon!</strong><br/> Have a great time drawing!'
             );
         }
         $scope.variableInitializer();
