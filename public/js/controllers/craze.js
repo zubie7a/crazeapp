@@ -14,9 +14,6 @@ angular.module('starter.craze', [])
 
     platform = ionic.Platform.platform();
     $scope.plat = platform;
-    if(platform == 'android') {
-        //window.location.href = "https://play.google.com/store/apps/details?id=com.zubieta.craze";        
-    }
 
     $scope.toggleHints = function() {
         $scope.hints = !($scope.hints);
@@ -226,6 +223,25 @@ angular.module('starter.craze', [])
             System.alert('Welcome to CraZe!', 'Scroll up the banner to hide the URL bar. Have a great time drawing!');
             init = true;
         }
+        else if(platform == 'android' && !init) {
+            System.confirm('Welcome to CraZe!', 'Do you want to go to the Play Store for the app version?')
+            .then(function(res) {
+                if(res) {
+                   window.location.href = "https://play.google.com/store/apps/details?id=com.zubieta.craze";        
+                }
+                else {
+                    System.alert('Welcome to CraZe!', 'Have a great time drawing!');
+                }
+            });
+        }
+        else {
+            System.alert('Welcome to CraZe!', 
+                '<strong>n</strong> : new image, <br/>'+
+                '<strong>s</strong> : save image, <br/>'+
+                '<strong>arrows</strong> : move canvas, <br/>'+
+                '<strong>more keyboard options to come soon!</strong>. Have a great time drawing!'
+            );
+        }
         $scope.variableInitializer();
         $scope.newImage();
     }, 2000);
@@ -278,7 +294,7 @@ angular.module('starter.craze', [])
 
     $scope.changeCenter = function() {
         changeCenter = true;
-        System.alert("Please click on the new center's location!");
+        System.alert('Change Center', 'Please click on the new center\'s location!');
         $ionicSideMenuDelegate.toggleLeft();
         menuOpen = false;
     }
