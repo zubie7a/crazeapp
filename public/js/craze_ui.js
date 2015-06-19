@@ -61,6 +61,7 @@ function setupEventHandlers() {
     $(window).resize(function() {
         //resize just happened, pixels changed
         canvas.resetOffsets();
+        canvas.resetMargins();
     });
 
     $(document).keydown(function(event) {
