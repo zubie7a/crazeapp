@@ -239,7 +239,7 @@ angular.module('starter.craze', [])
                 '<strong>n</strong> : new image, <br/>'+
                 '<strong>s</strong> : save image, <br/>'+
                 '<strong>arrows</strong> : move canvas, <br/>'+
-                '<strong>more keyboard options to come soon!</strong>. Have a great time drawing!'
+                '<strong>more keyboard options soon!</strong>. <br/> Have a great time drawing!'
             );
         }
         $scope.variableInitializer();
