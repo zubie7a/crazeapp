@@ -169,7 +169,7 @@ var CrazeCanvas = function() {
             canvas.height = window.innerWidth / 2;
             //$('#myCanvas').css({'width' : '200%'});
             //$('#myCanvas').css({'height' : '200%'});
-            offset = window.innerHeight / 2;
+            offset = window.innerHeight / 4;
             canvas.width  = window.innerWidth / 2;
         }
         else {
