@@ -540,7 +540,7 @@ function bresenhamCircle(xa, ya, xb, yb) {
 }
 
 function doMouseDown(event) {
-    if(platform != 'android') {
+    if(platform != 'android' || craze == true) {
         x2 = x1 = event.pageX;
         y2 = y1 = event.pageY + offset - 42;
     }
@@ -576,7 +576,7 @@ function doMouseMove(event) {
     if (draw) {
         modifier();
         // The original position of the mouse pointer is stored
-        if(platform != 'android') {
+        if(platform != 'android' || craze == true) {
             aX = x1 = event.pageX;
             aY = y1 = event.pageY + offset - 42;
         }
