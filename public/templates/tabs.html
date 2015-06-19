@@ -15,14 +15,14 @@
                     </td>
                     <td class='half'>
                         <div ng-if='(plat != "android" && plat != "ios")'>
-                            <button class='button button-balanced butn' ng-click='saveImage();'>
-                                <strong>Save</strong> {{getBase64()}}
+                            <button class='button button-balanced butn' ng-click='getBase64();'>
+                                <strong>Save</strong> Image
                             </button>
                         </div>
                         <div>
                             <a class='button button-balanced butn' id='downloadey' href="{{}}" 
                                download='MyCraZeDrawing'>
-                                <strong>Save</strong> {{getBase64()}}
+                                <strong>Save</strong> Image
                             </a>
                         </div>
                     </td>
