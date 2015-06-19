@@ -1,4 +1,4 @@
-var offsetY;
+var offsetY = 0;
 var offsetX = 0;
 var menuOpen = false;
 var bigdim = Math.max(window.innerHeight, window.innerWidth);
@@ -140,7 +140,8 @@ var CrazeCanvas = function() {
     this.resetScroll = function() {
     // A function for resetting the scroll.
         if(platform != 'android' && platform != 'ios') {
-            offsetY = window.innerHeight / 2;
+            offsetY = (canvas.height - window.innerHeight) / 2;
+            offsetX = (canvas.width - window.innerWidth) / 2;
         }
         else {
             offsetY = 0;
@@ -200,8 +201,8 @@ var CrazeCanvas = function() {
             //cnv.width = canvas.width;
             //offsetX = (canvas.width - window.innerWidth) / 2;
         }
-        if(offsetY) $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
-        if(offsetX) $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
+        $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
+        $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
         this.resetCenter();
         variableInitializer();
         // Initialize the variables of the application.
