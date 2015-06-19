@@ -543,20 +543,11 @@ function doMouseDown(event) {
     if(platform != 'android') {
         x2 = x1 = event.pageX;
         y2 = y1 = event.pageY + offset - 42;
-        x2 /= 2;
-        x1 /= 2;
-        y2 /= 2;
-        y1 /= 2;
     }
     else {
         var touch = event.touches[0];
         x2 = x1 = touch.pageX;
         y2 = y1 = touch.pageY + offset - 42;
-        x2 /= 2;
-        x1 /= 2;
-        y2 /= 2;
-        y1 /= 2;
-
     }
     if(changeCenter) {
         canvas.setCenter(x1, y1);
@@ -593,12 +584,7 @@ function doMouseMove(event) {
             var touch = event.touches[0];
             aX = x1 = touch.pageX;
             aY = y1 = touch.pageY + offset - 42;
-        }
-        aX /= 2;
-        x1 /= 2;
-        aY /= 2;
-        y1 /= 2;
-        // It will then check which brush is currently selected
+        }        // It will then check which brush is currently selected
         switch (brush) {
             case REGULAR_LINE:
                 fitToGrid();
