@@ -60,26 +60,7 @@ function setupEventHandlers() {
 
     $(window).resize(function() {
         //resize just happened, pixels changed
-        if(platform != 'android' && platform != 'ios') {
-            canvas.height = bigdim;
-            cnv.height = canvas.height;
-            offsetY = (canvas.height - window.innerHeight) / 2;
-
-            canvas.width  = bigdim;
-            cnv.width = canvas.width;
-            offsetX = (canvas.width - window.innerWidth) / 2;
-        }
-        else {
-            canvas.height = bigdim;
-            cnv.height = canvas.height;
-            offsetY = (canvas.height - window.innerHeight) / 2;
-            
-            canvas.width  = bigdim;
-            cnv.width = canvas.width;
-            offsetX = (canvas.width - window.innerWidth) / 2;
-        }
-        $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
-        $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
+        canvas.resetSize();
     });
 
     $(document).keydown(function(event) {
@@ -169,6 +150,29 @@ var CrazeCanvas = function() {
         }
         else {
             offsetY = (canvas.height - window.innerHeight) / 2;
+            offsetX = (canvas.width - window.innerWidth) / 2;
+        }
+        $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
+        $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
+    }
+
+    this.resetSize = function() {
+        if(platform != 'android' && platform != 'ios') {
+            canvas.height = bigdim;
+            cnv.height = canvas.height;
+            offsetY = (canvas.height - window.innerHeight) / 2;
+
+            canvas.width  = bigdim;
+            cnv.width = canvas.width;
+            offsetX = (canvas.width - window.innerWidth) / 2;
+        }
+        else {
+            canvas.height = bigdim;
+            cnv.height = canvas.height;
+            offsetY = (canvas.height - window.innerHeight) / 2;
+            
+            canvas.width  = bigdim;
+            cnv.width = canvas.width;
             offsetX = (canvas.width - window.innerWidth) / 2;
         }
         $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
