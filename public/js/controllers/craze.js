@@ -73,6 +73,10 @@ angular.module('starter.craze', [])
     }
 
     $scope.base64 = "";
+    $scope.ayy = "LOL";
+    $scope.heh = function() {
+        $scope.ayy = "MEH";
+    }
     $scope.getBase64 = function() {
     // Save the canvas. We may need to rework this later for saving into a device.
         //if(canvas) {
@@ -81,11 +85,8 @@ angular.module('starter.craze', [])
         canvas.transcribe(); 
         setTimeout(function() {
             var dataUrl = canvas.getCnv().toDataURL("image/jpeg");
-            System.alert("Hey", dataUrl.substring(0, 20));
+            return dataUrl;
         }, 100);
-        // var dataUrl = canvas.getCnv.toDataURL("image/jpeg");
-        // System.alert("Hey", dataUrl.substring(0, 20));
-        //return canvas.toDataURL("image/jpeg");
     }
 
     $scope.saveImage = function() {
