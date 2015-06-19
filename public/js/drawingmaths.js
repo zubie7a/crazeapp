@@ -541,12 +541,12 @@ function bresenhamCircle(xa, ya, xb, yb) {
 
 function doMouseDown(event) {
     if(platform != 'android' || craze == true) {
-        x2 = x1 = event.pageX + offsetX;
+        x2 = x1 = event.pageX - offsetX;
         y2 = y1 = event.pageY + offsetY - 42;
     }
     else {
         var touch = event.touches[0];
-        x2 = x1 = touch.pageX + offsetX;
+        x2 = x1 = touch.pageX - offsetX;
         y2 = y1 = touch.pageY + offsetY - 42;
     }
     if(changeCenter) {
