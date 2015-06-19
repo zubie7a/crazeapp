@@ -180,17 +180,17 @@ var CrazeCanvas = function() {
         canvas = document.getElementById('myCanvas');
         cnv    = document.createElement('canvas');
         if(platform != 'android' && platform != 'ios') {
-            canvas.height = 300;
+            canvas.height = bigdim;
             cnv.height = canvas.height;
             offsetY = -(window.innerHeight) / 2;
         }
         else {
-            canvas.height = 300;
+            canvas.height = bigdim;
             cnv.height = canvas.height;
             offsetY = 0;
         }
-        $('#myCanvas').css({'margin-top' : offsetY + 'px'});
-        canvas.width  = 300;
+        $('#myCanvas').css({'margin-top' : '-' + Math.abs(offsetY) + 'px'});
+        canvas.width  = bigdim;
         cnv.width = canvas.width;
         this.resetCenter();
         variableInitializer();
