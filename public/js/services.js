@@ -23,7 +23,7 @@ angular.module('starter.services', ['btford.socket-io'])
             var alertPopup = $ionicPopup.alert({
                 'title' : title,
                 'template' : text,
-                'okType' : 'button-energized'
+                'okType' : 'button-balanced'
             });
             alertPopup.then(function(res) {
             });
