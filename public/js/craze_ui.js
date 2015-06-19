@@ -183,7 +183,6 @@ var CrazeCanvas = function() {
         cnv    = document.createElement('canvas');
         if(platform != 'android' && platform != 'ios') {
             canvas.height = window.innerWidth;
-            cnv.height = canvas.height;
             offset = window.innerHeight / 2;
         }
         else {
@@ -193,6 +192,7 @@ var CrazeCanvas = function() {
         }
         $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         canvas.width  = window.innerWidth;
+        cnv.width = canvas.width;
         this.resetCenter();
         variableInitializer();
         // Initialize the variables of the application.
