@@ -189,7 +189,7 @@ var CrazeCanvas = function() {
             cnv.height = canvas.height;
             offsetY = 0;
         }
-        $('#myCanvas').css({'margin-top' : '-' + Math.abs(offsetY) + 'px'});
+        $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
         canvas.width  = bigdim;
         cnv.width = canvas.width;
         this.resetCenter();
