@@ -223,8 +223,38 @@ var CrazeCanvas = function() {
         canvas.height = bigdim;
         this.clearImage();
         this.resetCenter();
-        this.resetOffsets();
-        this.resetMargins();
+        if(canvas.width < window.innerWidth) {
+        // Canvas width is lesser than window width, white bars.
+            offsetX = -(window.innerWidth - canvas.width) / 2;
+        }
+        else {
+        // Canvas with is bigger than window width, canvas clipped.
+            offsetX = (canvas.width - window.innerWidth) / 2;
+        }
+        if(canvas.height < window.innerHeight) {
+        // Canvas height is lesser than window height, white bars.
+            offsetY = -(window.innerHeight - canvas.height) / 2;
+        }
+        else {
+        // Canvas height is bigger than window height, canvas clipped.
+            offsetY = (canvas.height - window.innerHeight) / 2;
+        }
+        if(canvas.width < window.innerWidth) {
+        // Canvas width is lesser than window width, white bars.
+            $('#myCanvas').css({'margin-left' : Math.abs(offsetX) + 'px'});
+        }
+        else {
+        // Canvas with is bigger than window width, canvas clipped.
+            $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
+        }
+        if(canvas.height < window.innerHeight) {
+        // Canvas height is lesser than window height, white bars.
+            $('#myCanvas').css({'margin-top' : Math.abs(offsetY) - 21 + 'px'});
+        }
+        else {
+        // Canvas height is bigger than window height, canvas clipped.
+            $('#myCanvas').css({'margin-top' : '-' + (offsetY + 21) + 'px'});
+        }
         cnv.width = canvas.width;
         cnv.height = canvas.height;
         variableInitializer();
