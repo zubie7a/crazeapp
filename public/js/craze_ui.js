@@ -166,12 +166,16 @@ var CrazeCanvas = function() {
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
         if(platform != 'android' && platform != 'ios') {
-            canvas.height = window.innerWidth;
+            canvas.height = window.innerWidth / 2;
+            $('#myCanvas').css({'width' : '200%'});
+            $('#myCanvas').css({'height' : '200%'});
             offset = window.innerHeight / 2;
+            canvas.width  = window.innerWidth / 2;
         }
         else {
             canvas.height = window.innerHeight;
             offset = 0;
+            canvas.width  = window.innerWidth;
         }
         $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         canvas.width  = window.innerWidth;
