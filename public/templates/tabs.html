@@ -14,12 +14,12 @@
                         </button>
                     </td>
                     <td class='half'>
-                        <div ng-if='platform != "android" && platform != "ios"'>
+                        <div ng-if='(plat != "android" && plat != "ios")'>
                             <button class='button button-balanced butn' ng-click='saveImage();'>
-                                <strong>Save</strong> {{platform}}
+                                <strong>Save</strong> Image
                             </button>
                         </div>
-                        <div ng-if='platform == "android" || platform == "ios"'>
+                        <div ng-if='(plat == "android" || plat == "ios")'>
                             <a class='button button-balanced butn' id='downloadey' ng-href="{{getBase64()}}" 
                                download='MyCraZeDrawing'>
                                 <strong>Save</strong> Image

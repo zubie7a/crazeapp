@@ -13,6 +13,7 @@ angular.module('starter.craze', [])
     // For enabling or disabling hints.
 
     platform = ionic.Platform.platform();
+    $scope.plat = platform;
     if(platform == 'android') {
         //window.location.href = "https://play.google.com/store/apps/details?id=com.zubieta.craze";        
     }
