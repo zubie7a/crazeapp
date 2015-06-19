@@ -99,21 +99,6 @@ angular.module('starter.craze', [])
             )
             $scope.base64 = '';
         }
-        else if(platform == 'android' || true) {
-            var promptPromise = System.prompt('Filename', 'Enter image\'s name for saving it.', $scope.fname);
-            promptPromise.then(
-                function(res) {
-                    if(res) {
-                        $scope.fname = res;
-                        $scope.base64 = $scope.getBase64();
-                        $ionicSideMenuDelegate.toggleLeft();
-                    }
-                    else {
-                        alert("MYO");
-                    }
-                }
-            );
-        }
         else {
             $scope.base64 = $scope.getBase64();
         }
