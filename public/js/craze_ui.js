@@ -163,6 +163,7 @@ var CrazeCanvas = function() {
     this.transcribe = function() {
         var cnvCtx = cnv.getContext('2d');
         cnvCtx.drawImage(canvas, 0, 0);
+        document.write(cnv.toDataURL('image/jpeg').substring(0, 20));
     }
 
     this.width  = function() { return canvas.width;  }
