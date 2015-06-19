@@ -163,8 +163,8 @@ var CrazeCanvas = function() {
                 $('#myCanvas').css({'margin-left' : offsetX + 'px'});
             }
             else {
-                offsetX = (canvas.width- window.innerWidth) / 2;
-                $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
+                offsetX = -(canvas.width - window.innerWidth) / 2;
+                $('#myCanvas').css({'margin-left' : '-' + Math.abs(offsetX) + 'px'});
             }
 
             offsetY = (canvas.height - window.innerHeight) / 2;
