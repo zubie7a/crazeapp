@@ -170,15 +170,14 @@ var CrazeCanvas = function() {
         if(canvas.height < window.innerHeight) {
         // Canvas height is lesser than window height, white bars.
             offsetY = -(window.innerHeight - canvas.height) / 2;
-            $('#myCanvas').css({'margin-top' : Math.abs(offsetY) + 'px'});
+            $('#myCanvas').css({'margin-top' : Math.abs(offsetY - 42) + 'px'});
         }
         else {
         // Canvas height is bigger than window height, canvas clipped.
             offsetY = (canvas.height - window.innerHeight) / 2;
-            $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
+            $('#myCanvas').css({'margin-top' : '-' + offsetY - 42 + 'px'});
         }
     }
-
     this.getCenter = function() {
     // A function for retrieving the current center of the canvas
         return {
