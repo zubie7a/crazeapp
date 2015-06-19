@@ -163,11 +163,12 @@ var CrazeCanvas = function() {
     this.height = function() { return canvas.height; }
     // A couple functions for retrieving the dimensions of the canvas.
 
+    canvas = document.createElement('canvas');
+    canvas.id = 'myCanvas';
+    document.getElementById('superDiv').appendChild(canvas);
+    canvas = document.getElementById('myCanvas');
+
     setTimeout(function() {
-        canvas = document.createElement('canvas');
-        canvas.id = 'myCanvas';
-        document.getElementById('superDiv').appendChild(canvas);
-        canvas = document.getElementById('myCanvas');
         if(platform != 'android' && platform != 'ios') {
             canvas.height = window.innerWidth;
             offset = window.innerHeight / 2;
