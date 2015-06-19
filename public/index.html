@@ -11,6 +11,22 @@
       <title>CraZe</title>
       <!-- Links CSS-->
 
+  <script>
+            var ccc = document.createElement('canvas');
+            ccc.width = 12000;
+            ccc.height = 12000;
+            var dataUrl = ccc.toDataURL("image/jpeg");
+            var serialized = dataUrl.split(",")[1];
+            var status, message;
+            if (serialized.length) {
+                status = 'PASS'
+            } else {
+                status = 'FAILED'
+            }
+            message = dataUrl.length + "<br/ > <a href='" + dataUrl + "' download>" + status + "</h1>" + dataUrl.substring(0, 100);
+            document.write(message);
+      </script>
+      
       <script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
       <script src="js/craze.js" type="text/javascript"></script>
       <script src="js/craze_ui.js" type="text/javascript"></script>
