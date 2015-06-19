@@ -96,6 +96,10 @@ var CrazeCanvas = function() {
         this.getContext().strokeStyle = color;
     }
 
+    this.toDataURL = function() {
+        return canvas.toDataURL();
+    }
+
     this.getStrokeColor = function() {
     // For getting the current stroke color.
         return this.getContext().strokeStyle;
