@@ -72,15 +72,12 @@ angular.module('starter.craze', [])
     }
 
     $scope.base64 = "";
-    $scope.saveImage = function() {
+    $scope.getBase64 = function() {
     // Save the canvas. We may need to rework this later for saving into a device.
         //if(canvas) {
         //    canvas.saveImage();
         //}
-        $scope.base64 = canvas.toDataURL();
-        setTimeout(function() {
-            canvas.saveImage();
-        }, 1000);
+        return canvas.toDataURL();
     }
 
     $scope.crazeMode = function() {
