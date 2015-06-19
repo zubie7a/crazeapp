@@ -209,6 +209,7 @@ angular.module('starter.craze', [])
             System.alert('Welcome to CraZe!', 'Scroll up the banner to hide the URL bar. Have a great time drawing!');
             init = true;
         }
+        System.alert(platform);
         $scope.variableInitializer();
         $scope.newImage();
     }, 2000);
