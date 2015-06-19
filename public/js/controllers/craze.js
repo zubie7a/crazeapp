@@ -224,6 +224,7 @@ angular.module('starter.craze', [])
             init = true;
         }
         else if(platform == 'android' && !init) {
+            init = true;
             System.confirm('Welcome to CraZe!', 'Do you want to go to the Play Store for the app version?')
             .then(function(res) {
                 if(res) {
@@ -232,7 +233,6 @@ angular.module('starter.craze', [])
                 else {
                     System.alert('Welcome to CraZe!', 'Have a great time drawing!');
                 }
-                init = true;
             });
         }
         else if(!init){
