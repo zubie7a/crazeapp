@@ -127,10 +127,15 @@ var CrazeCanvas = function() {
     this.drawNewImage = function() {
     // A function for cleaning the slate and also stop the Craze Mode.
         killCrazeMode();
+        Math.max(window.innerHeight, window.innerWidth);
+        canvas.width = bigdim;
+        canvas.height = bigdim;
         this.clearImage();
         this.resetCenter();
         this.resetOffsets();
         this.resetMargins();
+        cnv.width = canvas.width;
+        cnv.height = canvas.height;
     }
 
     this.clearImage = function() {
