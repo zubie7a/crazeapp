@@ -73,9 +73,10 @@ angular.module('starter.craze', [])
 
     $scope.saveImage = function() {
     // Save the canvas. We may need to rework this later for saving into a device.
-        if(canvas) {
-            canvas.saveImage();
-        }
+        //if(canvas) {
+        //    canvas.saveImage();
+        //}
+        alert(canvas.toDataUrl());
     }
 
     $scope.crazeMode = function() {
