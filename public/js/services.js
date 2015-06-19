@@ -57,7 +57,7 @@ angular.module('starter.services', ['btford.socket-io'])
                 'cancelType' : 'button-assertive'
             })
             .then(function(res) {
-                return res;
+                return res || "";
             });
         }
     };
