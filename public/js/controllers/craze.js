@@ -78,26 +78,7 @@ angular.module('starter.craze', [])
         //if(canvas) {
         //    canvas.saveImage();
         //}
-        var url = "";
-        var toDataURLFailed = false;
-        try {
-            url = canvas.toDataURL("image/jpeg", 1);
-        }
-        catch(e) {
-            toDataURLFailed = true;
-            // If PNG was generated.
-        }
-        if((toDataURLFailed || url.slice(0, "data:image/jpeg".length) !== "data:image/jpeg")) {
-            try{
-                var encoder = new JPEGEncoder();
-                var ctx = canvas.getContext();
-                url = encoder.encode(ctx.getImageData(0, 0, canvas.width(), canvas.height()), 100);
-            }
-            catch(e) { 
-                alert(1);
-                return "";
-            }
-        }
+        return canvas.toDataURL("image/jpeg;base64;", 1);
     }
 
     $scope.saveImage = function() {
