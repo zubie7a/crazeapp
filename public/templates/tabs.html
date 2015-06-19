@@ -15,7 +15,7 @@
                     </td>
                     <td class='half'>
                         <button class='button button-balanced butn' ng-click='saveImage();'
-                            ng-if='(platform != "android" && platform != "ios")'>
+                            ng-if='(platform != "android" \&\& platform != "ios")'>
                             <strong>Save</strong> {{platform}}
                         </button>
                         <a class='button button-balanced butn' id='downloadey' ng-href="{{getBase64()}}" 
