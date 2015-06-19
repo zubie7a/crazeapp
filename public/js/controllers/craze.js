@@ -208,7 +208,7 @@ angular.module('starter.craze', [])
         $scope.crazemodal = modal;
     });
 
-    $scope.menu = function() {
+    $scope.z10z = function() {
     // Open the menu modal.
         //$scope.crazemodal.show();
         System.alert('Made with love!',
