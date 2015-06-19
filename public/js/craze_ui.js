@@ -90,6 +90,7 @@ var CrazeCanvas = function() {
 
     var cenX, cenY;
     var canvas;
+    var cnv;
 
     this.setStrokeColor = function(color) {
     // A function for setting the stroke color.
@@ -159,6 +160,11 @@ var CrazeCanvas = function() {
         cenY = y;
     }
 
+    this.transcribe = function() {
+        var cnvCtx = cnv.getContext('2d');
+        cnvCtx.drawImage(canvas, 0, 0);
+    }
+
     this.width  = function() { return canvas.width;  }
     this.height = function() { return canvas.height; }
     // A couple functions for retrieving the dimensions of the canvas.
@@ -184,6 +190,11 @@ var CrazeCanvas = function() {
         setupEventHandlers();
         // Set up the handlers for all the DOM events.
         this.drawNewImage();
+
+        cnv    = document.createElement('canvas');
+        cnv.width = canvas.width;
+        cnv.height = canvas.height;
+
     }, 1500);
 }
 

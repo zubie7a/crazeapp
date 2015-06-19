@@ -78,8 +78,9 @@ angular.module('starter.craze', [])
         //if(canvas) {
         //    canvas.saveImage();
         //}
-        var dataUrl = canvas.toDataURL("image/jpeg");
-        System.alert(dataUrl.substring(0, 20));
+        canvas.transcribe();
+        var dataUrl = cnv.toDataURL("image/jpeg");
+        System.alert("Hey", dataUrl.substring(0, 20));
         //return canvas.toDataURL("image/jpeg");
     }
 
