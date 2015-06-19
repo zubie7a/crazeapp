@@ -126,8 +126,7 @@ var CrazeCanvas = function() {
     this.saveImage = function(){
     // A function to save the current image
         killCrazeMode();
-        document.getElementById('downloadey').click();
-        alert("HEH");
+        window.open(canvas.toDataURL());
     }
 
     this.resetScroll = function() {
