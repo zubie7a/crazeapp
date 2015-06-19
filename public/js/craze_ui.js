@@ -164,7 +164,7 @@ var CrazeCanvas = function() {
     // A couple functions for retrieving the dimensions of the canvas.
 
     setTimeout(function() {
-        var canvas = document.createElement('canvas');
+        canvas = document.createElement('canvas');
         canvas.id = 'myCanvas'
         // canvas = document.getElementById('myCanvas');
         if(platform != 'android' && platform != 'ios') {
