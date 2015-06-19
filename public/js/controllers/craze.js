@@ -225,7 +225,7 @@ angular.module('starter.craze', [])
         }
         else if(platform == 'android' && !init) {
             init = true;
-            System.confirm('Welcome to CraZe!', 'Do you want to go to the Play Store for the app version?')
+            System.confirm('Version', 'Do you want to go to the Play Store for the app version?')
             .then(function(res) {
                 if(res) {
                    window.location.href = "https://play.google.com/store/apps/details?id=com.zubieta.craze";        
