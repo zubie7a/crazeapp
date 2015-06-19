@@ -213,8 +213,8 @@ angular.module('starter.craze', [])
         //$scope.crazemodal.show();
         System.alert('Made with love!',
             'Made by <a href=\'https://github.com/Zubieta\'>Santiago Zubieta</a><br/>' +
-            'Visit my <a href=\'https://zubieta.github.io\'>website</a> for nice things!<br/>' +
-            'I love you!'
+            'Visit my <a href=\'https://zubieta.github.io/z10z\'>website</a> for nice things!<br/>' +
+            '<strong>I love you!</strong>'
         );
     }
 
