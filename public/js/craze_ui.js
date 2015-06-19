@@ -60,14 +60,14 @@ function setupEventHandlers() {
         if(event.which == 40) {
         // Going down.
             //if(menuOpen) return;
-            offset += 20;
+            // offset += 20;
             if(offset > window.innerWidth / 2) { offset = window.innerWidth / 2; }
             $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         }
         if(event.which == 38) {
         // Going up.
             //if(menuOpen) return;
-            offset -= 20;
+            // offset -= 20;
             if(offset < 0) { offset = 0; }
             $('#myCanvas').css({'margin-top' : '-' + offset + 'px'});
         }
@@ -132,7 +132,8 @@ var CrazeCanvas = function() {
     this.resetScroll = function() {
     // A function for resetting the scroll.
         if(platform != 'android' && platform != 'ios') {
-            offset = window.innerHeight / 2;
+            // offset = window.innerHeight / 2;
+            offset = 0;
         }
         else {
             offset = 0;
@@ -166,8 +167,10 @@ var CrazeCanvas = function() {
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
         if(platform != 'android' && platform != 'ios') {
-            canvas.height = window.innerWidth;
-            offset = window.innerHeight / 2;
+            // canvas.height = window.innerWidth;
+            // offset = window.innerHeight / 2;
+            canvas.height = window.innerHeight;
+            offset = 0;
         }
         else {
             canvas.height = window.innerHeight;
