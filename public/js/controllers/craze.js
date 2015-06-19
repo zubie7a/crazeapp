@@ -93,8 +93,8 @@ angular.module('starter.craze', [])
                 function(res) {
                     if(res) {
                         canvas.saveImage($scope.getBase64());
+                        $ionicSideMenuDelegate.toggleLeft();
                     }
-                    $ionicSideMenuDelegate.toggleLeft();
                 }
             )
             $scope.base64 = '';
@@ -106,6 +106,10 @@ angular.module('starter.craze', [])
                     if(res) {
                         $scope.fname = res;
                         $scope.base64 = $scope.getBase64();
+                        $ionicSideMenuDelegate.toggleLeft();
+                    }
+                    else {
+                        alert("MYO");
                     }
                 }
             );
