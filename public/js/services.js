@@ -33,7 +33,9 @@ angular.module('starter.services', ['btford.socket-io'])
             var title = 'Confirm ' + type;
             return confirmPopup = $ionicPopup.confirm({
                 'title' : title,
-                'template' : text
+                'template' : text,
+                'okType' : 'button-balanced',
+                'cancelType' : 'button-assertive'
             })
             .then(function(res) {
                 if(res) {

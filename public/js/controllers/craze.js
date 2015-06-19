@@ -86,8 +86,16 @@ angular.module('starter.craze', [])
     $scope.updateHref = function() {
     // To update the href of the anchor for downloading.
         if(platform == 'ios') {
-            System.alert("Save New Image", "Image will open in a new tab, touch and hold it to save it.");
-            canvas.saveImage($scope.getBase64());
+            var confirmPromise = System.confirm("Save Image",
+                                 "Image will open in a new tab, touch and hold it to save it.");
+            confirmPromise.then(
+                function(res) {
+                    if(res) {
+                        canvas.saveImage($scope.getBase64());
+                    }
+                    $ionicSideMenuDelegate.toggleLeft();
+                }
+            )
             $scope.base64 = "";
         }
         else {
