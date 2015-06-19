@@ -211,7 +211,11 @@ angular.module('starter.craze', [])
     $scope.menu = function() {
     // Open the menu modal.
         //$scope.crazemodal.show();
-        window.location = 'https://zubieta.github.io/z10z';
+        System.alert('Made with love!',
+            'Made by <a href=\'https://github.com/Zubieta\'>Santiago Zubieta</a><br/>' +
+            'Visit my <a href=\'https://zubieta.github.io\'>website</a> for nice things!<br/>' +
+            'I love you!'
+        );
     }
 
     $scope.close = function() {
