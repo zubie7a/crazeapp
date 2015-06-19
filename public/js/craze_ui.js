@@ -61,6 +61,7 @@ function setupEventHandlers() {
     $(window).resize(function() {
         //resize just happened, pixels changed
         canvas.resetOffsets();
+        canvas.resetMargins();
     });
 
     $(document).keydown(function(event) {
@@ -128,7 +129,8 @@ var CrazeCanvas = function() {
         killCrazeMode();
         this.clearImage();
         this.resetCenter();
-        this.resetScroll();
+        this.resetOffsets():
+        this.resetMargins();
     }
 
     this.clearImage = function() {
@@ -142,42 +144,44 @@ var CrazeCanvas = function() {
         window.open(dataUrl);
     }
 
-    this.resetScroll = function() {
-    // A function for resetting the scroll.
-        if(platform != 'android' && platform != 'ios') {
-            offsetY = (canvas.height - window.innerHeight) / 2;
-            offsetX = (canvas.width - window.innerWidth) / 2;
-        }
-        else {
-            offsetY = (canvas.height - window.innerHeight) / 2;
-            offsetX = (canvas.width - window.innerWidth) / 2;
-        }
-        $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
-        $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
-    }
-
     this.resetOffsets = function() {
         if(canvas.width < window.innerWidth) {
         // Canvas width is lesser than window width, white bars.
             offsetX = -(window.innerWidth - canvas.width) / 2;
-            $('#myCanvas').css({'margin-left' : Math.abs(offsetX) + 'px'});
         }
         else {
         // Canvas with is bigger than window width, canvas clipped.
             offsetX = (canvas.width - window.innerWidth) / 2;
-            $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
         }
         if(canvas.height < window.innerHeight) {
         // Canvas height is lesser than window height, white bars.
             offsetY = -(window.innerHeight - canvas.height) / 2;
-            $('#myCanvas').css({'margin-top' : Math.abs(offsetY) - 21 + 'px'});
         }
         else {
         // Canvas height is bigger than window height, canvas clipped.
             offsetY = (canvas.height - window.innerHeight) / 2;
+        }
+    }
+
+    this.resetMargins = function() {
+        if(canvas.width < window.innerWidth) {
+        // Canvas width is lesser than window width, white bars.
+            $('#myCanvas').css({'margin-left' : Math.abs(offsetX) + 'px'});
+        }
+        else {
+        // Canvas with is bigger than window width, canvas clipped.
+            $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
+        }
+        if(canvas.height < window.innerHeight) {
+        // Canvas height is lesser than window height, white bars.
+            $('#myCanvas').css({'margin-top' : Math.abs(offsetY) - 21 + 'px'});
+        }
+        else {
+        // Canvas height is bigger than window height, canvas clipped.
             $('#myCanvas').css({'margin-top' : '-' + (offsetY + 21) + 'px'});
         }
     }
+
     this.getCenter = function() {
     // A function for retrieving the current center of the canvas
         return {
@@ -209,26 +213,8 @@ var CrazeCanvas = function() {
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
         cnv    = document.createElement('canvas');
-        if(platform != 'android' && platform != 'ios') {
-            canvas.height = bigdim;
-            cnv.height = canvas.height;
-            offsetY = (canvas.height - window.innerHeight) / 2;
-
-            canvas.width  = bigdim;
-            cnv.width = canvas.width;
-            offsetX = (canvas.width - window.innerWidth) / 2;
-        }
-        else {
-            canvas.height = bigdim;
-            cnv.height = canvas.height;
-            offsetY = (canvas.height - window.innerHeight) / 2;
-            
-            canvas.width  = bigdim;
-            cnv.width = canvas.width;
-            offsetX = (canvas.width - window.innerWidth) / 2;
-        }
-        $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
-        $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
+        this.resetOffsets();
+        this.resetMargins();
         this.resetCenter();
         variableInitializer();
         // Initialize the variables of the application.
