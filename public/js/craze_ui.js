@@ -157,25 +157,26 @@ var CrazeCanvas = function() {
     }
 
     this.resetOffsets = function() {
-        if(platform != 'android' && platform != 'ios') {
-            if(canvas.width < window.innerWidth) {
-                offsetX = -(window.innerWidth - canvas.width) / 2;
-                $('#myCanvas').css({'margin-left' : Math.abs(offsetX) + 'px'});
-            }
-            else {
-                offsetX = (canvas.width - window.innerWidth) / 2;
-                $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
-            }
-
-            offsetY = (canvas.height - window.innerHeight) / 2;
-
+        if(canvas.width < window.innerWidth) {
+        // Canvas width is lesser than window width, white bars.
+            offsetX = -(window.innerWidth - canvas.width) / 2;
+            $('#myCanvas').css({'margin-left' : Math.abs(offsetX) + 'px'});
         }
         else {
-            offsetY = (canvas.height - window.innerHeight) / 2;
-            
+        // Canvas with is bigger than window width, canvas clipped.
             offsetX = (canvas.width - window.innerWidth) / 2;
+            $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
         }
-        $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
+        if(canvas.height < window.innerHeight) {
+        // Canvas height is lesser than window height, white bars.
+            offsetY = -(window.innerHeight - canvas.height) / 2;
+            $('#myCanvas').css({'margin-top' : Math.abs(offsetY) + 'px'});
+        }
+        else {
+        // Canvas height is bigger than window height, canvas clipped.
+            offsetY = (canvas.height - window.innerHeight) / 2;
+            $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
+        }
     }
 
     this.getCenter = function() {
