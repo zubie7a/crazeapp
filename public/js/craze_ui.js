@@ -176,7 +176,7 @@ var CrazeCanvas = function() {
         // Initialize the variables of the application.
         setupEventHandlers();
         // Set up the handlers for all the DOM events.
-        canvas.drawNewImage();
+        this.drawNewImage();
     }, 1500);
 }
 
