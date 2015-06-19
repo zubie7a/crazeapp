@@ -132,7 +132,7 @@ var CrazeCanvas = function() {
     this.resetScroll = function() {
     // A function for resetting the scroll.
         if(platform != 'android' && platform != 'ios') {
-            offset = window.innerHeight / 2;
+            offset = window.innerHeight / 4;
         }
         else {
             offset = 0;
