@@ -158,17 +158,22 @@ var CrazeCanvas = function() {
 
     this.resetOffsets = function() {
         if(platform != 'android' && platform != 'ios') {
+            if(canvas.width < window.innerWidth) {
+                offsetX = (window.innerWidth - canvas.width) / 2;
+                $('#myCanvas').css({'margin-left' : offsetX + 'px'});
+            }
+            else {
+                offsetX = ( - window.innerWidth + canvas.width) / 2;
+                $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
+            }
+
             offsetY = (canvas.height - window.innerHeight) / 2;
 
-            offsetX = (canvas.width - window.innerWidth) / 2;
         }
         else {
             offsetY = (canvas.height - window.innerHeight) / 2;
             
             offsetX = (canvas.width - window.innerWidth) / 2;
-        }
-        if(canvas.width < window.innerWidth) {
-            offsetX = (window.innerWidth - canvas.width) / 2;
         }
         $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
         $('#myCanvas').css({'margin-left' : '-' + offsetX + 'px'});
