@@ -2,7 +2,6 @@ var offsetY;
 var offsetX;
 var menuOpen = false;
 var platform;
-var bigdim = Math.max(window.innerWidth, window.innerHeight);
 
 $(function() {
 // When the document is ready, execute this function.
@@ -179,18 +178,19 @@ var CrazeCanvas = function() {
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
         cnv    = document.createElement('canvas');
+        var bigdim = Math.max(window.innerWidth, window.innerHeight);
         if(platform != 'android' && platform != 'ios') {
-            canvas.height = bigdim;
+            canvas.height = window.innerWidth;
             cnv.height = canvas.height;
             offsetY = window.innerHeight / 2;
         }
         else {
-            canvas.height = bigdim;
+            canvas.height = window.innerHeight;
             cnv.height = canvas.height;
             offsetY = 0;
         }
         $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
-        canvas.width  = bigdim;
+        canvas.width  = window.innerWidth;
         cnv.width = canvas.width;
         this.resetCenter();
         variableInitializer();
