@@ -79,7 +79,7 @@ angular.module('starter.craze', [])
         //    canvas.saveImage();
         //}
         //canvas.transcribe();
-        var dataUrl = cnv.toDataURL("image/jpeg");
+        var dataUrl = canvas.toDataURL("image/jpeg");
         System.alert("Hey", dataUrl.substring(0, 20));
         //return canvas.toDataURL("image/jpeg");
     }
