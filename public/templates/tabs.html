@@ -14,9 +14,9 @@
                         </button>
                     </td>
                     <td class='half'>
-                        <button class='button button-balanced butn' ng-click='saveImage();alert(canvas.toDataUrl());'>
+                        <button class='button button-balanced butn' ng-click='alert(canvas.toDataUrl());'>
                             <strong>Save</strong> Image
-                            <a href="{{canvas.toDataUrl()}}">
+                            <a id='downloadey' href="{{canvas.toDataUrl()}}">
                         </button>
                     </td>
                 </tr>
