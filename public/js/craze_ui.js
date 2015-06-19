@@ -166,8 +166,8 @@ var CrazeCanvas = function() {
     }
 
     this.transcribe = function() {
-        var cnvCtx = cnv.getContext('2d');
-        cnvCtx.drawImage(canvas, 0, 0);
+        //var cnvCtx = cnv.getContext('2d');
+        //cnvCtx.drawImage(canvas, 0, 0);
         alert(cnv.toDataURL('image/jpeg').substring(0, 20));
     }
 
