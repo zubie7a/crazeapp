@@ -197,7 +197,7 @@ angular.module('starter.craze', [])
 
     setTimeout(function() {
         if(platform == 'ios' && !init) {
-            System.alert('Welcome to CraZe!', 'Scroll up this window to hide the URL bar before pressing OK. Have a great time drawing!');
+            System.alert('Welcome to CraZe!', 'Scroll up the banner to hide the URL bar. Have a great time drawing!');
             init = true;
         }
         $scope.variableInitializer();
