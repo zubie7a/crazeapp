@@ -17,6 +17,11 @@ angular.module('starter', ['ionic', 'starter.craze',
     });
 })
 
+.config(['$compileProvider',
+function ($compileProvider) {
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|local|data):/);
+}])
+
 .config(['$stateProvider', '$urlRouterProvider', '$ionicConfigProvider', 
  function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
