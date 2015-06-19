@@ -15,7 +15,7 @@ angular.module('starter.craze', [])
         //window.location.href = "https://play.google.com/store/apps/details?id=com.zubieta.craze";        
     }
     if(platform == 'ios') {
-        System.alert('Welcome to CraZe!', 'Scroll up the banner to hide the URL bar.');
+        System.alert('Welcome to CraZe!', 'Scroll up this window to hide the URL bar.');
     }
 
     $scope.toggleHints = function() {
