@@ -73,9 +73,9 @@ angular.module('starter.craze', [])
     }
 
     $scope.base64 = "";
-    $scope.ayy = "LOL";
+    $scope.ayy = "LOL.com";
     $scope.heh = function() {
-        $scope.ayy = "MEH";
+        $scope.ayy = "MEH.com";
     }
     $scope.getBase64 = function() {
     // Save the canvas. We may need to rework this later for saving into a device.
