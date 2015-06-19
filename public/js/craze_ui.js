@@ -1,5 +1,5 @@
 var offsetY;
-var offsetX;
+var offsetX = 0;
 var menuOpen = false;
 var platform;
 
