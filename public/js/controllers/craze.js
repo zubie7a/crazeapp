@@ -71,12 +71,16 @@ angular.module('starter.craze', [])
         }
     }
 
+    $scope.base64 = "";
     $scope.saveImage = function() {
     // Save the canvas. We may need to rework this later for saving into a device.
         //if(canvas) {
         //    canvas.saveImage();
         //}
-        System.alert(canvas.toDataURL());
+        $scope.base64 = canvas.toDataURL();
+        $("#downloadey").click(function() {
+            $scope.base64 = "";
+        } );
     }
 
     $scope.crazeMode = function() {
