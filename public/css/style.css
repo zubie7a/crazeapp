@@ -13,6 +13,10 @@
     max-width: 60%;
 }
 
+#myCanvas {
+    margin-top: -42px;
+}
+
 .selector {
     width: 60%;
     background-color: #FFF;
