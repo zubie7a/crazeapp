@@ -184,7 +184,7 @@ var CrazeCanvas = function() {
             canvas.height = bigdim;
             cnv.height = canvas.height;
             offsetY = (canvas.height - window.innerHeight) / 2;
-            alert(offsetY);
+
             canvas.width  = bigdim;
             cnv.width = canvas.width;
             offsetX = (canvas.width - window.innerWidth) / 2;
