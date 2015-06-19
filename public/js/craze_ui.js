@@ -182,7 +182,7 @@ var CrazeCanvas = function() {
         if(platform != 'android' && platform != 'ios') {
             canvas.height = 100;
             cnv.height = canvas.height;
-            offsetY = (900 - canvas.height) / 2;
+            offsetY = (400 - canvas.height) / 2;
         }
         else {
             canvas.height = 100;
