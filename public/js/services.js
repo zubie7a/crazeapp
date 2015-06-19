@@ -17,6 +17,16 @@ angular.module('starter.services', ['btford.socket-io'])
             alertPopup.then(function(res) {
             });
         },
+        alert : function(title, message) {
+        // For displaying beautiful alerts, not using the default alert window.
+            var text = '<p align=\'center\'>' + message + '</p>';
+            var alertPopup = $ionicPopup.alert({
+                'title' : title,
+                'template' : text
+            });
+            alertPopup.then(function(res) {
+            });
+        },
         confirm : function(type, message) {
             var text = '<p align=\'center\'>' + message + '</p>';
             var title = 'Confirm ' + type;
