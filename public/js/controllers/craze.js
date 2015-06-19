@@ -212,9 +212,9 @@ angular.module('starter.craze', [])
     // Open the menu modal.
         //$scope.crazemodal.show();
         System.alert('Made with love!',
-            'Made by <a href=\'https://github.com/Zubieta\'>Santiago Zubieta</a><br/>' +
-            'Visit my <a href=\'https://zubieta.github.io/z10z\'>website</a> for nice things!<br/>.' +
-            'Also, see the <a href=\'https://instagram.com/crazeapp\'>Instagram</a> account, and share images with <strong>#CrazeApp</strong> to get them featured!<br/>.' +
+            'Made by <a href=\'https://github.com/Zubieta\'>Santiago Zubieta</a>.<br/>' +
+            'Visit my <a href=\'https://zubieta.github.io/z10z\'>website</a> for nice things!<br/>' +
+            'Also, see the <a href=\'https://instagram.com/crazeapp\'>Instagram</a> account, and share images with <strong>#CrazeApp</strong> to get them featured!<br/>' +
             '<strong>I love you!</strong>'
         );
     }
