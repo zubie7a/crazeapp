@@ -603,6 +603,7 @@ function doMouseMove(event) {
                 // setSeed is not called because x2 and y2 will forever be the original mouse position
                 // while x1 and y1 are usually modified at each detected mouse position, resulting in the
                 // 'Lines from start' effect
+                fitToGrid();
                 liner();
                 connecter();
                 break;
