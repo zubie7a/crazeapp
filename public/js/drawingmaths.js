@@ -713,10 +713,12 @@ function doMouseMove(event) {
                 //x2 = _x;
                 //y2 = _y;
                 liner();
+                restore();
                 parallels(true, dist);
                 //x2 = _x;
                 //y2 = _y;
                 liner();
+                restore();
                 break;
         }
         rotable = false;
