@@ -280,11 +280,19 @@ angular.module('starter.craze', [])
         }
     }
 
+    function randColors() {
+        var arr = [];
+        arr.push(randInt(0, 255));
+        arr.push(randInt(0, 255));
+        arr.push(randInt(0, 255));
+        return arr;
+    }
+
     $scope.randomizer = function() {
         $scope.crazeData = {
             'brush'   : randInt(1, 9),
             'palette' : randPalette(),
-            'colors' : [randInt(0, 255), randInt(0, 255), randInt(0, 255)],
+            'colors' : randColors(),
             'symmetry' : randBool(),
             'variable' : randBool(),
             'rotating' : randBool(),
@@ -295,7 +303,7 @@ angular.module('starter.craze', [])
             'bsize' : randInt(42, 142),
             'rotnum' : randInt(2, 10),
             'thickness' : 1,
-            'alpha' : randInt(50, 90)
+            'alpha' : randInt(50, 80)
         };
         $scope.variableInitializer();
     }

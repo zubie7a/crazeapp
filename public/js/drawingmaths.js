@@ -61,7 +61,8 @@ var TRIANGLES        = 6;
 var SQUARES          = 7;
 var CIRCLES          = 8;
 var CHAIN            = 9;
-var PARALLEL         = 10;
+var TANGENT         = 10;
+var SQUARE_START    = 11;
 
 //Values for different varying color palettes
 var NORMAL    = 1;
@@ -695,12 +696,19 @@ function doMouseMove(event) {
                 liner();
                 setSeed(0, 0, 0, 0);
                 break;
-            case PARALLEL:
+            case TANGENT:
                 backup();
-                parallels(true);
+                parallels(true, 0);
                 liner();
                 restore();
                 setSeed(0, 0, 0, 0);
+                break;
+            case SQUARE_START:
+                var dx = x1 - x2;
+                var dy = y1 - y2;
+                var dist = Math.sqrt(dx*dx + dy*dy);
+                parallels(false, dist);
+                parallels(true, dist);
                 break;
         }
         rotable = false;
@@ -709,7 +717,7 @@ function doMouseMove(event) {
     }
 }
 
-function parallels(dir) {
+function parallels(dir, dist) {
     var d = 0;
     // The distance we want to use for separating lines.
     var sign = (dir)? 1 : -1;
