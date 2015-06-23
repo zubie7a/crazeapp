@@ -726,7 +726,7 @@ function doMouseMove(event) {
 }
 
 function parallels(dir, dist) {
-    var d = 0;
+    var d = dist;
     // The distance we want to use for separating lines.
     var sign = (dir)? 1 : -1;
     // Whether its the line at one side or the other.
