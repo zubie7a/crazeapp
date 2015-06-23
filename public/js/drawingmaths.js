@@ -708,7 +708,9 @@ function doMouseMove(event) {
                 var dy = y1 - y2;
                 var dist = Math.sqrt(dx*dx + dy*dy);
                 parallels(false, dist);
+                liner();
                 parallels(true, dist);
+                liner()
                 break;
         }
         rotable = false;
