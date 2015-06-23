@@ -704,23 +704,9 @@ function doMouseMove(event) {
                 setSeed(0, 0, 0, 0);
                 break;
             case SQUARE_START:
-                var dx = (x1 - x2) / 2;
-                var dy = (y1 - y2) / 2;
-                var dist = Math.sqrt(dx*dx + dy*dy);
-                var _x = x2;
-                var _y = y2;
-                parallels(false, dist);
-                //x2 = _x;
-                //y2 = _y;
-                liner();
-                restore();
-                setSeed(0, 0, 0, 0);
-                parallels(true, dist);
-                //x2 = _x;
-                //y2 = _y;
-                liner();
-                restore();
-                setSeed(0, 0, 0, 0);
+                var mx = (x1 - x2) / 2;
+                var my = (y1 - y2) / 2;
+                var dist = Math.sqrt(mx*mx + my*my);
                 break;
         }
         rotable = false;
