@@ -70,25 +70,27 @@ function setupEventHandlers() {
             //if(menuOpen) return;
             offsetY += 20;
             if(offsetY > window.innerWidth / 2) { offsetY = window.innerWidth / 2; }
-            $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
+            $('#myCanvas').css({'margin-top' : '-' + (offsetY + 21) + 'px'});
         }
         if(event.which == 38) {
         // Going up.
             //if(menuOpen) return;
             offsetY -= 20;
             if(offsetY < 0) { offsetY = 0; }
-            $('#myCanvas').css({'margin-top' : '-' + offsetY + 'px'});
+            $('#myCanvas').css({'margin-top' : '-' + (offsetY + 21) + 'px'});
         }
         if(event.which == 78) {
         // N key, new image.
-           canvas.drawNewImage();
+            canvas.drawNewImage();
         }
         if(event.which == 83) {
         // S key, save image.
-           canvas.saveImage();
+            //canvas.saveImage();
+            canvas.undo();
         }
         if(event.which == 77) {
-        // M key, toggle menu?   
+        // M key, toggle menu?
+            canvas.undo();
         }
     });
 }
@@ -100,9 +102,55 @@ var CrazeCanvas = function() {
     var canvas;
     var cnv;
 
+    var left  = [];
+    var right = [];
+    // Two 'stacks' for undoing/redoing drawings.
+
+
+    this.transcribe = function() {
+        var cnvCtx = cnv.getContext('2d');
+        cnvCtx.drawImage(canvas, 0, 0);
+    }
+
     this.getCnv = function() {
     // Get the copy canvas in JPEG
         return cnv;
+    }
+
+    this.pushLeft = function() {
+    // The undo stack is pushed a new element (the last one) every
+    // time the user starts drawing.
+        var leftCnv = document.createElement('canvas');
+        // Create the canvas to push to the left.
+        leftCnv.width = canvas.width;
+        leftCnv.height = canvas.height;
+        // Set the dimensions of this new canvas.
+        var leftCtx = leftCnv.getContext('2d');
+        leftCtx.drawImage(canvas, 0, 0);
+        // Draw the current canvas over the canvas to store.
+        left.push(leftCnv);
+        // Store the past drawing into the undo array.
+        if(left.length > 5) {
+        // We'll have for now a limit of 5 undo operations.
+            left.splice(0, 1);
+        }
+    }
+
+    this.clearRight = function() {
+    // The redo stack is cleared everytime the user starts drawing.
+        right = [];
+    }
+
+    this.undo = function() {
+        if(left.length == 0) return;
+        // If there's nothing to undo, return.
+        var undoCnv = left[left.length - 1];
+        // Get the last image.
+        var canvasCtx = canvas.getContext('2d');
+        canvasCtx.drawImage(undoCnv, 0, 0);
+        // Draw into the screen's canvas.
+        left.splice(left.length - 1, 1);
+        // Erase that last image.
     }
 
     this.setStrokeColor = function(color) {
@@ -204,11 +252,6 @@ var CrazeCanvas = function() {
     // A function for setting a new center to the canvas.
         cenX = x;
         cenY = y;
-    }
-
-    this.transcribe = function() {
-        var cnvCtx = cnv.getContext('2d');
-        cnvCtx.drawImage(canvas, 0, 0);
     }
 
     this.width  = function() { return canvas.width;  }

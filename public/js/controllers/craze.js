@@ -246,6 +246,7 @@ angular.module('starter.craze', [])
             System.alert('Welcome to CraZe!', 
                 '<strong>n</strong> : new image,<br/>'+
                 '<strong>s</strong> : save image,<br/>'+
+                '<strong>u</strong> : undo stroke,<br/>'+
                 '<strong>arrows</strong> : move canvas.<br/>'+
                 '<strong>more keyboard options soon!</strong><br/> Have a great time drawing!'
             );

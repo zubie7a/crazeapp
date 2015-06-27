@@ -553,6 +553,12 @@ function doMouseDown(event) {
     if(changeCenter) {
         canvas.setCenter(x1, y1);
     }
+    else {
+        canvas.pushLeft();
+        // Store the last image into the undo stack.
+        canvas.clearRight();
+        // Clear the redo stack.
+    }
     bSize = bSizeTemp;
     brushRotD = 0;
     dir = true;
@@ -914,27 +920,34 @@ function naturePalette(){
 }
 
 function mysticPalette(){
-  var rr, gg, bb;
-  rr = 255, gg = 0, bb = 128;
-  colArray = new Array(512);
-  place = 0;
-  for(var i = 0; i < 512; ++i) {
-   if(i < 128){ bb++;}
-    else{ 
-      if(i < 256){ bb--; }
-      else{
-        if(i < 384){ bb++; }
-        else{ bb--; }
+    var rr, gg, bb;
+    rr = 128, gg = 0, bb = 255;
+    // Initial status: kinda purple
+    colArray = new Array(768);
+    // 512 possible colors, may change
+    place = 0;
+    // Starts at 0.
+    for(var i = 0; i < 768; ++i) {
+        if(i < 128){ rr++; }
+        // Increase blue until its full
+        else{ 
+            if(i < 384){ gg++; }
+            // Increase green to control brightness until white
+            else{
+          //if(i < 384){ bb++; }
+          //else{ bb--; }
+                if(i < 640) {
+                    gg--;
+                }
+                else {
+                    if(i < 768) {
+                        rr--;
+                    }
+                }
+            }
       }
+      colArray[i] = "rgba("+ rr + "," + gg + "," + bb + ",";
     }
-    if(i <  255){ rr--;
-      if(i < 128){ gg++;} else{ gg--; }
-    }
-    if(i >= 255){ rr++; 
-      if(i < 384){ gg++;} else{ gg--; }
-    }
-    colArray[i] = "rgba("+ rr + "," + gg + "," + bb + ",";
-  }
 }
 
 function borealisPalette(){
@@ -1096,8 +1109,8 @@ function colorShifter() {
     if (palette > 1) {
         place += 5;
         place %= colArray.length;
-        updateColor();
     }
+    updateColor();
 }
 
 function colorInitializer(paletteSelected) {
@@ -1255,7 +1268,7 @@ function updateBrush(br) {
 }
 
 function updateAngle() {
-    angle = 2 * Math.PI / rotnum;;
+    angle = 2 * Math.PI / rotnum;
 }
 
 function killCrazeMode() {
