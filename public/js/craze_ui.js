@@ -85,12 +85,17 @@ function setupEventHandlers() {
         }
         if(event.which == 83) {
         // S key, save image.
-            //canvas.saveImage();
-            canvas.undo();
+            canvas.saveImage();
         }
         if(event.which == 77) {
         // M key, toggle menu?
+        }
+        if(event.which == 85) {
+        // U key, undo.
             canvas.undo();
+        }
+        if(event.which == 82) {
+        // R key, redo.
         }
     });
 }
