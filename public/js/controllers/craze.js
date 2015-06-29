@@ -322,4 +322,12 @@ angular.module('starter.craze', [])
         resetCenter();
     }
 
+    $scope.undo = function() {
+        canvas.undo();
+    }
+
+    $scope.redo = function() {
+        canvas.redo();
+    }
+
 }]);

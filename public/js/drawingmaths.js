@@ -555,9 +555,9 @@ function doMouseDown(event) {
     }
     else {
         canvas.pushLeft();
-        // Store the last image into the undo stack.
+        // Every time a new stroke is detected, lets store at the
+        // 'undo' stack the current state of the canvas.
         canvas.clearRight();
-        // Clear the redo stack.
     }
     bSize = bSizeTemp;
     brushRotD = 0;

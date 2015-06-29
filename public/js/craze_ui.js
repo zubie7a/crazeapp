@@ -96,6 +96,7 @@ function setupEventHandlers() {
         }
         if(event.which == 82) {
         // R key, redo.
+            canvas.redo();
         }
     });
 }
@@ -123,35 +124,78 @@ var CrazeCanvas = function() {
     }
 
     this.pushLeft = function() {
-    // The undo stack is pushed a new element (the last one) every
-    // time the user starts drawing.
+    // A new element is pushed into the 'undo' stack (the previous image)
+    // every time the user starts drawing ~ a new stroke is detected, and
+    // this is the state of the canvas at the moment the stroke begins 
+    // (so the contents of the current stroke are not part of it).
         var leftCnv = document.createElement('canvas');
-        // Create the canvas to push to the left.
-        leftCnv.width = canvas.width;
+        // Create the new canvas to push to the left. Pushing the current
+        // canvas 'as is' would not create a copy, we want separate states.
+        leftCnv.width  = canvas.width;
         leftCnv.height = canvas.height;
-        // Set the dimensions of this new canvas.
+        // Set the dimensions of this new canvas to match the previous canvas.
         var leftCtx = leftCnv.getContext('2d');
         leftCtx.drawImage(canvas, 0, 0);
-        // Draw the current canvas over the canvas to store.
+        // Draw the previous canvas over the canvas to be stored.
         left.push(leftCnv);
-        // Store the past drawing into the undo array.
-        if(left.length > 5) {
-        // We'll have for now a limit of 5 undo operations.
+        // Store the past drawing into the undo stack.
+        if(left.length > 10) {
+        // We'll have for now a limit of 10 undo operations, lets estimate
+        // each canvas being at most 3mb in size being very rich in content.
             left.splice(0, 1);
         }
     }
 
     this.clearRight = function() {
-    // The redo stack is cleared everytime the user starts drawing.
         right = [];
+        // Clear the 'redo' stack. If there are things on the 'redo' stack,
+        // lets dispose of them once a new stroke is detected.
+    }
+
+    this.pushRight = function() {
+    // A new element is pushed into the 'redo' stack (the current image), 
+    // every time the user undoes an operation, to be able to restore an
+    // undone operation.
+        var rightCnv = document.createElement('canvas');
+        // Create the new canvas to push to the right. Pushing the current
+        // canvas 'as is' would not create a copy, we want separate states.
+        rightCnv.width  = canvas.width;
+        rightCnv.height = canvas.height;
+        // Set the dimensions of this new canvas to match the current canvas.
+        var rightCtx = rightCnv.getContext('2d');
+        rightCtx.drawImage(canvas, 0, 0);
+        // Draw the current canvas over the canvas to be stored.
+        right.push(rightCnv);
+        // Store the current drawing into the 'redo' stack.
+        // No need to set a size limit, since it will be limited by the 'undo'
+        // operations, limited by the length of the 'undo' stack, which has a
+        // control for size limit.
+    }
+
+    this.redo = function() {
+        if(right.length == 0) return;
+        // If there's nothing to redo, return.
+        this.pushLeft();
+        var redoCnv = right[right.length - 1];
+        // Get the last undone image.
+        var canvasCtx = canvas.getContext('2d');
+        // Get the current canvas.
+        canvasCtx.drawImage(redoCnv, 0, 0);
+        // Draw into the screen's canvas.
+        right.splice(right.length - 1, 1);
+        // Erase that last undone image.
     }
 
     this.undo = function() {
         if(left.length == 0) return;
         // If there's nothing to undo, return.
+        this.pushRight();
+        // Since the current image will be overwritten with a past one, lets
+        // put the current image on the redo stack in case we want it back.
         var undoCnv = left[left.length - 1];
         // Get the last image.
         var canvasCtx = canvas.getContext('2d');
+        // Get the current canvas.
         canvasCtx.drawImage(undoCnv, 0, 0);
         // Draw into the screen's canvas.
         left.splice(left.length - 1, 1);
