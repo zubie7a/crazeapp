@@ -81,6 +81,7 @@ function setupEventHandlers() {
         }
         if(event.which == 78) {
         // N key, new image.
+            canvas.pushLeft();
             canvas.drawNewImage();
         }
         if(event.which == 83) {
