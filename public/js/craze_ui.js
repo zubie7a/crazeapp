@@ -88,7 +88,6 @@ function setupEventHandlers() {
         }
         if(event.which == 83) {
         // S key, save image.
-            canvas.saveImage();
         }
         if(event.which == 77) {
         // M key, toggle menu?

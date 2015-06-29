@@ -243,11 +243,10 @@ angular.module('starter.craze', [])
         }
         else if(!init){
             init = true;
-            System.alert('Welcome to CraZe!', 
-                '<strong>n</strong> : new image,<br/>'+
-                '<strong>s</strong> : save image,<br/>'+
-                '<strong>u</strong> : undo stroke,<br/>'+
+            System.alert('Welcome to CraZe!',
                 '<strong>r</strong> : redo stroke,<br/>'+
+                '<strong>u</strong> : undo stroke,<br/>'+
+                '<strong>n</strong> : new image,<br/>'+
                 '<strong>arrows</strong> : move canvas.<br/>'+
                 '<strong>more keyboard options soon!</strong><br/> Have a great time drawing!'
             );
