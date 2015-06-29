@@ -227,7 +227,7 @@ angular.module('starter.craze', [])
     setTimeout(function() {
         if(platform == 'ios' && !init) {
             init = true;
-            System.alert('Welcome to CraZe!', 'Scroll up the banner to hide the URL bar. Have a great time drawing!');
+            System.alert('Welcome to CraZe!', 'Have a great time drawing!');
         }
         else if(platform == 'android' && !init) {
             init = true;
