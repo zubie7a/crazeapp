@@ -247,6 +247,7 @@ angular.module('starter.craze', [])
                 '<strong>n</strong> : new image,<br/>'+
                 '<strong>s</strong> : save image,<br/>'+
                 '<strong>u</strong> : undo stroke,<br/>'+
+                '<strong>r</strong> : redo stroke,<br/>'+
                 '<strong>arrows</strong> : move canvas.<br/>'+
                 '<strong>more keyboard options soon!</strong><br/> Have a great time drawing!'
             );
