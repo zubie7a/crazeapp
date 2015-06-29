@@ -71,14 +71,14 @@ function setupEventHandlers() {
         // Going down.
             //if(menuOpen) return;
             offsetY += 20;
-            if(offsetY > window.innerWidth / 2) { offsetY = window.innerWidth / 2; }
+            if(offsetY > window.innerWidth / 2 - 42) { offsetY = window.innerWidth / 2; }
             $('#myCanvas').css({'margin-top' : '-' + (offsetY + 21) + 'px'});
         }
         if(event.which == 38) {
         // Going up.
             //if(menuOpen) return;
             offsetY -= 20;
-            if(offsetY < 42) { offsetY = 42; }
+            if(offsetY < 0) { offsetY = 0; }
             $('#myCanvas').css({'margin-top' : '-' + (offsetY + 21) + 'px'});
         }
         if(event.which == 78) {
