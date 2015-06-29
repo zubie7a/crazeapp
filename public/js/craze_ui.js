@@ -71,7 +71,7 @@ function setupEventHandlers() {
         // Going down.
             //if(menuOpen) return;
             offsetY += 20;
-            if(offsetY > window.innerWidth / 2 - 42) { offsetY = window.innerWidth / 2; }
+            if(offsetY > window.innerWidth / 2 + 42) { offsetY = window.innerWidth / 2 + 42; }
             $('#myCanvas').css({'margin-top' : '-' + (offsetY + 21) + 'px'});
         }
         if(event.which == 38) {
