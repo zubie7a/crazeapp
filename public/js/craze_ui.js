@@ -3,6 +3,8 @@ var offsetX = 0;
 var menuOpen = false;
 var bigdim = Math.max(window.innerHeight, window.innerWidth);
 var platform;
+var blank = true;
+// Meaning canvas is blank.
 
 $(function() {
 // When the document is ready, execute this function.
@@ -129,6 +131,8 @@ var CrazeCanvas = function() {
     // every time the user starts drawing ~ a new stroke is detected, and
     // this is the state of the canvas at the moment the stroke begins 
     // (so the contents of the current stroke are not part of it).
+        if(blank) return;
+        // If canvas is blank, do nothing.
         var leftCnv = document.createElement('canvas');
         // Create the new canvas to push to the left. Pushing the current
         // canvas 'as is' would not create a copy, we want separate states.
@@ -234,6 +238,7 @@ var CrazeCanvas = function() {
         this.resetMargins();
         cnv.width = canvas.width;
         cnv.height = canvas.height;
+        blank = true;
     }
 
     this.clearImage = function() {

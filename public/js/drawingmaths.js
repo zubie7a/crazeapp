@@ -574,6 +574,7 @@ function doMouseUp(event) {
         changeCenter = false;
     }
     draw = false;
+    blank = false;
 }
 
 function doMouseMove(event) {
