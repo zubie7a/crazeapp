@@ -131,7 +131,6 @@ var CrazeCanvas = function() {
     // this is the state of the canvas at the moment the stroke begins 
     // (so the contents of the current stroke are not part of it).
         if(blank) return;
-        alert("HEY");
         // If canvas is blank, do nothing.
         var leftCnv = document.createElement('canvas');
         // Create the new canvas to push to the left. Pushing the current
