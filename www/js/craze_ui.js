@@ -143,7 +143,6 @@ var CrazeCanvas = function() {
         // Draw the previous canvas over the canvas to be stored.
         left.push(leftCnv);
         // Store the past drawing into the undo stack.
-        alert(left.length);
         if(left.length > 10) {
         // We'll have for now a limit of 10 undo operations, lets estimate
         // each canvas being at most 3mb in size being very rich in content.

@@ -567,6 +567,7 @@ function doMouseDown(event) {
         // Every time a new stroke is detected, lets store at the
         // 'undo' stack the current state of the canvas.
         canvas.clearRight();
+        blank = false;
     }
     bSize = bSizeTemp;
     brushRotD = 0;
@@ -584,7 +585,6 @@ function doMouseUp(event) {
         changeCenter = false;
     }
     draw = false;
-    blank = false;
 }
 
 function doMouseMove(event) {
