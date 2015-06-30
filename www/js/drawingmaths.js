@@ -592,6 +592,8 @@ function doMouseUp(event) {
     if(brush == REGULAR_LINE && fill) {
         var len = posX.length;
         filler(len, sym, posX, posY, fill, rotnum, true, canvas.getCenter().x, canvas.getCenter().y);
+        posX = [];
+        posY = [];
     }
     draw = false;
 }
