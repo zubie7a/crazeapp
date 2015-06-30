@@ -220,7 +220,7 @@ angular.module('starter.craze', [])
             'Made by <a href=\'https://github.com/Zubieta\'>Santiago Zubieta</a>.<br/>' +
             'Visit my <a href=\'https://zubieta.github.io/z10z\'>website</a> for nice things!<br/>' +
             'Also, see the <a href=\'https://instagram.com/crazeapp\'>Instagram</a> account, and share images with <strong>#crazeapp</strong> to get them featured!<br/>' +
-            '<strong>I love you!</strong>'
+            '<strong>You are awesome!</strong>'
         );
     }
 
