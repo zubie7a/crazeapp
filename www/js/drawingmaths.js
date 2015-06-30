@@ -1302,7 +1302,7 @@ function updateAngle() {
 function killCrazeMode() {
     intv = window.clearInterval(intv);
     craze = false;
-    doMouseUp(null);
+    //doMouseUp(null);
     draw = false;
 }
 
