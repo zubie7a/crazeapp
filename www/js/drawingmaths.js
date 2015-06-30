@@ -583,7 +583,10 @@ function doMouseDown(event) {
 }
 
 function doMouseUp(event) {
-    alert("HM");
+    if(brush == REGULAR_LINE && fill) {
+        var len = fillX.length;
+        filler(len, sym, fillX, fillY, fill, rotnum, true, canvas.getCenter().x, canvas.getCenter().y);
+    }
     draw = false;
 }
 
