@@ -199,6 +199,9 @@ function fadeDrawing(user) {
 // Make the drawing 'fade' with the 'Fading Image' parameter. This is not shared
 // between clients, if someone has its drawing fading, the other person's drawing
 // will not fade unless that person also has the parameter set.
+    if(brush == REGULAR_LINE && fill) {
+        return;
+    }
     fadeCount++;
     if(fadeCount > 30 * (!user? 20 : 1)) {
     // This is because the user will call the fading function only once for all the
