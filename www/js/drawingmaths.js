@@ -590,8 +590,8 @@ function doMouseDown(event) {
 
 function doMouseUp(event) {
     if(brush == REGULAR_LINE && fill) {
-        var len = fillX.length;
-        filler(len, sym, fillX, fillY, fill, rotnum, true, canvas.getCenter().x, canvas.getCenter().y);
+        var len = posX.length;
+        filler(len, sym, posX, posY, fill, rotnum, true, canvas.getCenter().x, canvas.getCenter().y);
     }
     draw = false;
 }
@@ -618,10 +618,10 @@ function doMouseMove(event) {
                 // detect all the pixels where the mouse went through, it just detects a handful of points
                 // so drawing a stroke is really about drawing lines between the detected points
                 setSeed(0, 0, 0, 0);
-                if(fill) {
-                    fillX.push(aX);
-                    fillY.push(aY);
-                }
+                //if(fill) {
+                //    fillX.push(aX);
+                //    fillY.push(aY);
+                //}
                 break;
             case LINES_FROM_START:
                 connectable = true;
