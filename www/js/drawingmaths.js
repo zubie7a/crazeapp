@@ -561,6 +561,7 @@ function doMouseDown(event) {
     }
     if(changeCenter) {
         canvas.setCenter(x1, y1);
+        changeCenter = false;
     }
     else {
         canvas.pushLeft();
@@ -581,16 +582,10 @@ function doMouseDown(event) {
 }
 
 function doMouseUp(event) {
-    if(changeCenter) {
-        changeCenter = false;
-    }
     draw = false;
 }
 
 function doMouseMove(event) {
-    if(changeCenter) {
-        return;
-    }
     if (draw) {
         modifier();
         // The original position of the mouse pointer is stored
