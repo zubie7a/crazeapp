@@ -357,6 +357,10 @@ function store(mx2, my2, mx1, my1) {
     posY.push(my2);
 }
 
+function fillFree(fillX, fillY) {
+    for
+}
+
 function filler(fillnum, symm, posX, posY, fill, rotnum, user, oldcenX, oldcenY) {
 // To fill shapes in case it is needed
     if(fill == true) {
@@ -1298,6 +1302,7 @@ function updateAngle() {
 function killCrazeMode() {
     intv = window.clearInterval(intv);
     craze = false;
+    doMouseUp(null);
     draw = false;
 }
 
