@@ -38,6 +38,11 @@ function setupEventHandlers() {
             mousedown(null);
         }
     );
+    $('#myCanvas').bind('touchend', 
+        function(e) {
+            mouseup(null);
+        }
+    );
 
     $('#myCanvas').bind('mousemove',
         function(e) {

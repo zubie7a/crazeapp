@@ -45,7 +45,7 @@ var angle, brushRotD, brushRotR;              // several numbers used forseveral
                                               // brushRotR: the angle in radians of a brush rotating on itself
 var posX,posY,preX,preY;                      // several arrays forstoring previous and current coordinates
                                               // .. for shape drawing purposes
-var freeshape = [];
+var fillX, fillY;
 
 var fadeCount;    // counter for the fading
 var triDir;       // direction of the triangle for the alternating triangle fillings
@@ -578,10 +578,12 @@ function doMouseDown(event) {
     posY = [];
     preX = [];
     preY = [];
-    freeshape = [];
+    fillX = [];
+    fillY = [];
 }
 
 function doMouseUp(event) {
+    alert("HM");
     draw = false;
 }
 
@@ -607,6 +609,10 @@ function doMouseMove(event) {
                 // detect all the pixels where the mouse went through, it just detects a handful of points
                 // so drawing a stroke is really about drawing lines between the detected points
                 setSeed(0, 0, 0, 0);
+                if(fill) {
+                    fillX.push(aX);
+                    fillY.push(aY);
+                }
                 break;
             case LINES_FROM_START:
                 connectable = true;
@@ -1220,7 +1226,6 @@ function variableInitializer() {
     grid = false;
     triDir = 1;
     changeCenter = false;
-    freeshape = [];
 }
 
 function updateSymmetry(sym) {
