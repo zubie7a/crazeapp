@@ -563,7 +563,6 @@ function doMouseDown(event) {
         canvas.setCenter(x1, y1);
     }
     else {
-        alert("WAT");
         canvas.pushLeft();
         // Every time a new stroke is detected, lets store at the
         // 'undo' stack the current state of the canvas.
