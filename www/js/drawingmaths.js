@@ -45,7 +45,6 @@ var angle, brushRotD, brushRotR;              // several numbers used forseveral
                                               // brushRotR: the angle in radians of a brush rotating on itself
 var posX,posY,preX,preY;                      // several arrays forstoring previous and current coordinates
                                               // .. for shape drawing purposes
-var fillX, fillY;
 
 var fadeCount;    // counter for the fading
 var triDir;       // direction of the triangle for the alternating triangle fillings
@@ -63,7 +62,6 @@ var SQUARES          = 7;
 var CIRCLES          = 8;
 var CHAIN            = 9;
 var TANGENT         = 10;
-var FREE_STYLE_FILL = 11;
 
 //Values for different varying color palettes
 var NORMAL    = 1;
@@ -122,7 +120,12 @@ function liner() {
         if(connectable || fill){
         // If the current shape is to be filled, or we want the points to be co
         // nnected, we want to store the coordinates, for later drawing/filling.
-            store(x2new + cenX, y2new + cenY, x1new + cenX, y1new + cenY);
+            if(brush == REGULAR_LINE) {
+                store(x1new + cenX, y1new + cenY, x2new + cenX, y2new + cenY);
+            }
+            else {
+                store(x2new + cenX, y2new + cenY, x1new + cenX, y1new + cenY);
+            }
         }
     }
 }
@@ -357,15 +360,15 @@ function store(mx2, my2, mx1, my1) {
     posY.push(my2);
 }
 
-function fillFree(fillX, fillY) {
-}
-
 function filler(fillnum, symm, posX, posY, fill, rotnum, user, oldcenX, oldcenY) {
 // To fill shapes in case it is needed
     if(fill == true) {
         var filX = [];
         var filY = [];
         for(var i = 0; i < posX.length; ++i) {
+        // Push the coordinates of the current shape into the filling arrays. This
+        // whole function will be called again if Symmetry is enabled, with just a
+        // changed parameter to denote its the alternate case for calling it.
             if(symm) {
                 filX.push((2 * oldcenX - posX[i]) - oldcenX + canvas.getCenter().x);
             }
@@ -590,7 +593,16 @@ function doMouseDown(event) {
 
 function doMouseUp(event) {
     if(brush == REGULAR_LINE && fill) {
-        var len = posX.length;
+        var xi, yi;
+        xi = posX[0];
+        yi = posY[0];
+        // Initial points, lets close the shape!
+        var xf, yf;
+        xf = posX[posX.length - 1];
+        yf = posY[posY.length - 1];
+        // Ending points, lets close the shape!
+        store(xf, yf, xi, yi);
+        var len = posX.length / 2;
         filler(len, sym, posX, posY, fill, rotnum, true, canvas.getCenter().x, canvas.getCenter().y);
         posX = [];
         posY = [];
@@ -620,10 +632,6 @@ function doMouseMove(event) {
                 // detect all the pixels where the mouse went through, it just detects a handful of points
                 // so drawing a stroke is really about drawing lines between the detected points
                 setSeed(0, 0, 0, 0);
-                //if(fill) {
-                //    fillX.push(aX);
-                //    fillY.push(aY);
-                //}
                 break;
             case LINES_FROM_START:
                 connectable = true;
@@ -736,7 +744,6 @@ function doMouseMove(event) {
                 break;
             case FREE_STYLE_FILL:
                 liner();
-
                 //setSeed(0,0,0,0) means that simply all of the x1,y1,x2,y2 will be set to aX and aY.
                 // this is because at the end of each stroke, the current detected mouse position will
                 // be transferred to the old one. when drawing a stroke, the computer doesn't really 
