@@ -390,6 +390,7 @@ function filler(fillnum, symm, posX, posY, fill, rotnum, user, oldcenX, oldcenY)
             }
             ctx.closePath();
             ctx.fill();
+            ctx.stroke();
         }
         ctx.fillStyle = fillbak;
         if(symm) {
@@ -593,15 +594,6 @@ function doMouseDown(event) {
 
 function doMouseUp(event) {
     if(brush == REGULAR_LINE && fill) {
-        var xi, yi;
-        xi = posX[0];
-        yi = posY[0];
-        // Initial points, lets close the shape!
-        var xf, yf;
-        xf = posX[posX.length - 1];
-        yf = posY[posY.length - 1];
-        // Ending points, lets close the shape!
-        store(xf, yf, xi, yi);
         var len = posX.length / 2;
         filler(len, sym, posX, posY, fill, rotnum, true, canvas.getCenter().x, canvas.getCenter().y);
         posX = [];
