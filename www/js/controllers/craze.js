@@ -28,7 +28,7 @@ angular.module('starter.craze', [])
         'rotating' : false,
         'connect' : false,
         'fill' : false,
-        'fade' : true,
+        'fade' : false,
         'grid' : false,
         'palette' : 2,
         'bsize' : 42,

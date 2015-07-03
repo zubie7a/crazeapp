@@ -572,6 +572,7 @@ function doMouseDown(event) {
     if(changeCenter) {
         canvas.setCenter(x1, y1);
         changeCenter = false;
+        return;
     }
     else {
         canvas.pushLeft();
@@ -590,6 +591,7 @@ function doMouseDown(event) {
     preY = [];
     fillX = [];
     fillY = [];
+    doMouseMove(event);
 }
 
 function doMouseUp(event) {
