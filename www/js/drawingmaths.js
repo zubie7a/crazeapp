@@ -244,11 +244,11 @@ function varySize() {
     }
     if(pers == true) {
         bSize = bSizeTemp
-        var dx = x1 - cenX
-        var dy = y1 - cenY
+        var dx = x1 - canvas.getCenter().x
+        var dy = y1 - canvas.getCenter().y
         var dist = Math.sqrt(dx*dx + dy*dy)
         dist /= Math.max(cenX*2, cenY*2)
-        alert(dist)
+        console.log(dist)
     }
 }
 
