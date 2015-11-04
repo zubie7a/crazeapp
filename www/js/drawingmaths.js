@@ -243,6 +243,7 @@ function varySize() {
         }
     }
     if(pers == true) {
+        bSize = bSizeTemp
         var dx = x1 - cenX
         var dy = y1 - cenY
         var dist = Math.sqrt(dx*dx + dy*dy)
