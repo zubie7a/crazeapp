@@ -30,6 +30,7 @@ angular.module('starter.craze', [])
         'fill' : false,
         'fade' : false,
         'grid' : false,
+        'pers' : false,
         'palette' : 2,
         'bsize' : 42,
         'rotnum' : 6,
@@ -148,6 +149,11 @@ angular.module('starter.craze', [])
         updateGrid($scope.crazeData.grid);
     }
 
+    $scope.updatePers = function() {
+    // Update the selected Perspective Size boolean.
+        updatePers($scope.crazeData.pers);
+    }
+
     $scope.updatePalette = function() {
     // Update the selected Color Palette value.
         updatePalette($scope.crazeData.palette)
@@ -189,6 +195,7 @@ angular.module('starter.craze', [])
         $scope.updateFill();
         $scope.updateFade();
         $scope.updateGrid();
+        $scope.updatePers();
         $scope.updatePalette();
         $scope.updateSize();
         $scope.updateRotNum();

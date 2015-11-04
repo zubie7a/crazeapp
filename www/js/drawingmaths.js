@@ -241,6 +241,13 @@ function varySize() {
             if(dir == false){ dir = true; }
         }
     }
+    if(pers == true) {
+        var dx = x1 - cenX
+        var dy = y1 - cenY
+        var dist = Math.sqrt(dx*dx + dy*dy)
+        dist /= Math.max(cenX*2, cenY*2)
+        bSize *= dist 
+    }
 }
 
 function drawOther(message) {
@@ -1266,6 +1273,10 @@ function updateFade(fade) {
 
 function updateGrid(grid) {
     this.grid = grid;
+}
+
+function updatePers(pers) {
+    this.pers = pers;
 }
 
 function updateRotNum(rotnum) {
