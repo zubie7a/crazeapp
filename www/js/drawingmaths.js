@@ -248,7 +248,7 @@ function varySize() {
         var dy = y1 - cenY
         var dist = Math.sqrt(dx*dx + dy*dy)
         dist /= Math.max(cenX*2, cenY*2)
-        bSize *= dist 
+        alert(dist)
     }
 }
 
