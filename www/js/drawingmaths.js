@@ -50,6 +50,7 @@ var fadeCount;    // counter for the fading
 var triDir;       // direction of the triangle for the alternating triangle fillings
 var stage;        // variable for storing in Craze Mode the alternating line and circle drawings
 var changeCenter; // variable for checking whether the center is to be changed or not.
+var pers;
 
 //Values for Switch/Case regarding the selected Brush
 var REGULAR_LINE     = 1;
