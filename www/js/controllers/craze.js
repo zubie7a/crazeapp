@@ -221,16 +221,16 @@ angular.module('starter.craze', [])
                     '</a>';
 
     $scope.z10z = function() {
-    // Open the menu modal.
-        //$scope.crazemodal.show();
-        System.alert('Made with love!',
-            'Made by <a href=\'https://github.com/Zubieta\'>Santiago Zubieta</a>.<br/>' +
-            'Visit my <a href=\'https://zubieta.github.io/z10z\'>website</a> for nice things!<br/>' +
-            'Also, see the <a href=\'https://instagram.com/crazeapp\'>Instagram</a> account, and share images with <strong>#crazeapp</strong> to get them featured!<br/>' +
-            '<strong>You are awesome!</strong>'
-        );
+        // Open the menu modal.
+            //$scope.crazemodal.show();
+            System.alert('Made with love! 2012-2018',
+                'Made by <a href=\'https://github.com/zubie7a\'>Santiago Zubieta</a>.<br/>' +
+                'Visit my <a href=\'https://z10z.xyz\'>website</a> for nice things!<br/>' +
+                'Also, see the <a href=\'https://instagram.com/crazeapp\'>Instagram</a> account, and share images with <strong>#CraZeApp</strong> to get them featured!<br/>' +
+                '<strong>You are awesome!</strong>'
+            );
     }
-
+                    
     $scope.close = function() {
     // Close the menu modal.
         //$scope.crazemodal.hide();
@@ -260,7 +260,7 @@ angular.module('starter.craze', [])
                 '<strong>u</strong> : undo stroke,<br/>'+
                 '<strong>n</strong> : new image,<br/>'+
                 '<strong>arrows</strong> : move canvas.<br/>'+
-                '<strong>more keyboard options soon!</strong><br/> Have a great time drawing!'
+                '<strong>Have a great time drawing! Spread the love!</strong>'
             );
         }
         $scope.variableInitializer();
