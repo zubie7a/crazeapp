@@ -104,10 +104,22 @@ angular.module('starter.services', ['btford.socket-io'])
             $window.localStorage[key] = JSON.stringify(object);
         },
         getObject : function(key) {
-            return JSON.parse($window.localStorage[key], null);
+            var value = $window.localStorage[key];
+            if (!value) return null;
+            try {
+                return JSON.parse(value, null);
+            } catch(e) {
+                return null;
+            }
         },
         getUser : function() {
-            return JSON.parse($window.localStorage['user'], null);
+            var value = $window.localStorage['user'];
+            if (!value) return null;
+            try {
+                return JSON.parse(value, null);
+            } catch(e) {
+                return null;
+            }
         }
     };
 }])
@@ -206,6 +218,17 @@ angular.module('starter.services', ['btford.socket-io'])
          function(socketFactory, User, $rootScope){
 // For dealing with Socket.io connections with the server
 
+    // Check if socket.io is available (it won't be in static file mode)
+    if (typeof io === 'undefined') {
+        // Return a mock socket object that won't break the app
+        return {
+            on: function() {},
+            emit: function() {},
+            connect: function() {},
+            disconnect: function() {}
+        };
+    }
+
     //var myIoSocket = io.connect('http://chat.socket.io');
     var myIoSocket = io.connect(server);
     //Create socket and connect to our desired server.
@@ -219,7 +242,9 @@ angular.module('starter.services', ['btford.socket-io'])
     mySocket.on('connect', function() {
     // When the application connects with the server, send the email of this particular
     // user so that the server relates it to the socket used in this connection.
-        mySocket.emit('register', user.email);
+        if (user && user.email) {
+            mySocket.emit('register', user.email);
+        }
     });
 
     mySocket.on('message', function(data) {

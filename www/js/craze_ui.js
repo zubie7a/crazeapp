@@ -317,6 +317,7 @@ var CrazeCanvas = function() {
     this.height = function() { return canvas.height; }
     // A couple functions for retrieving the dimensions of the canvas.
 
+    var self = this; // Store reference to 'this' for use inside setTimeout
     setTimeout(function() {
         canvas = document.getElementById('myCanvas');
         cnv    = document.createElement('canvas');
@@ -356,12 +357,12 @@ var CrazeCanvas = function() {
         }
         cnv.width = canvas.width;
         cnv.height = canvas.height;
-        this.resetCenter();
+        self.resetCenter();
         variableInitializer();
         // Initialize the variables of the application.
         setupEventHandlers();
         // Set up the handlers for all the DOM events.
-        this.drawNewImage();
+        self.drawNewImage();
     }, 1500);
 }
 

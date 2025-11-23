@@ -206,13 +206,12 @@ angular.module('starter.craze', [])
         $scope.alphaChanged();
     }
 
-    $ionicModal.fromTemplateUrl('templates/craze-modal.html', {
     // Set up a modal for displaying more specific information about
     // a request than the 'contracted' view.
+    // Note: fromTemplate returns the modal directly (not a promise like fromTemplateUrl)
+    $scope.crazemodal = $ionicModal.fromTemplate('<ion-modal-view style=\'height:80%;\'><ion-header-bar class=\'bar-dark\'><h1 class=\'title\'>Menu</h1><button class=\'button button-clear\' ng-click=\'close()\'>Close</button></ion-header-bar><ion-content scroll=\'true\'><div><table><td><button class="btn" ng-click=\'newImage()\'>New Image</button></td><td><button class="btn" ng-click=\'saveImage()\'>Save Image</button></td><td><button class="btn" ng-click=\'crazeMode()\'>CraZe</button></td><td><a id="author" href="https://github.com/zubie7a/"> / Santiago Zubieta </a></td></table></div></ion-content></ion-modal-view>', {
         scope: $scope
         //backdropClickToClose: false
-    }).then(function(modal) {
-        $scope.crazemodal = modal;
     });
 
     var instagram = '<a class="item" href="#" onclick="window.open(\'https://instagram.com/crazeapp\',' +
@@ -223,9 +222,9 @@ angular.module('starter.craze', [])
     $scope.z10z = function() {
         // Open the menu modal.
             //$scope.crazemodal.show();
-            System.alert('Made with love! 2012-2018',
+            System.alert('Made with love! 2012-2026',
                 'Made by <a href=\'https://github.com/zubie7a\'>Santiago Zubieta</a>.<br/>' +
-                'Visit my <a href=\'https://z10z.xyz\'>website</a> for nice things!<br/>' +
+                'Visit my <a href=\'https://www.z10z.xyz\'>website</a> for nice things!<br/>' +
                 'Also, see the <a href=\'https://instagram.com/crazeapp\'>Instagram</a> account, and share images with <strong>#CraZeApp</strong> to get them featured!<br/>' +
                 '<strong>You are awesome!</strong>'
             );
