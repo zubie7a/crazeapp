@@ -1722,8 +1722,8 @@ function initHandsFreeInstance(HandsfreeConstructor) {
                 hands: {
                     enabled: true,
                     maxNumHands: 2,
-                    minDetectionConfidence: 0.5,
-                    minTrackingConfidence: 0.5
+                    minDetectionConfidence: 0.7,
+                    minTrackingConfidence: 0.7
                 },
                 showDebug: false
             });
