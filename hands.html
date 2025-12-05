@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Tracking</title>
+    <link rel="stylesheet" href="https://unpkg.com/handsfree@8.5.1/build/lib/assets/handsfree.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+        }
+        
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transform: scaleX(-1);
+        }
+        
+        #overlayCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(-1);
+            pointer-events: none;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+        
+        button {
+            padding: 20px 40px;
+            font-size: 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 30px rgba(0,0,0,0.6);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        #startBtn {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+        }
+        
+        #stopBtn {
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+        }
+        
+        .handsfree-canvas {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video id="videoElement" autoplay playsinline></video>
+        <canvas id="overlayCanvas"></canvas>
+    </div>
+    
+    <div class="controls">
+        <button id="startBtn">Start</button>
+        <button id="stopBtn" disabled>Stop</button>
+    </div>
+    
+    <script src="https://unpkg.com/handsfree@8.5.1/build/lib/handsfree.js"></script>
+    <script>
+        let handsfree = null;
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const videoElement = document.getElementById('videoElement');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const ctx = overlayCanvas.getContext('2d');
+        
+        // https://handsfreejs.netlify.app/ref/model/hands.html#with-config
+        const HAND_CONNECTIONS = [
+            // [0, 1], [1, 2], [2, 3], [3, 4],
+            // [0, 5], [5, 6], [6, 7], [7, 8],
+            // [0, 9], [9, 10], [10, 11], [11, 12],
+            // [0, 13], [13, 14], [14, 15], [15, 16],
+            // [0, 17], [17, 18], [18, 19], [19, 20],
+            // [5, 9], [9, 13], [13, 17]
+            [8, 7]
+        ];
+        
+        function resizeCanvas() {
+            overlayCanvas.width = window.innerWidth;
+            overlayCanvas.height = window.innerHeight;
+        }
+        
+        function drawHands(landmarks) {
+            if (!landmarks || landmarks.length === 0) return;
+            
+            ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            
+            const width = overlayCanvas.width;
+            const height = overlayCanvas.height;
+            
+            landmarks.forEach((hand, handIndex) => {
+                ctx.strokeStyle = handIndex === 0 ? '#00FF41' : '#FF0080';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = ctx.strokeStyle;
+                
+                HAND_CONNECTIONS.forEach(([start, end]) => {
+                    const startPoint = hand[start];
+                    const endPoint = hand[end];
+                    
+                    if (startPoint && endPoint) {
+                        ctx.beginPath();
+                        ctx.moveTo(startPoint.x * width, startPoint.y * height);
+                        ctx.lineTo(endPoint.x * width, endPoint.y * height);
+                        ctx.stroke();
+                    }
+                });
+                
+                ctx.shadowBlur = 15;
+                hand.forEach((landmark, i) => {
+                    if (landmark) {
+                        if (i === 0) {
+                            ctx.fillStyle = '#FFFFFF';
+                        } else if (i % 4 === 0) {
+                            ctx.fillStyle = '#FFD700';
+                        } else {
+                            ctx.fillStyle = handIndex === 0 ? '#00FF41' : '#FF0080';
+                        }
+                        
+                        ctx.beginPath();
+                        ctx.arc(
+                            landmark.x * width,
+                            landmark.y * height,
+                            i === 0 ? 8 : (i % 4 === 0 ? 6 : 4),
+                            0,
+                            2 * Math.PI
+                        );
+                        ctx.fill();
+                    }
+                });
+                
+                ctx.shadowBlur = 0;
+            });
+        }
+        
+        function initHandsfree() {
+            handsfree = new Handsfree({
+                hands: {
+                    enabled: true,
+                    maxNumHands: 2,
+                    minDetectionConfidence: 0.5,
+                    minTrackingConfidence: 0.5
+                },
+                showDebug: false
+            });
+            
+            handsfree.on('data', (data) => {
+                if (data.hands && data.hands.landmarks) {
+                    drawHands(data.hands.landmarks);
+                } else {
+                    ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                }
+            });
+        }
+        
+        startBtn.addEventListener('click', async () => {
+            try {
+                startBtn.disabled = true;
+                await handsfree.start();
+                
+                const hfVideo = document.querySelector('.handsfree-canvas video');
+                if (hfVideo) {
+                    videoElement.srcObject = hfVideo.srcObject;
+                }
+                
+                stopBtn.disabled = false;
+            } catch (error) {
+                console.error('Error:', error);
+                startBtn.disabled = false;
+            }
+        });
+        
+        stopBtn.addEventListener('click', () => {
+            handsfree.stop();
+            ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        });
+        
+        window.addEventListener('resize', resizeCanvas);
+        
+        resizeCanvas();
+        initHandsfree();
+    </script>
+</body>
+</html>

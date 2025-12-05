@@ -1,3 +1,16 @@
+// Global error handler to prevent page reloads from unhandled errors
+window.addEventListener('error', function(event) {
+    console.error('Global error caught:', event.error);
+    event.preventDefault(); // Prevent default error handling that might cause reload
+    return true; // Indicate error was handled
+});
+
+// Prevent unhandled promise rejections from causing issues
+window.addEventListener('unhandledrejection', function(event) {
+    console.error('Unhandled promise rejection:', event.reason);
+    event.preventDefault(); // Prevent default handling
+});
+
 var offsetY = 0;
 var offsetX = 0;
 var menuOpen = false;
@@ -69,6 +82,14 @@ function setupEventHandlers() {
         //resize just happened, pixels changed
         canvas.resetOffsets();
         canvas.resetMargins();
+        
+        // Resize hands overlay canvas if it exists
+        if (typeof initHandsOverlayCanvas === 'function' && typeof handsFreeActive !== 'undefined' && handsFreeActive) {
+            // Small delay to ensure main canvas has updated
+            setTimeout(function() {
+                initHandsOverlayCanvas();
+            }, 50);
+        }
     });
 
     $(document).keydown(function(event) {
@@ -232,7 +253,46 @@ var CrazeCanvas = function() {
 
     this.drawNewImage = function() {
     // A function for cleaning the slate and also stop the Craze Mode.
-        killCrazeMode();
+        try {
+            killCrazeMode();
+        } catch (error) {
+            console.error('Error killing craze mode:', error);
+        }
+        
+        // Disable HandsFree mode before resizing canvas to avoid conflicts
+        // Don't call killHandsFreeMode() as it might cause page reload
+        // Instead, just set the flag and clear the overlay
+        if (typeof handsFreeActive !== 'undefined' && handsFreeActive) {
+            // Set flag immediately to stop data handler
+            handsFreeActive = false;
+            
+            // Clear overlay canvas
+            try {
+                if (typeof handsOverlayCanvas !== 'undefined' && handsOverlayCanvas && 
+                    typeof handsOverlayCtx !== 'undefined' && handsOverlayCtx) {
+                    handsOverlayCtx.clearRect(0, 0, handsOverlayCanvas.width, handsOverlayCanvas.height);
+                }
+            } catch (error) {
+                console.error('Error clearing overlay canvas:', error);
+            }
+            
+            // Stop drawing if we were drawing
+            if (typeof draw !== 'undefined' && draw) {
+                try {
+                    if (typeof doMouseUp === 'function') {
+                        doMouseUp(null);
+                    }
+                } catch (error) {
+                    console.error('Error in doMouseUp:', error);
+                }
+                draw = false;
+            }
+            
+            // Don't call killHandsFreeMode() here - it might cause page reload
+            // The HandsFree instance will continue running but won't process data
+            // User can manually stop it by clicking the HandsFree button again
+        }
+        
         bigdim = Math.max(window.innerHeight, window.innerWidth);
         canvas.width = bigdim;
         canvas.height = bigdim;
@@ -243,6 +303,8 @@ var CrazeCanvas = function() {
         cnv.width = canvas.width;
         cnv.height = canvas.height;
         blank = true;
+        
+        // Don't re-initialize overlay canvas here - it should only be initialized when HandsFree is started
     }
 
     this.clearImage = function() {
@@ -378,6 +440,7 @@ function mousedown(e) {
         e = event;
     }
     if(craze){ killCrazeMode(); }
+    if(handsFreeActive){ killHandsFreeMode(); }
     doMouseDown(e);
 }
 

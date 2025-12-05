@@ -3,6 +3,13 @@ var intv;                                     // interval that manipulates a fak
 
 var intvPoint;                                // a variable to store a IntvCoord object
 
+var handsFreeActive;                          // a boolean that determines whether HandsFree Mode is on or off
+var handsFreeInstance;                        // the HandsFree instance
+var handsFreePoint;                           // a variable to store hand coordinates as fake mouse event
+var handsOverlayCanvas;                       // overlay canvas for drawing hand landmarks
+var handsOverlayCtx;                          // context for the overlay canvas
+var handsVideoAspectRatio;                    // aspect ratio of the video source
+
 var IntvCoord = function(){                   // IntvCoord object is a coordinate that passes as a fake mouse
                                               // coordinate forcalling the methods related to moving the mouse
                                               // with it, making the program think the mouse was moved the mouse,
@@ -1245,6 +1252,7 @@ function updateColor() {
 function variableInitializer() {
 // this function initializes variables pulling them from the original default value in the DOM
     craze = false;
+    handsFreeActive = false;
     stage = true;
     fadeCount = 0;
     fade = true;
@@ -1321,7 +1329,7 @@ function updateAngle() {
 function killCrazeMode() {
     intv = window.clearInterval(intv);
     craze = false;
-    doMouseUp(null)
+    doMouseUp(null);
     draw = false;
 }
 
@@ -1342,6 +1350,10 @@ function crazeMode() {
     if (craze) {
         killCrazeMode();
     } else {
+        // Kill handsFree mode if it's running
+        if (handsFreeActive) {
+            killHandsFreeMode();
+        }
         craze = true;
         //[2]
         intvPoint = new IntvCoord();
@@ -1425,4 +1437,468 @@ function crazeModeMove() {
         if (stage && Math.floor((Math.random() * 20 + 1)) == 1) break;
     }
     stage = !stage;
+}
+
+function killHandsFreeMode() {
+    // Prevent any errors from causing page reloads - wrap everything in try-catch
+    try {
+        // Set flag first to prevent data handler from running during cleanup
+        var wasActive = handsFreeActive;
+        handsFreeActive = false;
+        
+        // Only call doMouseUp if we're actually drawing (before setting handsFreeActive to false)
+        if (draw && wasActive) {
+            try {
+                doMouseUp(null);
+            } catch (error) {
+                console.error('Error in doMouseUp during HandsFree cleanup:', error);
+            }
+            draw = false;
+        }
+        
+        // Store reference to instance for async cleanup
+        var instanceToStop = handsFreeInstance;
+        handsFreeInstance = null;
+        
+        // Clear overlay canvas immediately (safe operation)
+        try {
+            if (handsOverlayCanvas && handsOverlayCtx) {
+                handsOverlayCtx.clearRect(0, 0, handsOverlayCanvas.width, handsOverlayCanvas.height);
+            }
+        } catch (error) {
+            console.error('Error clearing overlay canvas:', error);
+        }
+        
+        // Don't call stop() - it might be causing the reload
+        // Instead, just remove event listeners and let it run in the background
+        // The flag is set to false, so the data handler won't process anything
+        if (instanceToStop) {
+            // Remove event listeners to stop processing
+            setTimeout(function() {
+                try {
+                    // Remove event listeners before stopping to prevent errors
+                    try {
+                        if (typeof instanceToStop.off === 'function') {
+                            instanceToStop.off('data');
+                        } else if (typeof instanceToStop.removeListener === 'function') {
+                            instanceToStop.removeListener('data');
+                        } else if (typeof instanceToStop.removeAllListeners === 'function') {
+                            instanceToStop.removeAllListeners('data');
+                        }
+                    } catch (e) {
+                        console.warn('Could not remove HandsFree event listeners:', e);
+                    }
+                    
+                    // Try to pause instead of stop - might be safer
+                    if (typeof instanceToStop.pause === 'function') {
+                        try {
+                            instanceToStop.pause();
+                        } catch (pauseError) {
+                            console.error('Error in handsFreeInstance.pause():', pauseError);
+                        }
+                    }
+                    
+                    // Only call stop() as a last resort, and wrap it very carefully
+                    // Skip stop() entirely if pause() worked
+                    if (typeof instanceToStop.pause !== 'function' && typeof instanceToStop.stop === 'function') {
+                        try {
+                            // Use requestAnimationFrame to defer stop() even more
+                            requestAnimationFrame(function() {
+                                try {
+                                    instanceToStop.stop();
+                                } catch (stopError) {
+                                    console.error('Error in handsFreeInstance.stop():', stopError);
+                                }
+                            });
+                        } catch (stopError) {
+                            console.error('Error calling handsFreeInstance.stop():', stopError);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error in HandsFree cleanup:', error);
+                    // Don't rethrow - we want to continue even if cleanup fails
+                }
+            }, 50); // Longer delay to ensure current operation completes
+        }
+    } catch (error) {
+        console.error('Fatal error in killHandsFreeMode:', error);
+        // Reset state even if there's an error to prevent further issues
+        handsFreeActive = false;
+        handsFreeInstance = null;
+        draw = false;
+    }
+}
+
+/*
+  handsFreeMode:
+  a function that enables hand tracking for drawing
+  
+  [1]: if the mode is called by pressing the button, and its already running, its killed
+  [2]: initialize HandsFree with hand detection enabled
+  [3]: set up a data handler that processes hand landmarks and converts them to drawing coordinates
+*/
+// Hand connection indices for drawing hand skeleton
+var HAND_CONNECTIONS = [
+    [0, 1], [1, 2], [2, 3], [3, 4],
+    [0, 5], [5, 6], [6, 7], [7, 8],
+    [0, 9], [9, 10], [10, 11], [11, 12],
+    [0, 13], [13, 14], [14, 15], [15, 16],
+    [0, 17], [17, 18], [18, 19], [19, 20],
+    [5, 9], [9, 13], [13, 17]
+];
+
+function initHandsOverlayCanvas() {
+    // Initialize overlay canvas for hand landmarks
+    handsOverlayCanvas = document.getElementById('handsOverlayCanvas');
+    if (handsOverlayCanvas) {
+        handsOverlayCtx = handsOverlayCanvas.getContext('2d');
+        
+        // Get video aspect ratio from HandsFree video element
+        var hfVideo = document.querySelector('.handsfree-canvas video');
+        if (hfVideo && hfVideo.videoWidth > 0 && hfVideo.videoHeight > 0) {
+            handsVideoAspectRatio = hfVideo.videoWidth / hfVideo.videoHeight;
+            console.log('Video aspect ratio detected:', handsVideoAspectRatio, '(', hfVideo.videoWidth, 'x', hfVideo.videoHeight, ')');
+        } else {
+            // Default to 16:9 if video not ready yet
+            handsVideoAspectRatio = 16 / 9;
+            console.log('Video not ready, using default aspect ratio:', handsVideoAspectRatio);
+        }
+        
+        // Use viewport dimensions for internal canvas dimensions to match video coordinate system
+        // This prevents vertical stretching since hand coordinates are normalized to viewport
+        handsOverlayCanvas.width = window.innerWidth;
+        handsOverlayCanvas.height = window.innerHeight;
+        
+        // Match the CSS positioning to align with main canvas
+        var mainCanvas = document.getElementById('myCanvas');
+        if (mainCanvas) {
+            var mainCanvasStyle = window.getComputedStyle(mainCanvas);
+            var mainCanvasRect = mainCanvas.getBoundingClientRect();
+            
+            // Copy positioning styles from main canvas
+            if (mainCanvasStyle.marginTop) {
+                handsOverlayCanvas.style.marginTop = mainCanvasStyle.marginTop;
+            }
+            if (mainCanvasStyle.marginLeft) {
+                handsOverlayCanvas.style.marginLeft = mainCanvasStyle.marginLeft;
+            }
+            
+            // Calculate overlay dimensions maintaining video aspect ratio
+            // Fit within the visible canvas area while preserving aspect ratio
+            var containerWidth = mainCanvasRect.width;
+            var containerHeight = mainCanvasRect.height;
+            
+            var overlayWidth, overlayHeight;
+            var containerAspectRatio = containerWidth / containerHeight;
+            
+            if (containerAspectRatio > handsVideoAspectRatio) {
+                // Container is wider - fit to height
+                overlayHeight = containerHeight;
+                overlayWidth = overlayHeight * handsVideoAspectRatio;
+            } else {
+                // Container is taller - fit to width
+                overlayWidth = containerWidth;
+                overlayHeight = overlayWidth / handsVideoAspectRatio;
+            }
+            
+            // Center the overlay within the visible canvas area
+            var offsetX = (containerWidth - overlayWidth) / 2;
+            var offsetY = (containerHeight - overlayHeight) / 2;
+            
+            handsOverlayCanvas.style.width = overlayWidth + 'px';
+            handsOverlayCanvas.style.height = overlayHeight + 'px';
+            handsOverlayCanvas.style.left = offsetX + 'px';
+            handsOverlayCanvas.style.top = offsetY + 'px';
+        }
+        
+        // Ensure overlay is positioned absolutely on top
+        handsOverlayCanvas.style.position = 'absolute';
+        handsOverlayCanvas.style.pointerEvents = 'none';
+        handsOverlayCanvas.style.zIndex = '10';
+        
+        console.log('Hands overlay canvas initialized - internal:', handsOverlayCanvas.width, 'x', handsOverlayCanvas.height, 
+                    'CSS size:', handsOverlayCanvas.style.width, 'x', handsOverlayCanvas.style.height,
+                    'aspect ratio:', handsVideoAspectRatio);
+    } else {
+        console.warn('Hands overlay canvas element not found');
+    }
+}
+
+function drawHandsOnOverlay(landmarks) {
+    if (!handsOverlayCanvas || !handsOverlayCtx || !landmarks || landmarks.length === 0) {
+        if (handsOverlayCtx) {
+            handsOverlayCtx.clearRect(0, 0, handsOverlayCanvas.width, handsOverlayCanvas.height);
+        }
+        return;
+    }
+    
+    // Clear the overlay canvas
+    handsOverlayCtx.clearRect(0, 0, handsOverlayCanvas.width, handsOverlayCanvas.height);
+    
+    var width = handsOverlayCanvas.width;
+    var height = handsOverlayCanvas.height;
+    
+    landmarks.forEach(function(hand, handIndex) {
+        if (!hand || !Array.isArray(hand)) return;
+        
+        // Set color for this hand (first hand green, second hand pink)
+        var handColor = handIndex === 0 ? '#00FF41' : '#FF0080';
+        handsOverlayCtx.strokeStyle = handColor;
+        handsOverlayCtx.lineWidth = 3;
+        handsOverlayCtx.shadowBlur = 10;
+        handsOverlayCtx.shadowColor = handColor;
+        
+        // Draw connections between landmarks
+        HAND_CONNECTIONS.forEach(function(connection) {
+            var start = connection[0];
+            var end = connection[1];
+            var startPoint = hand[start];
+            var endPoint = hand[end];
+            
+            if (startPoint && endPoint && startPoint.x !== undefined && startPoint.y !== undefined) {
+                // Flip X coordinate horizontally (mirror the hand)
+                var startX = (1 - startPoint.x) * width;
+                var startY = startPoint.y * height;
+                var endX = (1 - endPoint.x) * width;
+                var endY = endPoint.y * height;
+                
+                handsOverlayCtx.beginPath();
+                handsOverlayCtx.moveTo(startX, startY);
+                handsOverlayCtx.lineTo(endX, endY);
+                handsOverlayCtx.stroke();
+            }
+        });
+        
+        // Draw landmarks (points)
+        handsOverlayCtx.shadowBlur = 15;
+        hand.forEach(function(landmark, i) {
+            if (landmark && landmark.x !== undefined && landmark.y !== undefined) {
+                if (i === 0) {
+                    // Wrist (landmark 0) - white
+                    handsOverlayCtx.fillStyle = '#FFFFFF';
+                } else if (i % 4 === 0) {
+                    // Fingertips - gold
+                    handsOverlayCtx.fillStyle = '#FFD700';
+                } else {
+                    // Other points - hand color
+                    handsOverlayCtx.fillStyle = handColor;
+                }
+                
+                // Flip X coordinate horizontally (mirror the hand)
+                var x = (1 - landmark.x) * width;
+                var y = landmark.y * height;
+                
+                handsOverlayCtx.beginPath();
+                var radius = i === 0 ? 8 : (i % 4 === 0 ? 6 : 4);
+                handsOverlayCtx.arc(
+                    x,
+                    y,
+                    radius,
+                    0,
+                    2 * Math.PI
+                );
+                handsOverlayCtx.fill();
+            }
+        });
+        
+        handsOverlayCtx.shadowBlur = 0;
+    });
+}
+
+function initHandsFreeInstance(HandsfreeConstructor) {
+    // Kill craze mode if it's running
+    if (craze) {
+        killCrazeMode();
+    }
+    handsFreeActive = true;
+    
+    // Initialize overlay canvas
+    initHandsOverlayCanvas();
+    
+    //[2]
+    try {
+        console.log('Initializing HandsFree with constructor:', HandsfreeConstructor);
+        handsFreeInstance = new HandsfreeConstructor({
+                hands: {
+                    enabled: true,
+                    maxNumHands: 2,
+                    minDetectionConfidence: 0.5,
+                    minTrackingConfidence: 0.5
+                },
+                showDebug: false
+            });
+            
+            //[3]
+            handsFreePoint = new IntvCoord();
+            var wasDrawing = false;
+            
+            console.log('Setting up HandsFree data handler...');
+            handsFreeInstance.on('data', function(data) {
+                if (!handsFreeActive) return;
+                
+                // Draw hands on overlay canvas
+                if (data.hands && data.hands.landmarks) {
+                    drawHandsOnOverlay(data.hands.landmarks);
+                } else {
+                    // Clear overlay if no hands detected
+                    if (handsOverlayCtx && handsOverlayCanvas) {
+                        handsOverlayCtx.clearRect(0, 0, handsOverlayCanvas.width, handsOverlayCanvas.height);
+                    }
+                }
+                
+                // Check for hand landmarks - structure: data.hands.landmarks is array of hands
+                if (data.hands && data.hands.landmarks && data.hands.landmarks.length > 0) {
+                    console.log('Hands detected! Number of hands:', data.hands.landmarks.length);
+                    
+                    // Use landmark 8 (index finger tip, connection [7,8]) from the first detected hand for drawing
+                    // Landmark 8 is the tip of the index finger
+                    var drawingPoint = null;
+                    var firstHand = data.hands.landmarks[0];
+                    
+                    if (firstHand && Array.isArray(firstHand) && firstHand.length > 8) {
+                        var landmark8 = firstHand[8];
+                        if (landmark8 && typeof landmark8.x === 'number' && typeof landmark8.y === 'number') {
+                            drawingPoint = {
+                                x: landmark8.x,
+                                y: landmark8.y
+                            };
+                        }
+                    }
+                    
+                    if (drawingPoint) {
+                        // Map from video coordinates (0-1) to main canvas drawing coordinates
+                        // HandsFree provides coordinates normalized to 0-1 range relative to video element
+                        
+                        // Get overlay and main canvas positions
+                        var mainCanvas = document.getElementById('myCanvas');
+                        var overlayCanvas = document.getElementById('handsOverlayCanvas');
+                        
+                        if (mainCanvas && overlayCanvas) {
+                            var mainCanvasRect = mainCanvas.getBoundingClientRect();
+                            var overlayRect = overlayCanvas.getBoundingClientRect();
+                            
+                            // Video coordinates are 0-1, flip X to match mirrored display
+                            var videoX = 1 - drawingPoint.x;
+                            var videoY = drawingPoint.y;
+                            
+                            // Map video coordinates (0-1) to overlay canvas CSS coordinates
+                            // Overlay internal dimensions = window.innerWidth x window.innerHeight (matching video)
+                            // Overlay CSS size is scaled to maintain aspect ratio
+                            var overlayX = videoX * overlayRect.width;
+                            var overlayY = videoY * overlayRect.height;
+                            
+                            // Calculate the absolute viewport position of the hand
+                            var viewportX = overlayRect.left + overlayX;
+                            var viewportY = overlayRect.top + overlayY;
+                            
+                            // Map from viewport position to main canvas position
+                            // The overlay is positioned on top of the main canvas in the same container
+                            // So we can map directly: where the hand appears on overlay = where it should draw on main canvas
+                            var relativeToMainX = viewportX - mainCanvasRect.left;
+                            var relativeToMainY = viewportY - mainCanvasRect.top;
+                            
+                            // Convert to page coordinates (doMouseDown expects pageX/pageY and adds offsetX/offsetY)
+                            // pageX/pageY are document-relative, so use viewport coordinates + scroll
+                            handsFreePoint.pageX = viewportX + (window.pageXOffset || window.scrollX || 0);
+                            handsFreePoint.pageY = viewportY + (window.pageYOffset || window.scrollY || 0);
+                        } else {
+                            // Fallback to old method if elements not found
+                            var screenX = (1 - drawingPoint.x) * window.innerWidth;
+                            var screenY = drawingPoint.y * window.innerHeight;
+                            handsFreePoint.pageX = screenX + (window.pageXOffset || window.scrollX || 0);
+                            handsFreePoint.pageY = screenY + (window.pageYOffset || window.scrollY || 0);
+                        }
+                        
+                        // Start drawing if not already drawing
+                        if (!wasDrawing) {
+                            console.log('Starting to draw at index finger tip (landmark 8):', handsFreePoint.pageX, handsFreePoint.pageY);
+                            doMouseDown(handsFreePoint);
+                            wasDrawing = true;
+                        } else {
+                            // Continue drawing
+                            doMouseMove(handsFreePoint);
+                        }
+                    } else if (wasDrawing) {
+                        // No index finger tip detected, stop drawing
+                        doMouseUp(null);
+                        wasDrawing = false;
+                    }
+                } else if (wasDrawing) {
+                    // No hands detected, stop drawing
+                    doMouseUp(null);
+                    wasDrawing = false;
+                }
+            });
+            
+            // Start HandsFree - handle both promise and callback
+            var startPromise = handsFreeInstance.start();
+            if (startPromise && typeof startPromise.then === 'function') {
+                startPromise.then(function() {
+                    console.log('HandsFree started successfully');
+                    
+                    // Wait for video to be ready, then update overlay canvas with correct aspect ratio
+                    setTimeout(function() {
+                        initHandsOverlayCanvas();
+                    }, 500);
+                }).catch(function(error) {
+                    console.error('Error starting HandsFree:', error);
+                    console.error('Error details:', error.message, error.stack);
+                    handsFreeActive = false;
+                    handsFreeInstance = null;
+                    alert('Error starting hand detection: ' + (error.message || 'Please check camera permissions.'));
+                });
+            } else {
+                // If start() doesn't return a promise, assume it started successfully
+                console.log('HandsFree start() called (no promise returned)');
+                
+                // Wait for video to be ready, then update overlay canvas with correct aspect ratio
+                setTimeout(function() {
+                    initHandsOverlayCanvas();
+                }, 500);
+            }
+            
+        } catch (error) {
+            console.error('Error initializing HandsFree:', error);
+            console.error('Error details:', error.message, error.stack);
+            handsFreeActive = false;
+            handsFreeInstance = null;
+            alert('Error initializing hand detection: ' + (error.message || 'Please check if HandsFree library is loaded.'));
+        }
+}
+
+function handsFreeMode() {
+    //[1]
+    if (handsFreeActive) {
+        killHandsFreeMode();
+    } else {
+        // Check if Handsfree library is loaded - try different possible names
+        var HandsfreeConstructor = window.Handsfree || window.handsfree;
+        // Also try without window prefix (in case it's in global scope)
+        if (typeof HandsfreeConstructor === 'undefined' && typeof Handsfree !== 'undefined') {
+            HandsfreeConstructor = Handsfree;
+        }
+        
+        if (typeof HandsfreeConstructor === 'undefined') {
+            // Try waiting a bit in case library is still loading
+            console.warn('Handsfree not found immediately, checking again...');
+            var retryCount = 0;
+            var maxRetries = 5;
+            var checkInterval = setInterval(function() {
+                retryCount++;
+                var retryConstructor = window.Handsfree || window.handsfree || (typeof Handsfree !== 'undefined' ? Handsfree : null);
+                if (typeof retryConstructor !== 'undefined') {
+                    clearInterval(checkInterval);
+                    console.log('Handsfree found on retry, initializing...');
+                    initHandsFreeInstance(retryConstructor);
+                } else if (retryCount >= maxRetries) {
+                    clearInterval(checkInterval);
+                    alert('HandsFree library is not loaded. Please refresh the page and try again.\n\nIf the problem persists, check the browser console for errors.');
+                    console.error('Handsfree is not defined after retries. Available globals with "hand":', Object.keys(window).filter(function(k) { return k.toLowerCase().includes('hand'); }));
+                }
+            }, 200);
+            return;
+        }
+        
+        initHandsFreeInstance(HandsfreeConstructor);
+    }
 }

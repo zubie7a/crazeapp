@@ -63,11 +63,23 @@ angular.module('starter.craze', [])
         mouseup(null);
     }
 
-    $scope.newImage = function() {
+    $scope.newImage = function($event) {
     // Clear the canvas.
-        if(canvas) {
-            canvas.drawNewImage();
+        if ($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
         }
+        
+        try {
+            if(canvas) {
+                canvas.drawNewImage();
+            }
+        } catch (error) {
+            console.error('Error in newImage:', error);
+        }
+        
+        // Prevent any default button behavior
+        return false;
     }
 
     $scope.getBase64 = function() {
@@ -106,6 +118,13 @@ angular.module('starter.craze', [])
     // Toggle the crazeMode!
         if(canvas) {
             crazeMode();
+        }
+    }
+
+    $scope.handsFreeMode = function() {
+    // Toggle the handsFreeMode!
+        if(canvas) {
+            handsFreeMode();
         }
     }
 
@@ -209,7 +228,7 @@ angular.module('starter.craze', [])
     // Set up a modal for displaying more specific information about
     // a request than the 'contracted' view.
     // Note: fromTemplate returns the modal directly (not a promise like fromTemplateUrl)
-    $scope.crazemodal = $ionicModal.fromTemplate('<ion-modal-view style=\'height:80%;\'><ion-header-bar class=\'bar-dark\'><h1 class=\'title\'>Menu</h1><button class=\'button button-clear\' ng-click=\'close()\'>Close</button></ion-header-bar><ion-content scroll=\'true\'><div><table><td><button class="btn" ng-click=\'newImage()\'>New Image</button></td><td><button class="btn" ng-click=\'saveImage()\'>Save Image</button></td><td><button class="btn" ng-click=\'crazeMode()\'>CraZe</button></td><td><a id="author" href="https://github.com/zubie7a/"> / Santiago Zubieta </a></td></table></div></ion-content></ion-modal-view>', {
+    $scope.crazemodal = $ionicModal.fromTemplate('<ion-modal-view style=\'height:80%;\'><ion-header-bar class=\'bar-dark\'><h1 class=\'title\'>Menu</h1><button class=\'button button-clear\' ng-click=\'close()\'>Close</button></ion-header-bar><ion-content scroll=\'true\'><div><table><td><button type="button" class="btn" ng-click=\'newImage()\'>New Image</button></td><td><button type="button" class="btn" ng-click=\'saveImage()\'>Save Image</button></td><td><button type="button" class="btn" ng-click=\'crazeMode()\'>CraZe</button></td><td><a id="author" href="https://github.com/zubie7a/"> / Santiago Zubieta </a></td></table></div></ion-content></ion-modal-view>', {
         scope: $scope
         //backdropClickToClose: false
     });
