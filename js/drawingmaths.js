@@ -1750,18 +1750,24 @@ function initHandsFreeInstance(HandsfreeConstructor) {
                 if (data.hands && data.hands.landmarks && data.hands.landmarks.length > 0) {
                     console.log('Hands detected! Number of hands:', data.hands.landmarks.length);
                     
-                    // Use landmark 8 (index finger tip, connection [7,8]) from the first detected hand for drawing
+                    // Use landmark 8 (index finger tip, connection [7,8]) from any detected hand for drawing
                     // Landmark 8 is the tip of the index finger
+                    // Check all hands and use the first one with a valid index finger tip
                     var drawingPoint = null;
-                    var firstHand = data.hands.landmarks[0];
                     
-                    if (firstHand && Array.isArray(firstHand) && firstHand.length > 8) {
-                        var landmark8 = firstHand[8];
-                        if (landmark8 && typeof landmark8.x === 'number' && typeof landmark8.y === 'number') {
-                            drawingPoint = {
-                                x: landmark8.x,
-                                y: landmark8.y
-                            };
+                    for (var handIndex = 0; handIndex < data.hands.landmarks.length; handIndex++) {
+                        var hand = data.hands.landmarks[handIndex];
+                        
+                        if (hand && Array.isArray(hand) && hand.length > 8) {
+                            var landmark8 = hand[8];
+                            if (landmark8 && typeof landmark8.x === 'number' && typeof landmark8.y === 'number') {
+                                drawingPoint = {
+                                    x: landmark8.x,
+                                    y: landmark8.y
+                                };
+                                // Use the first valid hand found
+                                break;
+                            }
                         }
                     }
                     
