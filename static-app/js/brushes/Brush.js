@@ -183,14 +183,6 @@ Brush.prototype.insideTriangle = function(point, triangle) {
   return Maths.insideTriangle(point, triangle);
 };
 
-// Connect previous and current points
-Brush.prototype.connectPosPre = function(ctx, color) {
-  if (!this.params.connectBorders) {
-    return;
-  }
-  // Connection logic would go here
-};
-
 // Finish stroke (override in children if needed)
 Brush.prototype.finishStroke = function(ctx) {
   // Override in children
@@ -219,19 +211,37 @@ Brush.prototype.rotateBrush = function(ctx, color, engine) {
   var center = new Point(engine.centerX, engine.centerY);
   var angle = 2 * Math.PI / rotations;
   
+  // Get screen size for subCenters (like iOS)
+  var screenSize = {
+    width: engine.canvas.width,
+    height: engine.canvas.height
+  };
+  
+  // Create subCenters (for now with amount=0 to match iOS, but structure supports multiple centers)
+  var subCenters = Maths.createSubCenters(center, 0, screenSize);
+  
   for (var i = 0; i < rotations; i++) {
     var rotAngle = angle * i;
     
-    // Rotate points around center
+    // Rotate the points around the current center
     var rotatedPoints = this.rotatePoints(center, points, rotAngle);
+    // Mirror the points horizontally in case they're needed
+    var mirroredPoints = this.mirrorPoints(center, rotatedPoints);
     
-    // Draw rotated path
-    this.drawPath(rotatedPoints, rotAngle, false, ctx, color, engine);
-    
-    // Mirror for symmetry if enabled
-    if (params.symmetry) {
-      var mirroredPoints = this.mirrorPoints(center, rotatedPoints);
-      this.drawPath(mirroredPoints, rotAngle, true, ctx, color, engine);
+    // Now draw the points translated to each of the "sub centers"
+    for (var j = 0; j < subCenters.length; j++) {
+      var subCenter = subCenters[j];
+      var diff = Maths.pointDifference(subCenter, center);
+      var subRotatedPoints = Maths.movePoints(rotatedPoints, diff);
+      var subMirroredPoints = Maths.movePoints(mirroredPoints, diff);
+      
+      // Draw rotated path at this subCenter
+      this.drawPath(subRotatedPoints, rotAngle, false, ctx, color, engine);
+      
+      // Mirror for symmetry if enabled
+      if (params.symmetry) {
+        this.drawPath(subMirroredPoints, rotAngle, true, ctx, color, engine);
+      }
     }
   }
 };
@@ -449,20 +459,38 @@ Brush.prototype.rotateBrushForPoints = function(points, ctx, color, engine) {
   var center = new Point(engine.centerX, engine.centerY);
   var angle = 2 * Math.PI / rotations;
   
+  // Get screen size for subCenters (like iOS)
+  var screenSize = {
+    width: engine.canvas.width,
+    height: engine.canvas.height
+  };
+  
+  // Create subCenters (for now with amount=0 to match iOS, but structure supports multiple centers)
+  var subCenters = Maths.createSubCenters(center, 0, screenSize);
+  
   for (var i = 0; i < rotations; i++) {
     var rotAngle = angle * i;
     
-    // Rotate points around center
+    // Rotate the points around the current center
     var rotatedPoints = this.rotatePoints(center, points, rotAngle);
+    // Mirror the points horizontally in case they're needed
+    var mirroredPoints = this.mirrorPoints(center, rotatedPoints);
     
-    // Use drawPath to handle both lines and filled shapes (like iOS)
-    // For 2 points, draw as line; for 3+ points, draw as filled shape if fillShape is enabled
-    this.drawPath(rotatedPoints, rotAngle, false, ctx, color, engine);
-    
-    // Mirror for symmetry if enabled
-    if (params.symmetry) {
-      var mirroredPoints = this.mirrorPoints(center, rotatedPoints);
-      this.drawPath(mirroredPoints, rotAngle, true, ctx, color, engine);
+    // Now draw the points translated to each of the "sub centers"
+    for (var j = 0; j < subCenters.length; j++) {
+      var subCenter = subCenters[j];
+      var diff = Maths.pointDifference(subCenter, center);
+      var subRotatedPoints = Maths.movePoints(rotatedPoints, diff);
+      var subMirroredPoints = Maths.movePoints(mirroredPoints, diff);
+      
+      // Use drawPath to handle both lines and filled shapes (like iOS)
+      // For 2 points, draw as line; for 3+ points, draw as filled shape if fillShape is enabled
+      this.drawPath(subRotatedPoints, rotAngle, false, ctx, color, engine);
+      
+      // Mirror for symmetry if enabled
+      if (params.symmetry) {
+        this.drawPath(subMirroredPoints, rotAngle, true, ctx, color, engine);
+      }
     }
   }
 };

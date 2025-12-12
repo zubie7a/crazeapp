@@ -237,6 +237,11 @@ var Maths = {
   createSubCenters: function(center, amount, size) {
     var subCenters = [center];
     
+    // If amount is 0, just return the main center
+    if (amount === 0) {
+      return subCenters;
+    }
+    
     var screenHeight = size.height;
     var subCenter = new Point(
       center.getX(),
