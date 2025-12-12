@@ -12,7 +12,7 @@
   var crazeController = null;
   var handsFreeInstance = null;
   var handsFreeActive = false;
-  var wasDrawing = false;
+  var activeHands = {}; // Map of handIndex -> { wasDrawing: boolean }
   var changeCenterMode = false;
 
   // DOM Elements (populated in init)
@@ -397,47 +397,69 @@
         }
 
         if (data.hands && data.hands.landmarks && data.hands.landmarks.length > 0) {
-          var drawingPoint = null;
+          // Track which hands are currently visible
+          var visibleHands = {};
+          
+          // Process each hand independently
           for (var h = 0; h < data.hands.landmarks.length; h++) {
             var hand = data.hands.landmarks[h];
-            if (hand && Array.isArray(hand) && hand.length > 8 && hand[8] && hand[8].x !== undefined) {
-              drawingPoint = { x: hand[8].x, y: hand[8].y };
-              break;
+            if (!hand || !Array.isArray(hand) || hand.length <= 8 || !hand[8] || hand[8].x === undefined) {
+              // Hand not visible or invalid - stop drawing for this hand
+              if (activeHands[h]) {
+                if (engine) engine.onMouseUp('hand' + h);
+                delete activeHands[h];
+              }
+              continue;
+            }
+            
+            visibleHands[h] = true;
+            var drawingPoint = { x: hand[8].x, y: hand[8].y };
+            
+            if (drawingPoint && engine && elements) {
+              var mainCanvas = elements.mainCanvas;
+              var overlay = elements.overlayCanvas;
+              var mainRect = mainCanvas.getBoundingClientRect();
+              var overlayRect = overlay.getBoundingClientRect();
+              
+              var videoX = 1 - drawingPoint.x;
+              var videoY = drawingPoint.y;
+              var overlayX = videoX * overlayRect.width;
+              var overlayY = videoY * overlayRect.height;
+              var viewportX = overlayRect.left + overlayX;
+              var viewportY = overlayRect.top + overlayY;
+              var relativeX = viewportX - mainRect.left;
+              var relativeY = viewportY - mainRect.top;
+              var scaleX = mainCanvas.width / mainRect.width;
+              var scaleY = mainCanvas.height / mainRect.height;
+              var canvasX = relativeX * scaleX;
+              var canvasY = relativeY * scaleY;
+              
+              var strokeId = 'hand' + h;
+              
+              if (!activeHands[h]) {
+                // Start drawing for this hand
+                engine.onMouseDown(canvasX, canvasY, strokeId);
+                activeHands[h] = { wasDrawing: true };
+              } else {
+                // Continue drawing for this hand
+                engine.onMouseMove(canvasX, canvasY, strokeId);
+              }
             }
           }
-
-          if (drawingPoint && engine) {
-            var mainCanvas = elements.mainCanvas;
-            var overlay = elements.overlayCanvas;
-            var mainRect = mainCanvas.getBoundingClientRect();
-            var overlayRect = overlay.getBoundingClientRect();
-
-            var videoX = 1 - drawingPoint.x;
-            var videoY = drawingPoint.y;
-            var overlayX = videoX * overlayRect.width;
-            var overlayY = videoY * overlayRect.height;
-            var viewportX = overlayRect.left + overlayX;
-            var viewportY = overlayRect.top + overlayY;
-            var relativeX = viewportX - mainRect.left;
-            var relativeY = viewportY - mainRect.top;
-            var scaleX = mainCanvas.width / mainRect.width;
-            var scaleY = mainCanvas.height / mainRect.height;
-            var canvasX = relativeX * scaleX;
-            var canvasY = relativeY * scaleY;
-
-            if (!wasDrawing) {
-              engine.onMouseDown(canvasX, canvasY);
-              wasDrawing = true;
-            } else {
-              engine.onMouseMove(canvasX, canvasY);
+          
+          // Stop drawing for hands that are no longer visible
+          for (var handIndex in activeHands) {
+            if (!visibleHands[handIndex]) {
+              if (engine) engine.onMouseUp('hand' + handIndex);
+              delete activeHands[handIndex];
             }
-          } else if (wasDrawing) {
-            engine.onMouseUp();
-            wasDrawing = false;
           }
-        } else if (wasDrawing) {
-          engine.onMouseUp();
-          wasDrawing = false;
+        } else {
+          // No hands visible - stop all drawing
+          for (var handIndex in activeHands) {
+            if (engine) engine.onMouseUp('hand' + handIndex);
+            delete activeHands[handIndex];
+          }
         }
       });
 
@@ -451,7 +473,13 @@
   }
 
   function stopHandsFree() {
-    wasDrawing = false;
+    // Stop all active hand strokes
+    for (var handIndex in activeHands) {
+      if (engine) engine.onMouseUp('hand' + handIndex);
+    }
+    activeHands = {};
+    
+    // Also stop default stroke if active
     if (engine) engine.onMouseUp();
 
     var ctx = elements.overlayCanvas.getContext('2d');
