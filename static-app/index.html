@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>CraZe</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/handsfree@8.5.1/build/lib/assets/handsfree.css">
+</head>
+<body>
+  <!-- Menu Toggle Button -->
+  <button type="button" id="menuToggle" class="menu-toggle" aria-label="Open menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+    </svg>
+  </button>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <h1>CraZe</h1>
+      <button type="button" id="closeSidebar" class="close-btn" aria-label="Close menu">&times;</button>
+    </div>
+
+    <div class="sidebar-content">
+      <!-- Action Buttons -->
+      <div class="button-row">
+        <button type="button" id="newBtn" class="btn btn-primary">New</button>
+        <button type="button" id="saveBtn" class="btn btn-secondary">Save</button>
+        <button type="button" id="undoBtn" class="btn btn-icon" title="Undo (U)">↶</button>
+        <button type="button" id="redoBtn" class="btn btn-icon" title="Redo (R)">↷</button>
+      </div>
+
+      <!-- Mode Buttons -->
+      <div class="button-row">
+        <button type="button" id="crazeBtn" class="btn btn-mode">CraZe Mode</button>
+        <button type="button" id="handsBtn" class="btn btn-mode">HandsFree</button>
+      </div>
+
+      <hr>
+
+      <!-- Brush Selection -->
+      <div class="control-group">
+        <label for="brushSelect">Brush</label>
+        <select id="brushSelect">
+          <option value="1">Regular Line</option>
+          <option value="2">Lines From Start</option>
+          <option value="3">Vertical Lines</option>
+          <option value="4">Horizontal Lines</option>
+          <option value="5">Great Cross</option>
+          <option value="6">Triangles</option>
+          <option value="7">Squares</option>
+          <option value="8">Circles</option>
+          <option value="9">Chain</option>
+          <option value="10">Tangent</option>
+        </select>
+      </div>
+
+      <!-- Palette Selection -->
+      <div class="control-group">
+        <label for="paletteSelect">Palette</label>
+        <select id="paletteSelect">
+          <option value="1">Manual</option>
+          <option value="2" selected>Rainbow</option>
+          <option value="3">Fire</option>
+          <option value="4">Ice</option>
+          <option value="5">Nature</option>
+          <option value="6">Mystic</option>
+          <option value="7">Borealis</option>
+          <option value="8">Grayscale</option>
+          <option value="9">Foxes</option>
+        </select>
+      </div>
+
+      <!-- Manual Color Picker -->
+      <div id="colorPicker" class="control-group" style="display: none;">
+        <label>Color</label>
+        <div class="color-row">
+          <input type="color" id="colorInput" value="#ff0000">
+          <input type="text" id="colorText" value="#ff0000" maxlength="7">
+        </div>
+      </div>
+
+      <!-- Transparency -->
+      <div class="control-group">
+        <label for="alphaSlider">Transparency: <span id="alphaValue">100</span>%</label>
+        <input type="range" id="alphaSlider" min="1" max="100" value="100">
+      </div>
+
+      <!-- Brush Size -->
+      <div class="control-group">
+        <label for="sizeSlider">Brush Size: <span id="sizeValue">50</span></label>
+        <input type="range" id="sizeSlider" min="1" max="500" value="50">
+      </div>
+
+      <!-- Rotations -->
+      <div class="control-group">
+        <label for="rotSlider">Rotations: <span id="rotValue">6</span></label>
+        <input type="range" id="rotSlider" min="1" max="36" value="6">
+      </div>
+
+      <!-- Thickness -->
+      <div class="control-group">
+        <label for="thickSlider">Thickness: <span id="thickValue">2</span></label>
+        <input type="range" id="thickSlider" min="1" max="10" value="2">
+      </div>
+
+      <hr>
+
+      <!-- Toggle Switches -->
+      <div class="toggle-group">
+        <label class="toggle">
+          <input type="checkbox" id="symmetryToggle" checked>
+          <span class="toggle-label">Symmetry Axis</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="variableToggle">
+          <span class="toggle-label">Variable Size</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="rotatingToggle">
+          <span class="toggle-label">Rotating Shape</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="connectToggle">
+          <span class="toggle-label">Connect Borders</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="fillToggle">
+          <span class="toggle-label">Fill Shape</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="fadeToggle" checked>
+          <span class="toggle-label">Fading Image</span>
+        </label>
+      </div>
+
+      <!-- Advanced Section -->
+      <button type="button" id="advancedToggle" class="btn btn-text">
+        Advanced Options <span id="advancedArrow">▼</span>
+      </button>
+
+      <div id="advancedSection" class="advanced-section">
+        <div class="toggle-group">
+          <label class="toggle">
+            <input type="checkbox" id="gridToggle">
+            <span class="toggle-label">Fit to Grid</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="perspectiveToggle">
+            <span class="toggle-label">Perspective Size</span>
+          </label>
+        </div>
+        <div class="button-row">
+          <button type="button" id="setCenterBtn" class="btn btn-small">Set Center</button>
+          <button type="button" id="resetCenterBtn" class="btn btn-small">Reset Center</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Overlay for closing sidebar on mobile -->
+  <div id="overlay" class="overlay"></div>
+
+  <!-- Welcome Popup Modal -->
+  <div id="welcomeModal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Welcome to CraZe!</h2>
+      </div>
+      <div class="modal-body">
+        <div id="modalMessage"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="modalOkBtn" class="btn btn-primary">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Canvas Container -->
+  <main class="canvas-container">
+    <canvas id="mainCanvas"></canvas>
+    <canvas id="overlayCanvas"></canvas>
+  </main>
+
+  <!-- Scripts - load in order, no modules -->
+  <script src="https://unpkg.com/handsfree@8.5.1/build/lib/handsfree.js"></script>
+  <script src="js/drawingEngine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
