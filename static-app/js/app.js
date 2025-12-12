@@ -232,8 +232,35 @@
 
   function randomizeParameters() {
     if (!engine) return;
+    
+    // Check if currently drawing (either manually or in CraZe mode)
+    var isDrawing = engine.drawing;
+    var currentPointer = null;
+    
+    if (isDrawing) {
+      // Get current pointer position
+      if (crazeController && crazeController.active) {
+        // CraZe mode is active - use its current point
+        currentPointer = new Point(crazeController.point.x, crazeController.point.y);
+      } else {
+        // Manual drawing - use engine's current position
+        currentPointer = new Point(engine.x1, engine.y1);
+      }
+    }
+    
+    // Randomize parameters
     Randomizer.randomizeParameters(engine);
     Randomizer.syncUI(engine, elements);
+    
+    // If drawing, create a new brush instance with the new randomized settings
+    if (isDrawing && currentPointer) {
+      // Update center coordinates in settings
+      engine.settings.centerX = engine.centerX;
+      engine.settings.centerY = engine.centerY;
+      // Create new brush with updated settings
+      engine.currentBrush = BrushGenerator.buildBrush(engine.settings, currentPointer);
+    }
+    
     // Show toast notification (like iOS)
     showToast('Parameters RandomiZed!');
   }
