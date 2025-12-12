@@ -49,6 +49,7 @@
       redoBtn: $('redoBtn'),
       crazeBtn: $('crazeBtn'),
       handsBtn: $('handsBtn'),
+      randomizeBtn: $('randomizeBtn'),
       infoBtn: $('infoBtn'),
       setCenterBtn: $('setCenterBtn'),
       resetCenterBtn: $('resetCenterBtn'),
@@ -196,6 +197,7 @@
     var message = '<strong>r</strong> : redo stroke,<br/>' +
                   '<strong>u</strong> : undo stroke,<br/>' +
                   '<strong>n</strong> : new image,<br/>' +
+                  '<strong>z</strong> : randomiZe parameters,<br/>' +
                   '<strong>arrows</strong> : move canvas.<br/>' +
                   '<br/>' +
                   '<strong>Have a great time drawing! Spread the love!</strong>';
@@ -209,6 +211,31 @@
                   '<br/>' +
                   '<strong>You are awesome!</strong>';
     showModal('Made with love! 2012-2026', message);
+  }
+
+  function showToast(message) {
+    // Simple toast notification (like iOS)
+    var toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); ' +
+                          'background: rgba(0, 0, 0, 0.8); color: white; padding: 12px 24px; ' +
+                          'border-radius: 8px; z-index: 10000; font-size: 14px; pointer-events: none;';
+    document.body.appendChild(toast);
+    setTimeout(function() {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s';
+      setTimeout(function() {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 2000);
+  }
+
+  function randomizeParameters() {
+    if (!engine) return;
+    Randomizer.randomizeParameters(engine);
+    Randomizer.syncUI(engine, elements);
+    // Show toast notification (like iOS)
+    showToast('Parameters RandomiZed!');
   }
 
   function getCanvasCoords(e) {
@@ -548,6 +575,10 @@
       e.preventDefault();
       toggleHandsFree();
     });
+    elements.randomizeBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      randomizeParameters();
+    });
     elements.infoBtn.addEventListener('click', function(e) {
       e.preventDefault();
       showInfoPopup();
@@ -682,6 +713,7 @@
       if (e.key === 'u' || e.key === 'U') { if (engine) engine.undo(); }
       else if (e.key === 'r' || e.key === 'R') { if (engine) engine.redo(); }
       else if (e.key === 'n' || e.key === 'N') { newImage(); }
+      else if (e.key === 'z' || e.key === 'Z') { randomizeParameters(); }
       else if (e.key === 'Escape') {
         if (elements.welcomeModal.classList.contains('show')) {
           hideModal();
