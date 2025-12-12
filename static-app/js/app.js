@@ -40,7 +40,6 @@
       infoBtn: $('infoBtn'),
       setCenterBtn: $('setCenterBtn'),
       resetCenterBtn: $('resetCenterBtn'),
-      advancedToggle: $('advancedToggle'),
 
       brushSelect: $('brushSelect'),
       paletteSelect: $('paletteSelect'),
@@ -67,9 +66,6 @@
       colorPicker: $('colorPicker'),
       colorInput: $('colorInput'),
       colorText: $('colorText'),
-
-      advancedSection: $('advancedSection'),
-      advancedArrow: $('advancedArrow'),
 
       welcomeModal: $('welcomeModal'),
       modalTitle: $('modalTitle'),
@@ -413,13 +409,6 @@
     elements.resetCenterBtn.addEventListener('click', function(e) {
       e.preventDefault();
       if (engine) engine.resetCenter();
-    });
-
-    // Advanced toggle
-    elements.advancedToggle.addEventListener('click', function(e) {
-      e.preventDefault();
-      elements.advancedSection.classList.toggle('open');
-      elements.advancedArrow.textContent = elements.advancedSection.classList.contains('open') ? '▲' : '▼';
     });
 
     // Modal

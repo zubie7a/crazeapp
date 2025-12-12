@@ -324,21 +324,155 @@ input[type="text"]:focus {
 .toggle {
   display: flex;
   align-items: center;
-  padding: 8px 0;
+  padding: 5px 0;
   cursor: pointer;
+  user-select: none;
 }
 
 .toggle input {
-  width: 18px;
-  height: 18px;
-  margin-right: 10px;
-  accent-color: var(--accent-primary);
+  display: none;
+}
+
+.toggle-track {
+  position: relative;
+  display: inline-block;
+  width: 51px;
+  height: 31px;
+  margin-right: 12px;
+  border: 2px solid #666;
+  border-radius: 20px;
+  background-color: #333;
+  transition: all 0.3s ease-in-out;
   cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toggle-handle {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s cubic-bezier(0, 1.1, 1, 1.1);
+  transform: translateX(0);
+}
+
+/* Toggle color variants - matching Ionic colors */
+.toggle.toggle-positive input:checked + .toggle-track {
+  border-color: #387ef5;
+  background-color: #387ef5;
+}
+
+.toggle.toggle-positive input:checked:hover + .toggle-track {
+  border-color: #5a9eff;
+  background-color: #5a9eff;
+}
+
+.toggle.toggle-calm input:checked + .toggle-track {
+  border-color: #11c1f3;
+  background-color: #11c1f3;
+}
+
+.toggle.toggle-calm input:checked:hover + .toggle-track {
+  border-color: #3dd5f5;
+  background-color: #3dd5f5;
+}
+
+.toggle.toggle-assertive input:checked + .toggle-track {
+  border-color: #ef473a;
+  background-color: #ef473a;
+}
+
+.toggle.toggle-assertive input:checked:hover + .toggle-track {
+  border-color: #ff6b5e;
+  background-color: #ff6b5e;
+}
+
+.toggle.toggle-balanced input:checked + .toggle-track {
+  border-color: #33cd5f;
+  background-color: #33cd5f;
+}
+
+.toggle.toggle-balanced input:checked:hover + .toggle-track {
+  border-color: #4ade80;
+  background-color: #4ade80;
+}
+
+.toggle.toggle-energized input:checked + .toggle-track {
+  border-color: #ffc900;
+  background-color: #ffc900;
+}
+
+.toggle.toggle-energized input:checked:hover + .toggle-track {
+  border-color: #ffd633;
+  background-color: #ffd633;
+}
+
+.toggle.toggle-royal input:checked + .toggle-track {
+  border-color: #886aea;
+  background-color: #886aea;
+}
+
+.toggle.toggle-royal input:checked:hover + .toggle-track {
+  border-color: #a68ef0;
+  background-color: #a68ef0;
+}
+
+.toggle.toggle-custom-orange input:checked + .toggle-track {
+  border-color: #ff9500;
+  background-color: #ff9500;
+}
+
+.toggle.toggle-custom-orange input:checked:hover + .toggle-track {
+  border-color: #ffad33;
+  background-color: #ffad33;
+}
+
+.toggle.toggle-custom-yellow input:checked + .toggle-track {
+  border-color: #ffcc00;
+  background-color: #ffcc00;
+}
+
+.toggle.toggle-custom-yellow input:checked:hover + .toggle-track {
+  border-color: #ffdd00;
+  background-color: #ffdd00;
+}
+
+.toggle.toggle-custom-pink input:checked + .toggle-track {
+  border-color: #ff2d92;
+  background-color: #ff2d92;
+}
+
+.toggle.toggle-custom-pink input:checked:hover + .toggle-track {
+  border-color: #ff5aa8;
+  background-color: #ff5aa8;
+}
+
+.toggle.toggle-custom-magenta input:checked + .toggle-track {
+  border-color: #bb2d92;
+  background-color: #bb2d92;
+}
+
+.toggle.toggle-custom-magenta input:checked:hover + .toggle-track {
+  border-color: #bb5aa8;
+  background-color: #bb5aa8;
+}
+
+.toggle input:checked + .toggle-track .toggle-handle {
+  transform: translateX(20px);
+}
+
+.toggle:hover .toggle-track {
+  border-color: #888;
 }
 
 .toggle-label {
   font-size: 14px;
   color: var(--text-primary);
+  flex: 1;
 }
 
 /* Dividers */
@@ -348,16 +482,6 @@ hr {
   margin: 16px 0;
 }
 
-/* Advanced Section */
-.advanced-section {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-
-.advanced-section.open {
-  max-height: 200px;
-}
 
 /* Canvas Container */
 .canvas-container {
