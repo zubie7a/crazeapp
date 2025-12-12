@@ -122,38 +122,14 @@ Brush.prototype.alignPoints = function(points, genCenter) {
   return this.movePoints(points, vector);
 };
 
-// Get centroid (average point) of a set of points
+// Get centroid (average point) of a set of points (delegates to Maths)
 Brush.prototype.getCentroid = function(points) {
-  if (points.length === 0) {
-    return new Point(0, 0);
-  }
-  
-  var sumX = 0;
-  var sumY = 0;
-  for (var i = 0; i < points.length; i++) {
-    sumX += points[i].getX();
-    sumY += points[i].getY();
-  }
-  
-  return new Point(sumX / points.length, sumY / points.length);
+  return Maths.getCentroid(points);
 };
 
-// Scale points around a center point
+// Scale points around a center point (delegates to Maths)
 Brush.prototype.scalePoints = function(center, points, factor) {
-  var result = [];
-  for (var i = 0; i < points.length; i++) {
-    var p = points[i];
-    var x = p.getX();
-    var y = p.getY();
-    var cX = center.getX();
-    var cY = center.getY();
-    
-    // Scale relative to center
-    var nX = ((x - cX) * factor) + cX;
-    var nY = ((y - cY) * factor) + cY;
-    result.push(new Point(nX, nY));
-  }
-  return result;
+  return Maths.scalePoints(center, points, factor);
 };
 
 // Transform variable size (oscillates between 0.5 and 1.5 times size)
@@ -182,76 +158,29 @@ Brush.prototype.transformSpinning = function() {
   this.posPoints = this.rotatePoints(centroid, this.posPoints, angleRad);
 };
 
-// Align a point to a grid (utility function)
+// Align a point to a grid (delegates to Maths)
 Brush.prototype.alignGridPoint = function(center, point, w, h) {
-  var cX = center.getX();
-  var cY = center.getY();
-  var pX = point.getX();
-  var pY = point.getY();
-  var dX = (pX - cX) + (w / 2.0);
-  var dY = (pY - cY) + (h / 2.0);
-  var roundX = Math.floor(dX / w) * w;
-  var roundY = Math.floor(dY / h) * h;
-  var nX = roundX + cX;
-  var nY = roundY + cY;
-  return new Point(nX, nY);
+  return Maths.alignGridPoint(center, point, w, h);
 };
 
-// Move points by a vector
+// Move points by a vector (delegates to Maths)
 Brush.prototype.movePoints = function(points, vector) {
-  var result = [];
-  for (var i = 0; i < points.length; i++) {
-    var p = points[i];
-    var nX = p.getX() + vector.getX();
-    var nY = p.getY() + vector.getY();
-    result.push(new Point(nX, nY));
-  }
-  return result;
+  return Maths.movePoints(points, vector);
 };
 
-// Mirror points vertically around a center
+// Mirror points vertically around a center (delegates to Maths)
 Brush.prototype.verticalMirrorPoints = function(center, points) {
-  var result = [];
-  for (var i = 0; i < points.length; i++) {
-    var p = points[i];
-    var cY = center.getY();
-    var nY = (2 * cY) - p.getY();
-    result.push(new Point(p.getX(), nY));
-  }
-  return result;
+  return Maths.verticalMirrorPoints(center, points);
 };
 
-// Mirror points horizontally around a center
+// Mirror points horizontally around a center (delegates to Maths)
 Brush.prototype.horizontalMirrorPoints = function(center, points) {
-  var result = [];
-  for (var i = 0; i < points.length; i++) {
-    var p = points[i];
-    var cX = center.getX();
-    var nX = (2 * cX) - p.getX();
-    result.push(new Point(nX, p.getY()));
-  }
-  return result;
+  return Maths.horizontalMirrorPoints(center, points);
 };
 
-// Check if a point is inside a triangle
+// Check if a point is inside a triangle (delegates to Maths)
 Brush.prototype.insideTriangle = function(point, triangle) {
-  if (triangle.length < 3) return false;
-  
-  var pX = point.getX();
-  var pY = point.getY();
-  var pAX = triangle[0].getX();
-  var pAY = triangle[0].getY();
-  var pBX = triangle[1].getX();
-  var pBY = triangle[1].getY();
-  var pCX = triangle[2].getX();
-  var pCY = triangle[2].getY();
-  
-  // Cross product test
-  var cp1 = (pBX - pAX) * (pY - pAY) - (pBY - pAY) * (pX - pAX);
-  var cp2 = (pCX - pBX) * (pY - pBY) - (pCY - pBY) * (pX - pBX);
-  var cp3 = (pAX - pCX) * (pY - pCY) - (pAY - pCY) * (pX - pCX);
-  
-  return (cp1 * cp2 >= 0) && (cp2 * cp3 >= 0) && (cp3 * cp1 >= 0);
+  return Maths.insideTriangle(point, triangle);
 };
 
 // Connect previous and current points
@@ -307,29 +236,14 @@ Brush.prototype.rotateBrush = function(ctx, color, engine) {
   }
 };
 
-// Rotate points around a center
+// Rotate points around a center (delegates to Maths)
 Brush.prototype.rotatePoints = function(center, points, angle) {
-  var result = [];
-  for (var i = 0; i < points.length; i++) {
-    var p = points[i];
-    var x = p.getX() - center.getX();
-    var y = p.getY() - center.getY();
-    var xNew = x * Math.cos(angle) - y * Math.sin(angle);
-    var yNew = x * Math.sin(angle) + y * Math.cos(angle);
-    result.push(new Point(xNew + center.getX(), yNew + center.getY()));
-  }
-  return result;
+  return Maths.rotatePoints(center, points, angle);
 };
 
-// Mirror points horizontally around center
+// Mirror points horizontally around center (delegates to Maths)
 Brush.prototype.mirrorPoints = function(center, points) {
-  var result = [];
-  for (var i = 0; i < points.length; i++) {
-    var p = points[i];
-    var mirroredX = 2 * center.getX() - p.getX();
-    result.push(new Point(mirroredX, p.getY()));
-  }
-  return result;
+  return Maths.horizontalMirrorPoints(center, points);
 };
 
 // Get path from points (can be overridden by children)
@@ -476,38 +390,29 @@ Brush.prototype.drawArcPath = function(pathData, rotAngle, symmetry, ctx, color,
   }
 };
 
-// Helper to calculate distance between two points
+// Helper to calculate distance between two points (delegates to Maths)
 Brush.prototype.distance = function(p1, p2) {
-  var dx = p2.getX() - p1.getX();
-  var dy = p2.getY() - p1.getY();
-  return Math.sqrt(dx * dx + dy * dy);
+  return Maths.distanceBetweenPoints(p1, p2);
 };
 
-// Helper to calculate distance from array of points
+// Helper to calculate distance from array of points (delegates to Maths)
 Brush.prototype.distanceFromPoints = function(points) {
-  if (points.length < 2) return 0;
-  return this.distance(points[0], points[1]);
+  return Maths.distance(points);
 };
 
-// Helper to scale a point relative to another
+// Helper to scale a point relative to another (delegates to Maths)
 Brush.prototype.scalePoint = function(center, point, factor) {
-  var x = center.getX() + (point.getX() - center.getX()) * factor;
-  var y = center.getY() + (point.getY() - center.getY()) * factor;
-  return new Point(x, y);
+  return Maths.scalePoint(center, point, factor);
 };
 
-// Helper to rotate a single point around a center
+// Helper to rotate a single point around a center (delegates to Maths)
 Brush.prototype.rotatePoint = function(center, point, angle) {
-  var x = point.getX() - center.getX();
-  var y = point.getY() - center.getY();
-  var xNew = x * Math.cos(angle) - y * Math.sin(angle);
-  var yNew = x * Math.sin(angle) + y * Math.cos(angle);
-  return new Point(xNew + center.getX(), yNew + center.getY());
+  return Maths.rotatePoint(center, point, angle);
 };
 
-// Helper to get point difference
+// Helper to get point difference (delegates to Maths)
 Brush.prototype.pointDifference = function(p1, p2) {
-  return new Point(p2.getX() - p1.getX(), p2.getY() - p1.getY());
+  return Maths.pointDifference(p1, p2);
 };
 
 // Connect previous and current points (like iOS - uses rotateBrush for connections)
