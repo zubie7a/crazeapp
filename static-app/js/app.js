@@ -49,6 +49,7 @@
       redoBtn: $('redoBtn'),
       crazeBtn: $('crazeBtn'),
       handsBtn: $('handsBtn'),
+      infoBtn: $('infoBtn'),
       setCenterBtn: $('setCenterBtn'),
       resetCenterBtn: $('resetCenterBtn'),
       advancedToggle: $('advancedToggle'),
@@ -199,6 +200,15 @@
                   '<br/>' +
                   '<strong>Have a great time drawing! Spread the love!</strong>';
     showModal('Welcome to CraZe!', message);
+  }
+
+  function showInfoPopup() {
+    var message = 'Made by <a href="https://github.com/zubie7a" target="_blank">Santiago Zubieta</a>.<br/>' +
+                  'Visit my <a href="https://www.z10z.xyz" target="_blank">website</a> for nice things!<br/>' +
+                  'Also, see the <a href="https://instagram.com/crazeapp" target="_blank">Instagram</a> account, and share images with <strong>#CraZeApp</strong> to get them featured!<br/>' +
+                  '<br/>' +
+                  '<strong>You are awesome!</strong>';
+    showModal('Made with love! 2012-2026', message);
   }
 
   function getCanvasCoords(e) {
@@ -537,6 +547,11 @@
     elements.handsBtn.addEventListener('click', function(e) {
       e.preventDefault();
       toggleHandsFree();
+    });
+    elements.infoBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      showInfoPopup();
+      closeSidebar();
     });
 
     elements.setCenterBtn.addEventListener('click', function(e) {
