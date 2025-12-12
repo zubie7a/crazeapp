@@ -705,6 +705,9 @@ DrawingEngine.prototype.onMouseDown = function(x, y) {
 
   // Create brush instance
   var pointer = new Point(x, y);
+  // Add center coordinates to settings for brushes
+  this.settings.centerX = this.centerX;
+  this.settings.centerY = this.centerY;
   this.currentBrush = BrushGenerator.buildBrush(this.settings, pointer);
 
   this.onMouseMove(x, y);
@@ -739,25 +742,21 @@ DrawingEngine.prototype.onMouseMove = function(x, y) {
   // Use brush system - just call draw() like iOS
   if (this.currentBrush) {
     var pointer = new Point(x, y);
+    // Update center coordinates in brush params
+    this.currentBrush.params.centerX = this.centerX;
+    this.currentBrush.params.centerY = this.centerY;
     this.currentBrush.move(pointer);
     
-    // Apply fit to grid if needed (before drawing)
-    if (this.settings.fitToGrid && this.shouldFitToGrid(this.settings.brush)) {
-      this.fitToGrid();
-      // Recalculate points after grid fitting
-      pointer = new Point(this.aX, this.aY);
-      this.currentBrush.move(pointer);
-    }
-    
-    // Draw the brush (handles all rotation, symmetry, etc.)
+    // Draw the brush (handles all rotation, symmetry, fit to grid, etc.)
     this.currentBrush.draw(this.ctx, this);
   }
 };
 
 // Helper to check if brush should use fit to grid
+// Note: All brushes now handle fit to grid internally via transformAlign
 DrawingEngine.prototype.shouldFitToGrid = function(brushType) {
-  return [BRUSHES.RADIANT, BRUSHES.VERTICAL_LINES, BRUSHES.HORIZONTAL_LINES,
-          BRUSHES.GREAT_CROSS, BRUSHES.TRIANGLES, BRUSHES.SQUARES, BRUSHES.CIRCLES].indexOf(brushType) !== -1;
+  // All brushes support fit to grid now (handled in Brush.transformAlign)
+  return true;
 };
 
 DrawingEngine.prototype.clearCanvas = function() {

@@ -51,3 +51,37 @@ Peak.getStaticBrushPoints = function(params, pointer) {
   return [p1, p2, c4, c3, c5];
 };
 
+// Override alignPoints for custom peak grid alignment
+Peak.prototype.alignPoints = function(points, genCenter) {
+  if (!genCenter || points.length === 0) {
+    return points;
+  }
+  
+  var center = new Point(this.params.centerX || 0, this.params.centerY || 0);
+  var brushSize = this.params.brushSize;
+  var i = brushSize / 2;
+  var j = brushSize / 2;
+  
+  var h = i * 2;
+  var w = j * 2;
+  
+  var fitPosCenter = this.alignGridPoint(center, genCenter, w, h);
+  var hPosFactor = (fitPosCenter.getY() - center.getY()) / h;
+  var vPosFactor = (fitPosCenter.getX() - center.getX()) / w;
+  
+  var posPeakUpV = Math.floor(Math.abs(vPosFactor)) % 2 === 0;
+  var posPeakUpH = Math.floor(Math.abs(hPosFactor)) % 2 === 0;
+  
+  var posPeakPoints = Peak.getStaticBrushPoints(this.params, fitPosCenter);
+  
+  if (!posPeakUpV) {
+    posPeakPoints = this.horizontalMirrorPoints(fitPosCenter, posPeakPoints);
+  }
+  
+  if (!posPeakUpH) {
+    posPeakPoints = this.verticalMirrorPoints(fitPosCenter, posPeakPoints);
+  }
+  
+  return posPeakPoints;
+};
+

@@ -30,3 +30,27 @@ Rectangle.getStaticBrushPoints = function(params, pointer) {
   ];
 };
 
+// Override alignPoints for custom rectangle grid alignment
+Rectangle.prototype.alignPoints = function(points, genCenter) {
+  if (!genCenter || points.length === 0) {
+    return points;
+  }
+  
+  // The center of rotations/symmetry
+  var center = new Point(this.params.centerX || 0, this.params.centerY || 0);
+  // The size of the box to fit, special for the rectangle
+  var brushSize = this.params.brushSize;
+  var i = brushSize / 2;
+  var j = brushSize / 4;
+  
+  var h = i * 2;
+  var w = j * 2;
+  
+  // Fit position to center of shape
+  var fitPosCenter = this.alignGridPoint(center, genCenter, w, h);
+  
+  var posRectanglePoints = Rectangle.getStaticBrushPoints(this.params, fitPosCenter);
+  
+  return posRectanglePoints;
+};
+

@@ -6,6 +6,13 @@ function Brush(params, points, pointer) {
   this.prePoints = [];
   // The parameters at the time this brush was created
   this.params = params;
+  // Store center coordinates in params for alignment
+  if (!this.params.centerX && params.centerX !== undefined) {
+    this.params.centerX = params.centerX;
+  }
+  if (!this.params.centerY && params.centerY !== undefined) {
+    this.params.centerY = params.centerY;
+  }
   // The steps that the current stroke has taken
   this.steps = 0;
   // Center points
@@ -70,8 +77,49 @@ Brush.prototype.transformAlign = function() {
   if (!this.params.fitToGrid) {
     return;
   }
-  // Alignment logic would go here - simplified for now
-  // Full implementation would use Maths utilities
+  
+  // Align points using alignPoints method (can be overridden by brushes)
+  this.posPoints = this.alignPoints(this.posPoints, this.posCenter);
+  
+  // If no previous points, copy current points
+  if (this.prePoints.length === 0) {
+    this.prePoints = this.copyPoints(this.posPoints);
+  }
+};
+
+// Align points to grid (generic implementation, can be overridden)
+Brush.prototype.alignPoints = function(points, genCenter) {
+  if (!genCenter || points.length === 0) {
+    return points;
+  }
+  
+  var centroid = this.getCentroid(points);
+  var center = new Point(this.params.centerX || 0, this.params.centerY || 0);
+  
+  var i = 0;
+  
+  // Variable size altering grid if brush size ends in 0 or 5
+  if (this.params.variableSize) {
+    if (this.params.brushSize % 5 === 0) {
+      i = this.steps;
+    }
+  }
+  
+  // Determine grid size (usually brush size unless variable size is enabled)
+  var factor = Math.sin((i * Math.PI) / 180.0);
+  var gridSize = this.params.brushSize * (1.0 + (0.5 * factor));
+  
+  var aligned = this.alignGridPoint(center, centroid, gridSize, gridSize);
+  
+  // Calculate shift vector
+  var cX = centroid.getX();
+  var cY = centroid.getY();
+  var aX = aligned.getX();
+  var aY = aligned.getY();
+  var vector = new Point(aX - cX, aY - cY);
+  
+  // Move points by vector
+  return this.movePoints(points, vector);
 };
 
 // Get centroid (average point) of a set of points
@@ -132,6 +180,78 @@ Brush.prototype.transformSpinning = function() {
   var angleRad = (this.steps * Math.PI) / 180.0;
   var centroid = this.getCentroid(this.posPoints);
   this.posPoints = this.rotatePoints(centroid, this.posPoints, angleRad);
+};
+
+// Align a point to a grid (utility function)
+Brush.prototype.alignGridPoint = function(center, point, w, h) {
+  var cX = center.getX();
+  var cY = center.getY();
+  var pX = point.getX();
+  var pY = point.getY();
+  var dX = (pX - cX) + (w / 2.0);
+  var dY = (pY - cY) + (h / 2.0);
+  var roundX = Math.floor(dX / w) * w;
+  var roundY = Math.floor(dY / h) * h;
+  var nX = roundX + cX;
+  var nY = roundY + cY;
+  return new Point(nX, nY);
+};
+
+// Move points by a vector
+Brush.prototype.movePoints = function(points, vector) {
+  var result = [];
+  for (var i = 0; i < points.length; i++) {
+    var p = points[i];
+    var nX = p.getX() + vector.getX();
+    var nY = p.getY() + vector.getY();
+    result.push(new Point(nX, nY));
+  }
+  return result;
+};
+
+// Mirror points vertically around a center
+Brush.prototype.verticalMirrorPoints = function(center, points) {
+  var result = [];
+  for (var i = 0; i < points.length; i++) {
+    var p = points[i];
+    var cY = center.getY();
+    var nY = (2 * cY) - p.getY();
+    result.push(new Point(p.getX(), nY));
+  }
+  return result;
+};
+
+// Mirror points horizontally around a center
+Brush.prototype.horizontalMirrorPoints = function(center, points) {
+  var result = [];
+  for (var i = 0; i < points.length; i++) {
+    var p = points[i];
+    var cX = center.getX();
+    var nX = (2 * cX) - p.getX();
+    result.push(new Point(nX, p.getY()));
+  }
+  return result;
+};
+
+// Check if a point is inside a triangle
+Brush.prototype.insideTriangle = function(point, triangle) {
+  if (triangle.length < 3) return false;
+  
+  var pX = point.getX();
+  var pY = point.getY();
+  var pAX = triangle[0].getX();
+  var pAY = triangle[0].getY();
+  var pBX = triangle[1].getX();
+  var pBY = triangle[1].getY();
+  var pCX = triangle[2].getX();
+  var pCY = triangle[2].getY();
+  
+  // Cross product test
+  var cp1 = (pBX - pAX) * (pY - pAY) - (pBY - pAY) * (pX - pAX);
+  var cp2 = (pCX - pBX) * (pY - pBY) - (pCY - pBY) * (pX - pBX);
+  var cp3 = (pAX - pCX) * (pY - pCY) - (pAY - pCY) * (pX - pCX);
+  
+  return (cp1 * cp2 >= 0) && (cp2 * cp3 >= 0) && (cp3 * cp1 >= 0);
 };
 
 // Connect previous and current points

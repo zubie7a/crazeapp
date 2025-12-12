@@ -31,3 +31,23 @@ Heart.getStaticBrushPoints = function(params, pointer) {
   ];
 };
 
+// Override alignPoints for custom heart grid alignment
+Heart.prototype.alignPoints = function(points, genCenter) {
+  if (!genCenter || points.length === 0) {
+    return points;
+  }
+  
+  var center = new Point(this.params.centerX || 0, this.params.centerY || 0);
+  var brushSize = this.params.brushSize;
+  var i = brushSize / 2;
+  var j = brushSize / 2;
+  
+  var h = i * 2;
+  var w = j * 2;
+  
+  var fitPosCenter = this.alignGridPoint(center, genCenter, w, h);
+  var posHeartPoints = Heart.getStaticBrushPoints(this.params, fitPosCenter);
+  
+  return posHeartPoints;
+};
+

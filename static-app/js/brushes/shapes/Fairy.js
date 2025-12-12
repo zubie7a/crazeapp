@@ -53,3 +53,29 @@ Fairy.getStaticBrushPoints = function(params, pointer) {
   return points1.concat(points2).concat(points3).concat(points4);
 };
 
+// Override alignPoints for custom fairy grid alignment
+Fairy.prototype.alignPoints = function(points, genCenter) {
+  if (!genCenter || points.length === 0) {
+    return points;
+  }
+  
+  var center = new Point(this.params.centerX || 0, this.params.centerY || 0);
+  var brushSize = this.params.brushSize;
+  var i = brushSize / 2;
+  var j = brushSize / 2;
+  
+  var h = i * 2;
+  var w = j * 2;
+  
+  var fitPosCenter = this.alignGridPoint(center, genCenter, w, h);
+  var vPosFactor = (fitPosCenter.getX() - center.getX()) / w;
+  var posFairyUp = Math.floor(Math.abs(vPosFactor)) % 2 === 0;
+  
+  var posFairyPoints = Fairy.getStaticBrushPoints(this.params, fitPosCenter);
+  if (!posFairyUp) {
+    posFairyPoints = this.verticalMirrorPoints(fitPosCenter, posFairyPoints);
+  }
+  
+  return posFairyPoints;
+};
+

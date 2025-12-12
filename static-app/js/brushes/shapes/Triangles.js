@@ -29,3 +29,47 @@ Triangles.getStaticBrushPoints = function(params, pointer) {
   ];
 };
 
+// Override alignPoints for custom triangle grid alignment
+Triangles.prototype.alignPoints = function(points, genCenter) {
+  if (!genCenter || points.length === 0) {
+    return points;
+  }
+  
+  // The center of rotations/symmetry
+  var center = new Point(this.params.centerX || 0, this.params.centerY || 0);
+  // The size of the box to fit, width is different than h because of the equilateral triangle
+  var h = this.params.brushSize;
+  var w = Math.sqrt(4.0 / 3.0) * h;
+  
+  // Fit position to center of shape
+  var fitPosCenter = this.alignGridPoint(center, genCenter, w, h);
+  
+  // To help determining alternating triangle orientation
+  var hPosFactor = (fitPosCenter.getY() - center.getY()) / h;
+  // Now use this factor to determine triangle orientation
+  var posTriangleUp = (Math.floor(Math.abs(hPosFactor)) % 2 === 0);
+  
+  var posTriPoints = Triangles.getStaticBrushPoints(this.params, fitPosCenter);
+  if (!posTriangleUp) {
+    posTriPoints = this.verticalMirrorPoints(fitPosCenter, posTriPoints);
+  }
+  
+  // Now check if the center is inside the fitted triangle
+  var posInside = this.insideTriangle(genCenter, posTriPoints);
+  
+  if (!posInside) {
+    // Then shift the fitted center to the left or to the right
+    // depending to what side the point is outside the triangle
+    var shiftVector = new Point(0, 0);
+    if (genCenter.getX() < fitPosCenter.getX()) {
+      shiftVector = new Point(-(w / 2), 0);
+    } else {
+      shiftVector = new Point((w / 2), 0);
+    }
+    posTriPoints = this.movePoints(posTriPoints, shiftVector);
+    posTriPoints = this.verticalMirrorPoints(fitPosCenter, posTriPoints);
+  }
+  
+  return posTriPoints;
+};
+

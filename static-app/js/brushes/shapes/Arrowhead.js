@@ -30,3 +30,38 @@ Arrowhead.getStaticBrushPoints = function(params, pointer) {
   ];
 };
 
+// Override alignPoints for custom arrowhead grid alignment (same as triangle)
+Arrowhead.prototype.alignPoints = function(points, genCenter) {
+  if (!genCenter || points.length === 0) {
+    return points;
+  }
+  
+  var center = new Point(this.params.centerX || 0, this.params.centerY || 0);
+  var h = this.params.brushSize;
+  var w = Math.sqrt(4.0 / 3.0) * h;
+  
+  var fitPosCenter = this.alignGridPoint(center, genCenter, w, h);
+  var hPosFactor = (fitPosCenter.getY() - center.getY()) / h;
+  var posTriangleUp = (Math.floor(Math.abs(hPosFactor)) % 2 === 0);
+  
+  var posTriPoints = Arrowhead.getStaticBrushPoints(this.params, fitPosCenter);
+  if (!posTriangleUp) {
+    posTriPoints = this.verticalMirrorPoints(fitPosCenter, posTriPoints);
+  }
+  
+  var posInside = this.insideTriangle(genCenter, posTriPoints);
+  
+  if (!posInside) {
+    var shiftVector = new Point(0, 0);
+    if (genCenter.getX() < fitPosCenter.getX()) {
+      shiftVector = new Point(-(w / 2), 0);
+    } else {
+      shiftVector = new Point((w / 2), 0);
+    }
+    posTriPoints = this.movePoints(posTriPoints, shiftVector);
+    posTriPoints = this.verticalMirrorPoints(fitPosCenter, posTriPoints);
+  }
+  
+  return posTriPoints;
+};
+

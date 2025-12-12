@@ -33,3 +33,62 @@ Insignia.getStaticBrushPoints = function(params, pointer) {
   ];
 };
 
+// Override alignPoints for custom insignia grid alignment
+Insignia.prototype.alignPoints = function(points, genCenter) {
+  if (!genCenter || points.length === 0) {
+    return points;
+  }
+  
+  var center = new Point(this.params.centerX || 0, this.params.centerY || 0);
+  var brushSize = this.params.brushSize;
+  var i = brushSize / 2;
+  var j = brushSize / 4;
+  var d3 = Math.sqrt(3.0) * j;
+  
+  var h = i;
+  var w = d3 * 2;
+  
+  var fitCenter = this.alignGridPoint(center, genCenter, w, h);
+  var insigniaPoints = Insignia.getStaticBrushPoints(this.params, fitCenter);
+  
+  var fitX = fitCenter.getX();
+  var fitY = fitCenter.getY();
+  var shiftVector = new Point(0, 0);
+  var found = false;
+  
+  // 1. Check if inside top-left
+  if (!found) {
+    var p1 = new Point(fitX - d3, fitY - j);
+    var p2 = new Point(fitX, fitY - j);
+    var p3 = new Point(fitX, fitY);
+    var inside = this.insideTriangle(genCenter, [p1, p2, p3]);
+    if (inside) {
+      shiftVector = new Point(0, -j);
+      found = true;
+    }
+  }
+  
+  // 2. Check if inside top-right
+  if (!found) {
+    var p1 = new Point(fitX, fitY - j);
+    var p2 = new Point(fitX + d3, fitY - j);
+    var p3 = new Point(fitX, fitY);
+    var inside = this.insideTriangle(genCenter, [p1, p2, p3]);
+    if (inside) {
+      shiftVector = new Point(0, -j);
+      found = true;
+    }
+  }
+  
+  if (!found) {
+    shiftVector = new Point(0, j);
+  }
+  
+  if (Math.floor(fitCenter.getX() / w) % 2 === 0) {
+    insigniaPoints = this.rotatePoints(fitCenter, insigniaPoints, Math.PI);
+  }
+  insigniaPoints = this.movePoints(insigniaPoints, shiftVector);
+  
+  return insigniaPoints;
+};
+
