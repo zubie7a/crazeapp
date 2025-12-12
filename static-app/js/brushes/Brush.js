@@ -81,6 +81,12 @@ Brush.prototype.transformAlign = function() {
   // Align points using alignPoints method (can be overridden by brushes)
   this.posPoints = this.alignPoints(this.posPoints, this.posCenter);
   
+  // Also align previous points if they exist (important for connectBorders)
+  // This prevents connecting aligned current points with non-aligned previous points
+  if (this.prePoints.length > 0 && this.preCenter) {
+    this.prePoints = this.alignPoints(this.prePoints, this.preCenter);
+  }
+  
   // If no previous points, copy current points
   if (this.prePoints.length === 0) {
     this.prePoints = this.copyPoints(this.posPoints);
