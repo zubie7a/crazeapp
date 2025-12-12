@@ -33,6 +33,75 @@ Flower.getStaticBrushPoints = function(params, pointer) {
   ];
 };
 
+// Override getPath to draw flower with arcs
+Flower.prototype.getPath = function(points, rotAngle, symmetry) {
+  if (points.length < 6) return points;
+  
+  var p1 = points[0];
+  var p2 = points[1];
+  var p3 = points[2];
+  var p4 = points[3];
+  var p5 = points[4];
+  var p6 = points[5];
+  
+  var radius = this.distance(p1, p4) / 2.0;
+  
+  var fixSector = function(sector, sym) {
+    if (!sym) return sector;
+    if (sector === 3) return 1;
+    if (sector === 1 || sector === 7) return 3;
+    if (sector === 4) return 6;
+    if (sector === 6) return 4;
+    return sector;
+  };
+  
+  var addFlowerArc = function(center, radius, sectors, rotAngle, symmetry) {
+    var radians6th = 2 * Math.PI / 6.0;
+    var offset = 2 * Math.PI / 12.0;
+    var mirror = symmetry ? -1.0 : 1.0;
+    
+    // Account for spinning
+    if (this.params.rotatingShape) {
+      offset -= (mirror * (this.steps * Math.PI / 180.0));
+    }
+    
+    // Account for rotation angle
+    offset -= (mirror * rotAngle);
+    
+    var sectorA = fixSector(sectors[0], symmetry);
+    var sectorB = fixSector(sectors[1], symmetry);
+    
+    return {
+      center: center,
+      radius: radius,
+      startAngle: (sectorB * radians6th) - offset,
+      endAngle: (sectorA * radians6th) - offset,
+      clockwise: symmetry
+    };
+  }.bind(this);
+  
+  // Build arcs in reverse order (for web Canvas compatibility)
+  var arcs = [
+    addFlowerArc(p4, radius, [4, 5], rotAngle, symmetry),
+    addFlowerArc(p6, radius, [1, 2], rotAngle, symmetry),
+    addFlowerArc(p3, radius, [3, 4], rotAngle, symmetry),
+    addFlowerArc(p5, radius, [6, 7], rotAngle, symmetry),
+    addFlowerArc(p2, radius, [2, 3], rotAngle, symmetry),
+    addFlowerArc(p4, radius, [5, 6], rotAngle, symmetry),
+    addFlowerArc(p1, radius, [1, 2], rotAngle, symmetry),
+    addFlowerArc(p3, radius, [4, 5], rotAngle, symmetry),
+    addFlowerArc(p2, radius, [3, 4], rotAngle, symmetry),
+    addFlowerArc(p6, radius, [6, 7], rotAngle, symmetry),
+    addFlowerArc(p5, radius, [5, 6], rotAngle, symmetry),
+    addFlowerArc(p1, radius, [2, 3], rotAngle, symmetry)
+  ];
+  
+  return {
+    type: 'arcs',
+    arcs: arcs
+  };
+};
+
 // Override alignPoints for custom flower grid alignment (same as hexagon)
 Flower.prototype.alignPoints = function(points, genCenter) {
   if (!genCenter || points.length === 0) {

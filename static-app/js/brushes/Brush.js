@@ -371,6 +371,12 @@ Brush.prototype.drawPath = function(points, rotAngle, symmetry, ctx, color, engi
     return;
   }
   
+  // Handle arc-based paths (Heart, Flower, Wave, Moon, Window)
+  if (path.type === 'arcs') {
+    this.drawArcPath(path, rotAngle, symmetry, ctx, color, engine);
+    return;
+  }
+  
   // Regular path - array of points
   if (!Array.isArray(path) || path.length === 0) return;
   
@@ -387,6 +393,114 @@ Brush.prototype.drawPath = function(points, rotAngle, symmetry, ctx, color, engi
       }
     }
   }
+};
+
+// Draw arc-based path (for Heart, Flower, Wave, Moon, Window)
+Brush.prototype.drawArcPath = function(pathData, rotAngle, symmetry, ctx, color, engine) {
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  
+  var arcs = pathData.arcs;
+  if (!arcs || arcs.length === 0) return;
+  
+  // Track current position as we draw
+  var currentX, currentY;
+  
+  // Start at first arc's start point
+  var firstArc = arcs[0];
+  currentX = firstArc.center.getX() + firstArc.radius * Math.cos(firstArc.startAngle);
+  currentY = firstArc.center.getY() + firstArc.radius * Math.sin(firstArc.startAngle);
+  ctx.moveTo(currentX, currentY);
+  
+  // Draw each arc
+  // Note: Canvas arc() uses anticlockwise (true = counter-clockwise), iOS uses clockwise (true = clockwise)
+  // So we need to invert the boolean
+  // Canvas arc() automatically adds a line from current point to arc start, then draws the arc
+  for (var i = 0; i < arcs.length; i++) {
+    var arc = arcs[i];
+    
+    // Calculate where this arc should start
+    var arcStartX = arc.center.getX() + arc.radius * Math.cos(arc.startAngle);
+    var arcStartY = arc.center.getY() + arc.radius * Math.sin(arc.startAngle);
+    
+    // If we're not already at the start of this arc, move there
+    // (This handles cases where arcs don't connect end-to-end, like in Heart)
+    var dist = Math.sqrt(Math.pow(arcStartX - currentX, 2) + Math.pow(arcStartY - currentY, 2));
+    if (dist > 0.1) {  // If more than 0.1 pixels away, move there
+      ctx.lineTo(arcStartX, arcStartY);
+      currentX = arcStartX;
+      currentY = arcStartY;
+    }
+    
+    // Draw the arc
+    ctx.arc(
+      arc.center.getX(),
+      arc.center.getY(),
+      arc.radius,
+      arc.startAngle,
+      arc.endAngle,
+      !arc.clockwise  // Invert: Canvas uses anticlockwise, iOS uses clockwise
+    );
+    
+    // Update current position to end of arc
+    currentX = arc.center.getX() + arc.radius * Math.cos(arc.endAngle);
+    currentY = arc.center.getY() + arc.radius * Math.sin(arc.endAngle);
+  }
+  
+  // Add lines if needed (after all arcs)
+  if (pathData.lines) {
+    for (var i = 0; i < pathData.lines.length; i++) {
+      var line = pathData.lines[i];
+      ctx.lineTo(line.getX(), line.getY());
+    }
+  }
+  
+  // Close path if needed
+  if (pathData.close) {
+    ctx.closePath();
+  }
+  
+  // Fill or stroke
+  if (this.params.fillShape) {
+    ctx.fill();
+  } else {
+    ctx.stroke();
+  }
+};
+
+// Helper to calculate distance between two points
+Brush.prototype.distance = function(p1, p2) {
+  var dx = p2.getX() - p1.getX();
+  var dy = p2.getY() - p1.getY();
+  return Math.sqrt(dx * dx + dy * dy);
+};
+
+// Helper to calculate distance from array of points
+Brush.prototype.distanceFromPoints = function(points) {
+  if (points.length < 2) return 0;
+  return this.distance(points[0], points[1]);
+};
+
+// Helper to scale a point relative to another
+Brush.prototype.scalePoint = function(center, point, factor) {
+  var x = center.getX() + (point.getX() - center.getX()) * factor;
+  var y = center.getY() + (point.getY() - center.getY()) * factor;
+  return new Point(x, y);
+};
+
+// Helper to rotate a single point around a center
+Brush.prototype.rotatePoint = function(center, point, angle) {
+  var x = point.getX() - center.getX();
+  var y = point.getY() - center.getY();
+  var xNew = x * Math.cos(angle) - y * Math.sin(angle);
+  var yNew = x * Math.sin(angle) + y * Math.cos(angle);
+  return new Point(xNew + center.getX(), yNew + center.getY());
+};
+
+// Helper to get point difference
+Brush.prototype.pointDifference = function(p1, p2) {
+  return new Point(p2.getX() - p1.getX(), p2.getY() - p1.getY());
 };
 
 // Connect previous and current points (like iOS - uses rotateBrush for connections)
