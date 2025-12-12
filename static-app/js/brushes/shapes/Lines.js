@@ -59,69 +59,16 @@ Lines.prototype.connectPosPre = function(ctx, color, engine) {
   }
 };
 
-// Override finishStroke for filling
+// Override finishStroke for filling (matches iOS implementation)
 Lines.prototype.finishStroke = function(ctx, engine) {
   if (!this.params.fillShape || this.allPoints.length < 2) {
     return;
   }
   
+  // Use the existing rotateBrush infrastructure, just like iOS
+  // iOS calls: Drawing.rotateBrush(self.params, self.allPoints, context, color, self)
+  // We'll use a helper method that does the same thing
   var color = engine.getColor();
-  var settings = this.params;
-  var rotations = settings.rotationAmount;
-  var center = new Point(engine.centerX, engine.centerY);
-  var angle = 2 * Math.PI / rotations;
-  
-  var fillbak = ctx.fillStyle;
-  ctx.fillStyle = color;
-  ctx.strokeStyle = color;
-  
-  // Fill for each rotation
-  for (var j = 0; j < rotations; j++) {
-    var rotAngle = angle * j;
-    ctx.beginPath();
-    
-    // Rotate all points and draw path
-    for (var i = 0; i < this.allPoints.length; i++) {
-      var p = this.allPoints[i];
-      var x = p.getX() - center.getX();
-      var y = p.getY() - center.getY();
-      var xNew = x * Math.cos(rotAngle) - y * Math.sin(rotAngle);
-      var yNew = x * Math.sin(rotAngle) + y * Math.cos(rotAngle);
-      
-      if (i === 0) {
-        ctx.moveTo(xNew + center.getX(), yNew + center.getY());
-      } else {
-        ctx.lineTo(xNew + center.getX(), yNew + center.getY());
-      }
-    }
-    
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    
-    // Mirror for symmetry if enabled
-    if (settings.symmetry) {
-      ctx.beginPath();
-      for (var i = 0; i < this.allPoints.length; i++) {
-        var p = this.allPoints[i];
-        var x = p.getX() - center.getX();
-        var y = p.getY() - center.getY();
-        var xNew = x * Math.cos(rotAngle) - y * Math.sin(rotAngle);
-        var yNew = x * Math.sin(rotAngle) + y * Math.cos(rotAngle);
-        var mirroredX = 2 * center.getX() - (xNew + center.getX());
-        
-        if (i === 0) {
-          ctx.moveTo(mirroredX, yNew + center.getY());
-        } else {
-          ctx.lineTo(mirroredX, yNew + center.getY());
-        }
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
-  }
-  
-  ctx.fillStyle = fillbak;
+  this.rotateBrushForPoints(this.allPoints, ctx, color, engine);
 };
 

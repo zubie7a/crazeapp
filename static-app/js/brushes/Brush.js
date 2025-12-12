@@ -536,7 +536,8 @@ Brush.prototype.connectPosPre = function(ctx, color, engine) {
   }
 };
 
-// Helper to rotate/mirror and draw a set of points (used for connections)
+// Helper to rotate/mirror and draw a set of points (used for connections and filling)
+// This matches iOS Drawing.rotateBrush functionality
 Brush.prototype.rotateBrushForPoints = function(points, ctx, color, engine) {
   var params = this.params;
   var rotations = params.rotationAmount;
@@ -549,21 +550,14 @@ Brush.prototype.rotateBrushForPoints = function(points, ctx, color, engine) {
     // Rotate points around center
     var rotatedPoints = this.rotatePoints(center, points, rotAngle);
     
-    // Draw rotated connection line
-    if (rotatedPoints.length >= 2) {
-      var p1 = rotatedPoints[0];
-      var p2 = rotatedPoints[1];
-      engine.drawLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), false);
-    }
+    // Use drawPath to handle both lines and filled shapes (like iOS)
+    // For 2 points, draw as line; for 3+ points, draw as filled shape if fillShape is enabled
+    this.drawPath(rotatedPoints, rotAngle, false, ctx, color, engine);
     
     // Mirror for symmetry if enabled
     if (params.symmetry) {
       var mirroredPoints = this.mirrorPoints(center, rotatedPoints);
-      if (mirroredPoints.length >= 2) {
-        var p1 = mirroredPoints[0];
-        var p2 = mirroredPoints[1];
-        engine.drawLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), false);
-      }
+      this.drawPath(mirroredPoints, rotAngle, true, ctx, color, engine);
     }
   }
 };
