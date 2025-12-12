@@ -74,20 +74,64 @@ Brush.prototype.transformAlign = function() {
   // Full implementation would use Maths utilities
 };
 
-// Transform variable size
+// Get centroid (average point) of a set of points
+Brush.prototype.getCentroid = function(points) {
+  if (points.length === 0) {
+    return new Point(0, 0);
+  }
+  
+  var sumX = 0;
+  var sumY = 0;
+  for (var i = 0; i < points.length; i++) {
+    sumX += points[i].getX();
+    sumY += points[i].getY();
+  }
+  
+  return new Point(sumX / points.length, sumY / points.length);
+};
+
+// Scale points around a center point
+Brush.prototype.scalePoints = function(center, points, factor) {
+  var result = [];
+  for (var i = 0; i < points.length; i++) {
+    var p = points[i];
+    var x = p.getX();
+    var y = p.getY();
+    var cX = center.getX();
+    var cY = center.getY();
+    
+    // Scale relative to center
+    var nX = ((x - cX) * factor) + cX;
+    var nY = ((y - cY) * factor) + cY;
+    result.push(new Point(nX, nY));
+  }
+  return result;
+};
+
+// Transform variable size (oscillates between 0.5 and 1.5 times size)
 Brush.prototype.transformVariable = function() {
   if (!this.params.variableSize) {
     return;
   }
-  // Variable size logic would go here
+  
+  // Use sin to oscillate between 0.5 and 1.5 times the shape's size
+  var angleRad = (this.steps * Math.PI) / 180.0;
+  var factor = 1 + (0.5 * Math.sin(angleRad));
+  
+  var centroid = this.getCentroid(this.posPoints);
+  this.posPoints = this.scalePoints(centroid, this.posPoints, factor);
 };
 
-// Transform spinning
+// Transform spinning (rotates points around their centroid)
 Brush.prototype.transformSpinning = function() {
   if (!this.params.rotatingShape) {
     return;
   }
-  // Spinning logic would go here
+  
+  // Rotate points around their centroid by the steps angle
+  var angleRad = (this.steps * Math.PI) / 180.0;
+  var centroid = this.getCentroid(this.posPoints);
+  this.posPoints = this.rotatePoints(centroid, this.posPoints, angleRad);
 };
 
 // Connect previous and current points
@@ -111,7 +155,7 @@ Brush.prototype.draw = function(ctx, engine) {
   // Apply transformations
   this.transform();
   
-  // Do connections if required
+  // Do connections if required (this will also rotate/mirror connections)
   this.connectPosPre(ctx, color, engine);
   
   // Draw (and Fill) the brush with rotation
@@ -225,7 +269,7 @@ Brush.prototype.drawPath = function(points, rotAngle, symmetry, ctx, color, engi
   }
 };
 
-// Connect previous and current points
+// Connect previous and current points (like iOS - uses rotateBrush for connections)
 Brush.prototype.connectPosPre = function(ctx, color, engine) {
   if (!this.params.connectBorders) {
     return;
@@ -238,12 +282,48 @@ Brush.prototype.connectPosPre = function(ctx, color, engine) {
     return;
   }
   
-  // Connect corresponding points
+  // Connect corresponding points - each connection goes through rotateBrush
+  // so it gets rotated and mirrored like the main brush (like iOS)
   var minLen = Math.min(prePoints.length, posPoints.length);
   for (var i = 0; i < minLen; i++) {
     var preP = prePoints[i];
     var posP = posPoints[i];
-    engine.drawLine(preP.getX(), preP.getY(), posP.getX(), posP.getY(), false);
+    // Create a 2-point path for the connection line
+    var connectionPoints = [preP, posP];
+    // Draw this connection with rotation/mirroring (like iOS Drawing.rotateBrush)
+    this.rotateBrushForPoints(connectionPoints, ctx, color, engine);
+  }
+};
+
+// Helper to rotate/mirror and draw a set of points (used for connections)
+Brush.prototype.rotateBrushForPoints = function(points, ctx, color, engine) {
+  var params = this.params;
+  var rotations = params.rotationAmount;
+  var center = new Point(engine.centerX, engine.centerY);
+  var angle = 2 * Math.PI / rotations;
+  
+  for (var i = 0; i < rotations; i++) {
+    var rotAngle = angle * i;
+    
+    // Rotate points around center
+    var rotatedPoints = this.rotatePoints(center, points, rotAngle);
+    
+    // Draw rotated connection line
+    if (rotatedPoints.length >= 2) {
+      var p1 = rotatedPoints[0];
+      var p2 = rotatedPoints[1];
+      engine.drawLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), false);
+    }
+    
+    // Mirror for symmetry if enabled
+    if (params.symmetry) {
+      var mirroredPoints = this.mirrorPoints(center, rotatedPoints);
+      if (mirroredPoints.length >= 2) {
+        var p1 = mirroredPoints[0];
+        var p2 = mirroredPoints[1];
+        engine.drawLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), false);
+      }
+    }
   }
 };
 
