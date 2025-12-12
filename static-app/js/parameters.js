@@ -35,36 +35,106 @@
     randomize: function(engine, crazeController, elements, showToast) {
       if (!engine) return;
       
-      // Check if currently drawing (either manually or in CraZe mode)
-      var isDrawing = engine.drawing;
-      var currentPointer = null;
+      // Store state for all active strokes (default and multi-hand)
+      var activeStrokeStates = {};
       
-      if (isDrawing) {
-        // Get current pointer position
+      // Capture state for default stroke
+      if (engine.drawing) {
         if (crazeController && crazeController.active) {
           // CraZe mode is active - use its current point
-          currentPointer = new Point(crazeController.point.x, crazeController.point.y);
+          activeStrokeStates['default'] = {
+            x: crazeController.point.x,
+            y: crazeController.point.y
+          };
         } else {
           // Manual drawing - use engine's current position
-          currentPointer = new Point(engine.x1, engine.y1);
+          activeStrokeStates['default'] = {
+            x: engine.x1,
+            y: engine.y1
+          };
         }
       }
       
-      // Randomize parameters
-      Randomizer.randomizeParameters(engine);
-      Randomizer.syncUI(engine, elements);
-      
-      // If drawing, create a new brush instance with the new randomized settings
-      if (isDrawing && currentPointer) {
-        // Update center coordinates in settings
-        engine.settings.centerX = engine.centerX;
-        engine.settings.centerY = engine.centerY;
-        // Create new brush with updated settings
-        engine.currentBrush = BrushGenerator.buildBrush(engine.settings, currentPointer);
+      // Capture state for multi-hand strokes
+      if (engine.activeStrokes) {
+        for (var strokeId in engine.activeStrokes) {
+          var stroke = engine.activeStrokes[strokeId];
+          if (stroke && stroke.aX !== undefined && stroke.aY !== undefined) {
+            activeStrokeStates[strokeId] = {
+              x: stroke.aX,
+              y: stroke.aY
+            };
+          }
+        }
       }
       
-      // Show toast notification (like iOS)
-      showToast('Parameters RandomiZed!');
+      // Backup current settings to restore after individual randomizations
+      var originalSettings = JSON.parse(JSON.stringify(engine.settings));
+      var originalCenterX = engine.centerX;
+      var originalCenterY = engine.centerY;
+      
+      // Store default stroke's randomized settings for UI sync
+      var defaultStrokeSettings = null;
+      
+      // Randomize separately for each active stroke - each gets its own unique random brush
+      for (var strokeId in activeStrokeStates) {
+        var state = activeStrokeStates[strokeId];
+        var pointer = new Point(state.x, state.y);
+        
+        // Randomize parameters for this specific stroke (independent randomization)
+        Randomizer.randomizeParameters(engine);
+        
+        // Update center coordinates in settings for brush creation
+        engine.settings.centerX = engine.centerX;
+        engine.settings.centerY = engine.centerY;
+        
+        // Store settings for default stroke (to sync UI later)
+        if (strokeId === 'default') {
+          defaultStrokeSettings = JSON.parse(JSON.stringify(engine.settings));
+        }
+        
+        // Create a new brush with randomized settings for this stroke
+        // The brush stores its own copy of params, so it won't be affected by later changes
+        var newBrush = BrushGenerator.buildBrush(engine.settings, pointer);
+        
+        if (strokeId === 'default') {
+          engine.currentBrush = newBrush;
+        } else {
+          // Update brush for multi-hand stroke
+          if (engine.activeStrokes && engine.activeStrokes[strokeId]) {
+            engine.activeStrokes[strokeId].brush = newBrush;
+          }
+        }
+        
+        // Restore original settings before next randomization (so each stroke gets independent randomization)
+        engine.settings = JSON.parse(JSON.stringify(originalSettings));
+        engine.centerX = originalCenterX;
+        engine.centerY = originalCenterY;
+      }
+      
+      // Set final engine.settings to match default stroke (if it exists) for UI consistency
+      if (defaultStrokeSettings) {
+        engine.settings = defaultStrokeSettings;
+        if (elements) {
+          Randomizer.syncUI(engine, elements);
+        }
+      } else if (Object.keys(activeStrokeStates).length > 0) {
+        // If no default stroke, randomize one more time for UI (use first stroke's settings)
+        Randomizer.randomizeParameters(engine);
+        if (elements) {
+          Randomizer.syncUI(engine, elements);
+        }
+      } else {
+        // No active strokes - just randomize for UI
+        Randomizer.randomizeParameters(engine);
+        if (elements) {
+          Randomizer.syncUI(engine, elements);
+        }
+      }
+      
+      if (showToast) {
+        showToast('Parameters RandomiZed!');
+      }
     }
   };
 

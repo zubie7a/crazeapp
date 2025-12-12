@@ -203,17 +203,52 @@ DrawingEngine.prototype.recreateActiveBrushes = function() {
   }
 };
 
-// Randomize active brushes (for persistent randomize)
-DrawingEngine.prototype.randomizeActiveBrushes = function() {
+// Randomize a specific active brush (for persistent randomize)
+// strokeId: 'default' for default stroke, or 'hand0', 'hand1', etc. for multi-hand strokes
+DrawingEngine.prototype.randomizeActiveBrushes = function(strokeId) {
   if (!this.settings.persistentRandomize) return;
   
-  // Randomize parameters (but preserve persistentRandomize setting)
+  strokeId = strokeId || 'default';
+  
+  // Get the brush for this specific stroke
+  var brush = null;
+  var pointer = null;
+  
+  if (strokeId === 'default') {
+    if (!this.drawing || !this.currentBrush) return;
+    brush = this.currentBrush;
+    pointer = new Point(this.x1, this.y1);
+  } else {
+    var stroke = this.activeStrokes[strokeId];
+    if (!stroke || !stroke.brush) return;
+    brush = stroke.brush;
+    pointer = new Point(stroke.aX, stroke.aY);
+  }
+  
+  // Backup current settings
+  var originalSettings = JSON.parse(JSON.stringify(this.settings));
   var persistentRandomize = this.settings.persistentRandomize;
+  
+  // Randomize parameters for this specific brush
   Randomizer.randomizeParameters(this);
   this.settings.persistentRandomize = persistentRandomize;
   
-  // Recreate all active brushes with new randomized settings
-  this.recreateActiveBrushes();
+  // Update center coordinates in settings for brush creation
+  this.settings.centerX = this.centerX;
+  this.settings.centerY = this.centerY;
+  
+  // Create new brush with randomized settings for this stroke only
+  var newBrush = BrushGenerator.buildBrush(this.settings, pointer);
+  
+  if (strokeId === 'default') {
+    this.currentBrush = newBrush;
+  } else {
+    this.activeStrokes[strokeId].brush = newBrush;
+  }
+  
+  // Restore original settings (so other brushes aren't affected)
+  this.settings = originalSettings;
+  this.settings.persistentRandomize = persistentRandomize;
 };
 
 DrawingEngine.prototype.setCenter = function(x, y) {
@@ -480,7 +515,8 @@ DrawingEngine.prototype.onMouseMove = function(x, y, strokeId) {
     // brush.steps is incremented in transform() which is called in draw()
     // Check if we've crossed a 30-step boundary (but not at step 0)
     if (this.settings.persistentRandomize && brush.steps > 0 && brush.steps % 30 === 0 && stepsBefore % 30 !== 0) {
-      this.randomizeActiveBrushes();
+      // Randomize only this specific brush (identified by strokeId)
+      this.randomizeActiveBrushes(strokeId);
     }
   }
 };
