@@ -11,6 +11,7 @@
   var engine = null;
   var crazeController = null;
   var changeCenterMode = false;
+  var activeTouches = {}; // Map of touch.identifier -> strokeId
 
   // DOM Elements (populated in init)
   var elements = {};
@@ -254,6 +255,36 @@
       HandsFree.stop();
     }
 
+    // Handle touch events (multi-touch support)
+    if (e.touches && e.touches.length > 0) {
+      var changedTouches = e.changedTouches || e.touches;
+      for (var i = 0; i < changedTouches.length; i++) {
+        var touch = changedTouches[i];
+        var touchId = 'touch' + touch.identifier;
+        activeTouches[touch.identifier] = touchId;
+        
+        // Create a synthetic event for this touch to get coordinates
+        var touchEvent = {
+          touches: [touch],
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        };
+        var coords = getCanvasCoords(touchEvent);
+        
+        if (changeCenterMode && i === 0) {
+          // Only set center on first touch
+          engine.setCenter(coords.x, coords.y);
+          changeCenterMode = false;
+          elements.canvasContainer.classList.remove('center-mode');
+          return;
+        }
+        
+        engine.onMouseDown(coords.x, coords.y, touchId);
+      }
+      return;
+    }
+
+    // Handle mouse events (single touch)
     var coords = getCanvasCoords(e);
 
     if (changeCenterMode) {
@@ -267,13 +298,52 @@
   }
 
   function handleMouseMove(e) {
-    if (!engine || !engine.drawing) return;
+    if (!engine) return;
+
+    // Handle touch events (multi-touch support)
+    if (e.touches && e.touches.length > 0) {
+      for (var i = 0; i < e.touches.length; i++) {
+        var touch = e.touches[i];
+        var touchId = activeTouches[touch.identifier];
+        
+        if (touchId) {
+          // Create a synthetic event for this touch to get coordinates
+          var touchEvent = {
+            touches: [touch],
+            clientX: touch.clientX,
+            clientY: touch.clientY
+          };
+          var coords = getCanvasCoords(touchEvent);
+          engine.onMouseMove(coords.x, coords.y, touchId);
+        }
+      }
+      return;
+    }
+
+    // Handle mouse events (single touch)
+    if (!engine.drawing) return;
     var coords = getCanvasCoords(e);
     engine.onMouseMove(coords.x, coords.y);
   }
 
-  function handleMouseUp() {
+  function handleMouseUp(e) {
     if (!engine) return;
+
+    // Handle touch events (multi-touch support)
+    if (e && e.changedTouches && e.changedTouches.length > 0) {
+      for (var i = 0; i < e.changedTouches.length; i++) {
+        var touch = e.changedTouches[i];
+        var touchId = activeTouches[touch.identifier];
+        
+        if (touchId) {
+          engine.onMouseUp(touchId);
+          delete activeTouches[touch.identifier];
+        }
+      }
+      return;
+    }
+
+    // Handle mouse events (single touch)
     engine.onMouseUp();
   }
 
@@ -343,9 +413,19 @@
       e.preventDefault();
       handleMouseUp(e);
     });
-    canvas.addEventListener('touchstart', function(e) { e.preventDefault(); handleMouseDown(e); });
-    canvas.addEventListener('touchmove', function(e) { e.preventDefault(); handleMouseMove(e); });
+    canvas.addEventListener('touchstart', function(e) { 
+      e.preventDefault(); 
+      handleMouseDown(e); 
+    });
+    canvas.addEventListener('touchmove', function(e) { 
+      e.preventDefault(); 
+      handleMouseMove(e); 
+    });
     canvas.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      handleMouseUp(e);
+    });
+    canvas.addEventListener('touchcancel', function(e) {
       e.preventDefault();
       handleMouseUp(e);
     });
