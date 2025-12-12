@@ -424,21 +424,19 @@ DrawingEngine.prototype.onMouseDown = function(x, y) {
 };
 
 DrawingEngine.prototype.onMouseUp = function() {
-  var settings = this.settings;
-  if (settings.brush === BRUSHES.LINES && settings.fillShape) {
-    var len = this.posX.length / 2;
-    this.filler(len);
-    this.posX = [];
-    this.posY = [];
-  }
-  
-  // Finish stroke on brush if needed
+  // Finish stroke on brush if needed (handles filling for Lines brush)
   if (this.currentBrush && this.currentBrush.finishStroke) {
-    this.currentBrush.finishStroke(this.ctx);
+    this.currentBrush.finishStroke(this.ctx, this);
   }
   
   this.drawing = false;
   this.currentBrush = null;
+  
+  // Clear point storage arrays
+  this.posX = [];
+  this.posY = [];
+  this.preX = [];
+  this.preY = [];
 };
 
 DrawingEngine.prototype.onMouseMove = function(x, y) {
