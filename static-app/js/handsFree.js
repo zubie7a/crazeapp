@@ -34,8 +34,36 @@ var HandsFree = (function() {
 
     if (!landmarks || landmarks.length === 0) return;
 
-    var width = canvas.width;
-    var height = canvas.height;
+    // Get video aspect ratio (typically 16:9 or 4:3 for webcams)
+    // Try to get it from HandsFree video element, or default to 16:9
+    var videoAspectRatio = 16 / 9; // Default to 16:9
+    if (handsFreeInstance && handsFreeInstance.video) {
+      var video = handsFreeInstance.video;
+      if (video.videoWidth && video.videoHeight) {
+        videoAspectRatio = video.videoWidth / video.videoHeight;
+      }
+    }
+    
+    var canvasWidth = canvas.width;
+    var canvasHeight = canvas.height;
+    var canvasAspectRatio = canvasWidth / canvasHeight;
+    
+    // Calculate letterboxed/pillarboxed area to maintain video aspect ratio
+    var drawWidth, drawHeight, offsetX, offsetY;
+    
+    if (canvasAspectRatio > videoAspectRatio) {
+      // Canvas is wider than video - letterbox (black bars on sides)
+      drawHeight = canvasHeight;
+      drawWidth = drawHeight * videoAspectRatio;
+      offsetX = (canvasWidth - drawWidth) / 2;
+      offsetY = 0;
+    } else {
+      // Canvas is taller than video - pillarbox (black bars on top/bottom)
+      drawWidth = canvasWidth;
+      drawHeight = drawWidth / videoAspectRatio;
+      offsetX = 0;
+      offsetY = (canvasHeight - drawHeight) / 2;
+    }
 
     for (var handIndex = 0; handIndex < landmarks.length; handIndex++) {
       var hand = landmarks[handIndex];
@@ -53,9 +81,15 @@ var HandsFree = (function() {
         var startPoint = hand[conn[0]];
         var endPoint = hand[conn[1]];
         if (startPoint && endPoint && startPoint.x !== undefined) {
+          // Map normalized video coordinates (0-1) to letterboxed drawing area
+          var x1 = offsetX + (1 - startPoint.x) * drawWidth;
+          var y1 = offsetY + startPoint.y * drawHeight;
+          var x2 = offsetX + (1 - endPoint.x) * drawWidth;
+          var y2 = offsetY + endPoint.y * drawHeight;
+          
           ctx.beginPath();
-          ctx.moveTo((1 - startPoint.x) * width, startPoint.y * height);
-          ctx.lineTo((1 - endPoint.x) * width, endPoint.y * height);
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
           ctx.stroke();
         }
       }
@@ -65,9 +99,13 @@ var HandsFree = (function() {
       for (var i = 0; i < hand.length; i++) {
         var landmark = hand[i];
         if (landmark && landmark.x !== undefined) {
+          // Map normalized video coordinates (0-1) to letterboxed drawing area
+          var x = offsetX + (1 - landmark.x) * drawWidth;
+          var y = offsetY + landmark.y * drawHeight;
+          
           ctx.fillStyle = i === 0 ? '#FFFFFF' : (i % 4 === 0 ? '#FFD700' : handColor);
           ctx.beginPath();
-          ctx.arc((1 - landmark.x) * width, landmark.y * height, i === 0 ? 8 : (i % 4 === 0 ? 6 : 4), 0, 2 * Math.PI);
+          ctx.arc(x, y, i === 0 ? 8 : (i % 4 === 0 ? 6 : 4), 0, 2 * Math.PI);
           ctx.fill();
         }
       }
