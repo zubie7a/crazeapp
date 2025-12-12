@@ -1,69 +1,558 @@
-angular.module('starter', ['ionic', 'starter.craze',
-               'starter.services', 'starter.tabs', 'ngCordova'])
-// $ cordova plugin add org.apache.cordova.geolocation
-// $ bower install ngCordova
-// $ bower install angular-socket-io
-// http://ngcordova.com/docs/install/
-// http://ngcordova.com/docs/plugins/geolocation/
+// CraZe App - Main Application
+// No modules - plain JavaScript that works with file:// URLs
 
-.run(function($ionicPlatform) {
-    $ionicPlatform.ready(function() {
-        if(window.cordova && window.cordova.plugins.Keyboard) {
-            cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-        }
-        if(window.StatusBar) {
-           StatusBar.styleDefault();
-        }
-    });
-})
+(function() {
+  'use strict';
 
-.config(['$compileProvider',
-function ($compileProvider) {
-    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|local|data):/);
-}])
+  // Wait for DOM to be ready
+  document.addEventListener('DOMContentLoaded', init);
 
-.config(['$stateProvider', '$urlRouterProvider', '$ionicConfigProvider', 
- function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+  // State
+  var engine = null;
+  var crazeController = null;
+  var changeCenterMode = false;
 
+  // DOM Elements (populated in init)
+  var elements = {};
 
-    $ionicConfigProvider.tabs.position('bottom');
-    // Because in Android by default it attempts putting the tabs at the
-    // top, which is a behavior we don't want if we want consistent be-
-    // haviour across platforms.
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function init() {
+    // Get DOM elements
+    elements = {
+      menuToggle: $('menuToggle'),
+      closeSidebar: $('closeSidebar'),
+      sidebar: $('sidebar'),
+      overlay: $('overlay'),
+      mainCanvas: $('mainCanvas'),
+      overlayCanvas: $('overlayCanvas'),
+      canvasContainer: document.querySelector('.canvas-container'),
+
+      newBtn: $('newBtn'),
+      saveBtn: $('saveBtn'),
+      undoBtn: $('undoBtn'),
+      redoBtn: $('redoBtn'),
+      crazeBtn: $('crazeBtn'),
+      handsBtn: $('handsBtn'),
+      randomizeBtn: $('randomizeBtn'),
+      infoBtn: $('infoBtn'),
+      setCenterBtn: $('setCenterBtn'),
+      resetCenterBtn: $('resetCenterBtn'),
+
+      brushSelect: $('brushSelect'),
+      paletteSelect: $('paletteSelect'),
+
+      alphaSlider: $('alphaSlider'),
+      sizeSlider: $('sizeSlider'),
+      rotSlider: $('rotSlider'),
+      thickSlider: $('thickSlider'),
+
+      alphaValue: $('alphaValue'),
+      sizeValue: $('sizeValue'),
+      rotValue: $('rotValue'),
+      thickValue: $('thickValue'),
+
+      symmetryToggle: $('symmetryToggle'),
+      variableToggle: $('variableToggle'),
+      rotatingToggle: $('rotatingToggle'),
+      connectToggle: $('connectToggle'),
+      fillToggle: $('fillToggle'),
+      fadeToggle: $('fadeToggle'),
+      gridToggle: $('gridToggle'),
+      perspectiveToggle: $('perspectiveToggle'),
+      persistentRandomizeToggle: $('persistentRandomizeToggle'),
+
+      colorPicker: $('colorPicker'),
+      colorInput: $('colorInput'),
+      colorText: $('colorText'),
+
+      welcomeModal: $('welcomeModal'),
+      modalTitle: $('modalTitle'),
+      modalMessage: $('modalMessage'),
+      modalOkBtn: $('modalOkBtn'),
+    };
+
+    // Initialize canvas
+    var canvas = elements.mainCanvas;
+    var bigdim = Math.max(window.innerHeight, window.innerWidth);
+    canvas.width = bigdim;
+    canvas.height = bigdim;
+
+    // Initialize engine
+    engine = new DrawingEngine(canvas);
+    crazeController = new CrazeModeController(engine);
     
-    $ionicConfigProvider.navBar.alignTitle('center');
-    // Because in Android by default the navBar title is aligned to the
-    // left, which is a behavior we don't want if we want consistent be-
-    // havior across platforms.
+    // Initialize HandsFree with required references
+    HandsFree.init(engine, elements, crazeController);
+    
+    engine.clearCanvas();
 
-    $stateProvider
+    updateCanvasDisplay();
+    setupEventListeners();
+    
+    // Show welcome popup after 2 seconds on first load (only once per session)
+    setTimeout(function() {
+      var welcomeShown = sessionStorage.getItem('crazeWelcomeShown');
+      if (!welcomeShown) {
+        showWelcomePopup();
+        sessionStorage.setItem('crazeWelcomeShown', 'true');
+      }
+    }, 2000);
+  }
 
-    // Abstract state for the basic tabs of the application, it will
-    // contain the views in which to render the tabs, and rendering
-    // a tab implies rendering this view, containing the tab.
-    .state('tabs', {
-        'url' : '/tabs',
-        'abstract' : true,
-        'template' : '<ion-side-menus><ion-side-menu-content id=\'mainContent\' drag-content=\'false\'><ion-nav-view name=\'tab-craze\'></ion-nav-view></ion-side-menu-content><ion-side-menu side=\'left\' ng-controller=\'CraZeCtrl\'><ion-content id=\'menucontent\'><table class=\'butable\'><tr><td class=\'half\'><button type="button" class=\'button button-positive butn\' ng-click=\'newImage()\'><strong>New</strong> Image</button></td><td class=\'half\'><div><a class=\'button button-balanced butn\' id=\'downloadey\' ng-click=\'saveImage()\' href="{{base64}}" download=\'{{fname}}\'><strong>Save</strong> Image</a></div></td></tr><tr><td class=\'entire\' colspan=\'2\'><button class=\'button button-assertive butn\' ng-click=\'crazeMode()\'><strong>CraZe</strong> Mode</button></td></tr><tr><td class=\'entire\' colspan=\'2\'><button class=\'button button-energized butn\' ng-click=\'handsFreeMode()\'>Camera <strong>Motion</strong> Control</button></td></tr><tr><td class=\'half\'><button class=\'button butn\' ng-click=\'undo()\'><strong>U</strong>ndo</button></td><td class=\'half\'><button class=\'button butn\' ng-click=\'redo()\'><strong>R</strong>edo</button></td></tr></table><label class=\'item item-dark item-input\'><span class=\'input-label stable\'><strong>Brush</strong></span><select ng-model=\'crazeData.brush\' class=\'selector\' ng-change=\'updateBrush()\'><option value=\'1\'>Regular Line</option><option value=\'2\'>Lines From Start</option><option value=\'3\'>Vertical Lines</option><option value=\'4\'>Horizontal Lines</option><option value=\'5\'>Great Cross</option><option value=\'6\'>Triangles</option><option value=\'7\'>Squares</option><option value=\'8\'>Circles</option><option value=\'9\'>Chain</option><option value=\'10\'>Tangent</option></select></label><label class=\'item item-dark item-input\'><span class=\'input-label stable\'><strong>Palette</strong></span><select ng-model=\'crazeData.palette\' class=\'selector\' ng-change=\'updatePalette()\'><option value=\'1\'>Manual</option><option value=\'2\'>Rainbow</option><option value=\'3\'>Fire</option><option value=\'4\'>Ice</option><option value=\'5\'>Nature</option><option value=\'6\'>Mystic</option><option value=\'7\'>Borealis</option><option value=\'8\'>Grayscale</option><option value=\'9\'>Foxes</option></select></label><label ng-if=\'(crazeData.palette == 1)\' class=\'item range range-assertive item-dark\'><strong>  R</strong><input type=\'range\' value=\'{{crazeData.colors[0]}}\' min=\'0\' max=\'255\' step=\'1\' ng-model=\'crazeData.colors[0]\' ng-change=\'colorChanged(0)\'>{{crazeData.colors[0]}} </label><label ng-if=\'(crazeData.palette == 1)\' class=\'item range range-balanced item-dark\'><strong>  G</strong><input type=\'range\' value=\'{{crazeData.colors[1]}}\' min=\'0\' max=\'255\' step=\'1\' ng-model=\'crazeData.colors[1]\' ng-change=\'colorChanged(1)\'>{{crazeData.colors[1]}} </label><label ng-if=\'(crazeData.palette == 1)\' class=\'item range range-positive item-dark\'><strong>  B</strong><input type=\'range\' value=\'{{crazeData.colors[2]}}\' min=\'0\' max=\'255\' step=\'1\' ng-model=\'crazeData.colors[2]\' ng-change=\'colorChanged(2)\'>{{crazeData.colors[2]}} </label><label ng-if=\'(crazeData.palette == 1)\' class=\'item item-dark item-input\'><span class=\'input-label stable\'><strong>Color</strong></span><input type=\'text\' id=\'coltxt\' readonly/></label><label class=\'item range range-energized item-dark\'><strong>  Transparency</strong><input type=\'range\' value=\'{{crazeData.alpha}}\' min=\'0\' max=\'100\' step=\'1\' ng-model=\'crazeData.alpha\' ng-change=\'alphaChanged()\'>{{crazeData.alpha}} </label><label class=\'item item-dark item-input\'><span class=\'input-label stable\'><strong>Size</strong> of Brush</span><input type=\'number\' value=\'{{crazeData.bsize}}\' style=\'background-color:#FFF; max-width:60px; border-radius: 10px; padding-left:5px;\' min=\'1\' max=\'1742\' step=\'1\' ng-model=\'crazeData.bsize\' ng-change=\'updateSize()\'></label><label class=\'item item-dark item-input\'><span class=\'input-label stable\'><strong>Rotation</strong> Amount</span><input type=\'number\' value=\'{{crazeData.rotnum}}\' style=\'background-color:#FFF; max-width:60px; border-radius: 10px; padding-left:5px;\' min=\'1\' max=\'360\' step=\'1\' ng-model=\'crazeData.rotnum\' ng-change=\'updateRotNum()\'></label><label class=\'item item-dark item-input\'><span class=\'input-label stable\'><strong>Thickness</strong> of Brush</span><input type=\'number\' value=\'{{crazeData.thickness}}\' style=\'background-color:#FFF; max-width:60px; border-radius: 10px; padding-left:5px;\' min=\'1\' max=\'7\' step=\'1\' ng-model=\'crazeData.thickness\' ng-change=\'updateThick()\'></label><ul class="list"><li class="item item-toggle item-dark"><strong>Symmetry</strong> Axis<label class="toggle toggle-positive"><input type="checkbox" ng-model=\'crazeData.symmetry\' ng-change=\'updateSymmetry()\'><div class="track"><div class="handle"></div></div></label></li><li class="item item-toggle item-dark"><strong>Variable</strong> Size<label class="toggle toggle-calm"><input type="checkbox" ng-model=\'crazeData.variable\' ng-change=\'updateVariable()\'><div class="track"><div class="handle"></div></div></label></li><li class="item item-toggle item-dark"><strong>Rotating</strong> Shape<label class="toggle toggle-balanced"><input type="checkbox" ng-model=\'crazeData.rotating\' ng-change=\'updateRotating()\'><div class="track"><div class="handle"></div></div></label></li><li class="item item-toggle item-dark"><strong>Connect</strong> Borders<label class="toggle toggle-energized"><input type="checkbox" ng-model=\'crazeData.connect\' ng-change=\'updateConnect()\'><div class="track"><div class="handle"></div></div></label></li><li class="item item-toggle item-dark"><strong>Fill</strong> Shape<label class="toggle toggle-assertive"><input type="checkbox" ng-model=\'crazeData.fill\' ng-change=\'updateFill()\'><div class="track"><div class="handle"></div></div></label></li><li class="item item-toggle item-dark"><strong>Fading</strong> Image<label class="toggle toggle-royal"><input type="checkbox" ng-model=\'crazeData.fade\' ng-change=\'updateFade()\'><div class="track"><div class="handle"></div></div></label></li><li class="item item-toggle item-dark"><strong>Fit</strong> to Grid<label class="toggle toggle-positive"><input type="checkbox" ng-model=\'crazeData.grid\' ng-change=\'updateGrid()\'><div class="track"><div class="handle"></div></div></label></li><li class="item item-toggle item-dark"><strong>Perspective</strong> Size<label class="toggle toggle-energized"><input type="checkbox" ng-model=\'crazeData.pers\' ng-change=\'updatePers()\'><div class="track"><div class="handle"></div></div></label></li><li><table class=\'butable\'><tr><td class=\'half\'><button class=\'button button-royal butn\' ng-click=\'changeCenter()\'><strong>Change</strong> Center</button></td><td class=\'half\'><button class=\'button button-calm butn\' ng-click=\'resetCenter()\'><strong>Reset</strong> Center</button></td></tr></table></li></ul></ion-content></ion-side-menu><ion-side-menu side=\'right\'></ion-side-menu></ion-side-menus>',
-        'controller' : 'TabsCtrl'
-    })
+  var canvasPanX = 0;
+  var canvasPanY = 0;
 
-    .state('tabs.craze', {
-        'url' : '/craze',
-        'views' : {
-            'tab-craze' : {
-                'template' : '<ion-view view-title=\'CraZe\'><ion-nav-buttons side=\'right\'><button class=\'button button-clear\' ng-click=\'z10z()\'>Info!</button></ion-nav-buttons><ion-nav-buttons side="left"><button class="button button-icon icon ion-navicon" ng-click="toggleMenu()"> Menu</button></ion-nav-buttons><ion-content scroll=\'false\'><div style="position: relative;"><canvas id=\'myCanvas\' style="margin-top: -42px;"></canvas><canvas id=\'handsOverlayCanvas\' style="position: absolute; top: 0; left: 0; pointer-events: none; margin-top: -42px;"></canvas></div></ion-content></ion-view>',
-                'controller' : 'CraZeCtrl'
-            }
+  function updateCanvasDisplay() {
+    var canvas = elements.mainCanvas;
+    var overlay = elements.overlayCanvas;
+
+    var windowWidth = window.innerWidth;
+    var windowHeight = window.innerHeight;
+    var canvasWidth = canvas.width;
+    var canvasHeight = canvas.height;
+
+    // Calculate offsets to center the canvas
+    // Canvas is larger than viewport, so we use negative margins to center it
+    var offsetX, offsetY;
+    var marginLeft, marginTop;
+
+    if (canvasWidth < windowWidth) {
+      // Canvas width is smaller than window - center with positive margin
+      offsetX = -(windowWidth - canvasWidth) / 2;
+      marginLeft = Math.abs(offsetX);
+    } else {
+      // Canvas width is bigger than window - use negative margin to center
+      offsetX = (canvasWidth - windowWidth) / 2;
+      marginLeft = -offsetX;
+    }
+
+    if (canvasHeight < windowHeight) {
+      // Canvas height is smaller than window - center with positive margin
+      offsetY = -(windowHeight - canvasHeight) / 2;
+      marginTop = Math.abs(offsetY);
+    } else {
+      // Canvas height is bigger than window - use negative margin to center
+      offsetY = (canvasHeight - windowHeight) / 2;
+      marginTop = -offsetY;
+    }
+
+    // Apply panning offset
+    marginLeft += canvasPanX;
+    marginTop += canvasPanY;
+
+    // Apply positioning - canvas stays at native size, just positioned
+    canvas.style.marginLeft = marginLeft + 'px';
+    canvas.style.marginTop = marginTop + 'px';
+
+    // Overlay matches the canvas position and size
+    overlay.width = canvasWidth;
+    overlay.height = canvasHeight;
+    overlay.style.marginLeft = marginLeft + 'px';
+    overlay.style.marginTop = marginTop + 'px';
+  }
+
+  function panCanvas(dx, dy) {
+    canvasPanX += dx;
+    canvasPanY += dy;
+    updateCanvasDisplay();
+  }
+
+  function openSidebar() {
+    elements.sidebar.classList.add('open');
+    elements.overlay.classList.add('visible');
+  }
+
+  function closeSidebar() {
+    elements.sidebar.classList.remove('open');
+    elements.overlay.classList.remove('visible');
+  }
+
+  // Modal functions
+  function showModal(title, message) {
+    elements.modalTitle.textContent = title;
+    elements.modalMessage.innerHTML = '<p>' + message + '</p>';
+    elements.welcomeModal.classList.add('show');
+  }
+
+  function hideModal() {
+    elements.welcomeModal.classList.remove('show');
+  }
+
+  function showWelcomePopup() {
+    var message = '<strong>r</strong> : redo stroke,<br/>' +
+                  '<strong>u</strong> : undo stroke,<br/>' +
+                  '<strong>n</strong> : new image,<br/>' +
+                  '<strong>z</strong> : randomiZe parameters,<br/>' +
+                  '<strong>arrows</strong> : move canvas.<br/>' +
+                  '<br/>' +
+                  '<strong>Have a great time drawing! Spread the love!</strong>';
+    showModal('Welcome to CraZe!', message);
+  }
+
+  function showInfoPopup() {
+    var message = 'Made by <a href="https://github.com/zubie7a" target="_blank">Santiago Zubieta</a>.<br/>' +
+                  'Visit my <a href="https://www.z10z.xyz" target="_blank">website</a> for nice things!<br/>' +
+                  'Also, see the <a href="https://instagram.com/crazeapp" target="_blank">Instagram</a> account, and share images with <strong>#CraZeApp</strong> to get them featured!<br/>' +
+                  '<br/>' +
+                  '<strong>You are awesome!</strong>';
+    showModal('Made with love! 2012-2026', message);
+  }
+
+  function showToast(message) {
+    // Simple toast notification (like iOS)
+    var toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); ' +
+                          'background: rgba(0, 0, 0, 0.8); color: white; padding: 12px 24px; ' +
+                          'border-radius: 8px; z-index: 10000; font-size: 14px; pointer-events: none;';
+    document.body.appendChild(toast);
+    setTimeout(function() {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s';
+      setTimeout(function() {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 2000);
+  }
+
+  function randomizeParameters() {
+    Parameters.randomize(engine, crazeController, elements, showToast);
+  }
+
+  function getCanvasCoords(e) {
+    var canvas = elements.mainCanvas;
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+
+    var clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+    };
+  }
+
+  function handleMouseDown(e) {
+    if (!engine) return;
+
+    if (crazeController && crazeController.active) {
+      crazeController.stop();
+      elements.crazeBtn.classList.remove('active');
+    }
+    if (HandsFree.isActive()) {
+      HandsFree.stop();
+    }
+
+    var coords = getCanvasCoords(e);
+
+    if (changeCenterMode) {
+      engine.setCenter(coords.x, coords.y);
+      changeCenterMode = false;
+      elements.canvasContainer.classList.remove('center-mode');
+      return;
+    }
+
+    engine.onMouseDown(coords.x, coords.y);
+  }
+
+  function handleMouseMove(e) {
+    if (!engine || !engine.drawing) return;
+    var coords = getCanvasCoords(e);
+    engine.onMouseMove(coords.x, coords.y);
+  }
+
+  function handleMouseUp() {
+    if (!engine) return;
+    engine.onMouseUp();
+  }
+
+  function newImage() {
+    if (crazeController && crazeController.active) {
+      crazeController.stop();
+      elements.crazeBtn.classList.remove('active');
+    }
+    if (HandsFree.isActive()) {
+      HandsFree.stop();
+    }
+
+    var canvas = elements.mainCanvas;
+    var bigdim = Math.max(window.innerHeight, window.innerWidth);
+    canvas.width = bigdim;
+    canvas.height = bigdim;
+    engine.clearCanvas();
+    engine.resetCenter();
+    updateCanvasDisplay();
+    closeSidebar();
+  }
+
+  function saveImage() {
+    var dataUrl = elements.mainCanvas.toDataURL('image/jpeg');
+    var link = document.createElement('a');
+    link.download = 'craze-' + Date.now() + '.jpg';
+    link.href = dataUrl;
+    link.click();
+  }
+
+  function toggleCrazeMode() {
+    CrazeMode.toggle(crazeController, HandsFree.isActive(), HandsFree.stop, elements.crazeBtn);
+  }
+
+  function setupEventListeners() {
+    // Sidebar
+    elements.menuToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      openSidebar();
+    });
+    elements.closeSidebar.addEventListener('click', function(e) {
+      e.preventDefault();
+      closeSidebar();
+    });
+    elements.overlay.addEventListener('click', function(e) {
+      e.preventDefault();
+      closeSidebar();
+    });
+
+    // Canvas events
+    var canvas = elements.mainCanvas;
+    canvas.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      handleMouseDown(e);
+    });
+    canvas.addEventListener('mousemove', function(e) {
+      if (engine && engine.drawing) {
+        e.preventDefault();
+      }
+      handleMouseMove(e);
+    });
+    canvas.addEventListener('mouseup', function(e) {
+      e.preventDefault();
+      handleMouseUp(e);
+    });
+    canvas.addEventListener('mouseleave', function(e) {
+      e.preventDefault();
+      handleMouseUp(e);
+    });
+    canvas.addEventListener('touchstart', function(e) { e.preventDefault(); handleMouseDown(e); });
+    canvas.addEventListener('touchmove', function(e) { e.preventDefault(); handleMouseMove(e); });
+    canvas.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      handleMouseUp(e);
+    });
+    
+    // Prevent context menu on canvas (right-click menu)
+    canvas.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+    
+    // Prevent drag and drop on canvas
+    canvas.addEventListener('dragstart', function(e) {
+      e.preventDefault();
+    });
+    
+    // Prevent double-click selection
+    canvas.addEventListener('selectstart', function(e) {
+      e.preventDefault();
+    });
+
+    // Buttons
+    elements.newBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      newImage();
+    });
+    elements.saveBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      saveImage();
+    });
+    elements.undoBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (engine) engine.undo();
+    });
+    elements.redoBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (engine) engine.redo();
+    });
+    elements.crazeBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      toggleCrazeMode();
+    });
+    elements.handsBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      HandsFree.toggle();
+    });
+    elements.randomizeBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      randomizeParameters();
+    });
+    elements.infoBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      showInfoPopup();
+      closeSidebar();
+    });
+
+    elements.setCenterBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      changeCenterMode = true;
+      elements.canvasContainer.classList.add('center-mode');
+      closeSidebar();
+    });
+
+    elements.resetCenterBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (engine) engine.resetCenter();
+    });
+
+    // Modal
+    elements.modalOkBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      hideModal();
+    });
+    elements.welcomeModal.querySelector('.modal-backdrop').addEventListener('click', function(e) {
+      e.preventDefault();
+      hideModal();
+    });
+
+    // Selects
+    elements.brushSelect.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('brush', parseInt(e.target.value));
+    });
+
+    elements.paletteSelect.addEventListener('change', function(e) {
+      var value = parseInt(e.target.value);
+      if (engine) engine.updateSetting('palette', value);
+      elements.colorPicker.style.display = value === PALETTES.MANUAL ? 'block' : 'none';
+    });
+
+    // Sliders
+    elements.alphaSlider.addEventListener('input', function(e) {
+      elements.alphaValue.textContent = e.target.value;
+      if (engine) engine.updateSetting('alpha', parseInt(e.target.value));
+    });
+
+    elements.sizeSlider.addEventListener('input', function(e) {
+      elements.sizeValue.textContent = e.target.value;
+      if (engine) engine.updateSetting('brushSize', parseInt(e.target.value));
+    });
+
+    elements.rotSlider.addEventListener('input', function(e) {
+      elements.rotValue.textContent = e.target.value;
+      if (engine) engine.updateSetting('rotationAmount', parseInt(e.target.value));
+    });
+
+    elements.thickSlider.addEventListener('input', function(e) {
+      elements.thickValue.textContent = e.target.value;
+      if (engine) engine.updateSetting('thickness', parseInt(e.target.value));
+    });
+
+    // Toggles
+    elements.symmetryToggle.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('symmetry', e.target.checked);
+    });
+
+    elements.variableToggle.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('variableSize', e.target.checked);
+    });
+
+    elements.rotatingToggle.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('rotatingShape', e.target.checked);
+    });
+
+    elements.connectToggle.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('connectBorders', e.target.checked);
+    });
+
+    elements.fillToggle.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('fillShape', e.target.checked);
+    });
+
+    elements.fadeToggle.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('fadingImage', e.target.checked);
+    });
+
+    elements.gridToggle.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('fitToGrid', e.target.checked);
+    });
+
+    elements.perspectiveToggle.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('perspectiveSize', e.target.checked);
+    });
+
+    elements.persistentRandomizeToggle.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('persistentRandomize', e.target.checked);
+    });
+
+    // Color picker
+    elements.colorInput.addEventListener('input', function(e) {
+      var hex = e.target.value;
+      elements.colorText.value = hex;
+      var r = parseInt(hex.slice(1, 3), 16);
+      var g = parseInt(hex.slice(3, 5), 16);
+      var b = parseInt(hex.slice(5, 7), 16);
+      if (engine) {
+        engine.updateSetting('r', r);
+        engine.updateSetting('g', g);
+        engine.updateSetting('b', b);
+      }
+    });
+
+    elements.colorText.addEventListener('change', function(e) {
+      var hex = e.target.value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+        elements.colorInput.value = hex;
+        var r = parseInt(hex.slice(1, 3), 16);
+        var g = parseInt(hex.slice(3, 5), 16);
+        var b = parseInt(hex.slice(5, 7), 16);
+        if (engine) {
+          engine.updateSetting('r', r);
+          engine.updateSetting('g', g);
+          engine.updateSetting('b', b);
         }
-    })
+      }
+    });
 
-    // Default router. I'll look up later some way to route to an initial
-    // temporal state which will check for the token and then redirect to
-    // the home view, if not, redirect to signin, all this with LocalStorage,
-    // or make signin first check for the local storage and then redirecting,
-    // But then it could hang in a signin screen whereas we could have a pse-
-    // udo 'splash' screen that will be there only when resolving whether to
-    // go to signin view or check the token and go to home view.
-    $urlRouterProvider.otherwise('tabs/craze');
-}]);
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'u' || e.key === 'U') { if (engine) engine.undo(); }
+      else if (e.key === 'r' || e.key === 'R') { if (engine) engine.redo(); }
+      else if (e.key === 'n' || e.key === 'N') { newImage(); }
+      else if (e.key === 'z' || e.key === 'Z') { randomizeParameters(); }
+      else if (e.key === 'Escape') {
+        if (elements.welcomeModal.classList.contains('show')) {
+          hideModal();
+        } else {
+          closeSidebar();
+        }
+      }
+      else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        panCanvas(0, -20);
+      }
+      else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        panCanvas(0, 20);
+      }
+      else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        panCanvas(-20, 0);
+      }
+      else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        panCanvas(20, 0);
+      }
+    });
+
+    // Window resize
+    window.addEventListener('resize', updateCanvasDisplay);
+  }
+
+})();

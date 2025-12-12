@@ -1,89 +1,668 @@
-
-#menucontent * {
-    font-size: 12px;
-    max-height: 47px;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-#menucontent {
-    overflow: hidden;
+:root {
+  --bg-dark: #121212;
+  --bg-sidebar: #1a1a1a;
+  --bg-hover: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --accent-primary: #4caf50;
+  --accent-secondary: #f44336;
+  --accent-warning: #ff9800;
+  --accent-info: #2196f3;
+  --border-color: #333;
+  --sidebar-width: 280px;
 }
 
-#coltxt {
-    border-radius: 10px;
-    max-width: 60%;
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: #000;
+  color: var(--text-primary);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
 }
 
-#myCanvas {
-    margin-top: -42px;
+/* Menu Toggle Button */
+.menu-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 8px;
+  background: var(--bg-sidebar);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
 }
 
-.selector {
-    width: 60%;
-    background-color: #FFF;
+.menu-toggle:hover {
+  background: var(--bg-hover);
 }
 
-.ranger {
-    max-width: 60%;
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-sidebar);
+  z-index: 1001;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
-.ion-checkbox {
-    margin-bottom: 10px;
-    margin-top: 0px;
+.sidebar.open {
+  transform: translateX(0);
 }
 
-.ion-input-select, select {
-/* This is used for styling the select for the request creation form.
-   Sadly in Ionic there aren't beautiful selects :-(
-   from http://forum.ionicframework.com/t/new-select-style-component/2503/2
-*/
-    -webkit-appearance:none;
-    background-repeat: no-repeat;
-    background-color: rgba(0,0,0,0);  
-    border: thin solid #dddddd;
-    font-weight: 300;
-    display: inline;
-    vertical-align: middle;
-    color: #333;
-    width: 100%;
-    padding: auto 0;
-    overflow: hidden;
-    box-sizing:border-box;
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.list.card.list_item {
-    margin-top:    8px;
-  	margin-left:   4px;
-  	margin-right:  4px;
-    margin-bottom: 8px;
+.sidebar-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
-.butable {
-    width: 100%;
+.close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
-a {
-    color : #000000;
+.close-btn:hover {
+  background: var(--bg-hover);
 }
 
-.butn {
-    width: 100%;
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
 }
 
-.item-remove-animate.item-icon-right.searchitem > a.item-content {
-    padding: 0 0 0 0;
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
 }
 
-.entire {
-    width: 100%;
+.overlay.visible {
+  opacity: 1;
+  visibility: visible;
 }
 
-.half {
-/* This is to create table fields that are half of the row containing them,
-   to allow table fields of equal horizontal spread
-*/
-    width: 50%;
+/* Buttons */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
 }
 
-.third {
-    width: 33%;
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #43a047;
+}
+
+.btn-secondary {
+  background: var(--accent-secondary);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #e53935;
+}
+
+.btn-icon {
+  width: 40px;
+  padding: 8px;
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  font-size: 18px;
+}
+
+.btn-icon:hover {
+  background: #3a3a3a;
+}
+
+.btn-mode {
+  flex: 1;
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border: 2px solid transparent;
+}
+
+.btn-mode:hover {
+  background: #3a3a3a;
+}
+
+.btn-mode.active {
+  border-color: var(--accent-warning);
+  background: rgba(255, 152, 0, 0.2);
+}
+
+.btn-text {
+  width: 100%;
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+  padding: 12px 0;
+}
+
+.btn-text:hover {
+  color: var(--text-primary);
+}
+
+.btn-small {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: 12px;
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.btn-small:hover {
+  background: #3a3a3a;
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Controls */
+.control-group {
+  margin-bottom: 16px;
+}
+
+.control-group label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.control-group select,
+.control-group input[type="range"] {
+  width: 100%;
+}
+
+select {
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b0b0b0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-hover);
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  cursor: pointer;
+  border: none;
+}
+
+/* Color Picker */
+.color-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+input[type="color"] {
+  width: 50px;
+  height: 40px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border-radius: 4px;
+  border: none;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: monospace;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+/* Toggle Switches */
+.toggle-group {
+  margin-bottom: 12px;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle input {
+  display: none;
+}
+
+.toggle-track {
+  position: relative;
+  display: inline-block;
+  width: 51px;
+  height: 31px;
+  margin-right: 12px;
+  border: 2px solid #666;
+  border-radius: 20px;
+  background-color: #333;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toggle-handle {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s cubic-bezier(0, 1.1, 1, 1.1);
+  transform: translateX(0);
+}
+
+/* Toggle color variants - matching Ionic colors */
+.toggle.toggle-positive input:checked + .toggle-track {
+  border-color: #387ef5;
+  background-color: #387ef5;
+}
+
+.toggle.toggle-positive input:checked:hover + .toggle-track {
+  border-color: #5a9eff;
+  background-color: #5a9eff;
+}
+
+.toggle.toggle-calm input:checked + .toggle-track {
+  border-color: #11c1f3;
+  background-color: #11c1f3;
+}
+
+.toggle.toggle-calm input:checked:hover + .toggle-track {
+  border-color: #3dd5f5;
+  background-color: #3dd5f5;
+}
+
+.toggle.toggle-assertive input:checked + .toggle-track {
+  border-color: #ef473a;
+  background-color: #ef473a;
+}
+
+.toggle.toggle-assertive input:checked:hover + .toggle-track {
+  border-color: #ff6b5e;
+  background-color: #ff6b5e;
+}
+
+.toggle.toggle-balanced input:checked + .toggle-track {
+  border-color: #33cd5f;
+  background-color: #33cd5f;
+}
+
+.toggle.toggle-balanced input:checked:hover + .toggle-track {
+  border-color: #4ade80;
+  background-color: #4ade80;
+}
+
+.toggle.toggle-energized input:checked + .toggle-track {
+  border-color: #ffc900;
+  background-color: #ffc900;
+}
+
+.toggle.toggle-energized input:checked:hover + .toggle-track {
+  border-color: #ffd633;
+  background-color: #ffd633;
+}
+
+.toggle.toggle-royal input:checked + .toggle-track {
+  border-color: #886aea;
+  background-color: #886aea;
+}
+
+.toggle.toggle-royal input:checked:hover + .toggle-track {
+  border-color: #a68ef0;
+  background-color: #a68ef0;
+}
+
+.toggle.toggle-custom-orange input:checked + .toggle-track {
+  border-color: #ff9500;
+  background-color: #ff9500;
+}
+
+.toggle.toggle-custom-orange input:checked:hover + .toggle-track {
+  border-color: #ffad33;
+  background-color: #ffad33;
+}
+
+.toggle.toggle-custom-yellow input:checked + .toggle-track {
+  border-color: #ffcc00;
+  background-color: #ffcc00;
+}
+
+.toggle.toggle-custom-yellow input:checked:hover + .toggle-track {
+  border-color: #ffdd00;
+  background-color: #ffdd00;
+}
+
+.toggle.toggle-custom-pink input:checked + .toggle-track {
+  border-color: #ff2d92;
+  background-color: #ff2d92;
+}
+
+.toggle.toggle-custom-pink input:checked:hover + .toggle-track {
+  border-color: #ff5aa8;
+  background-color: #ff5aa8;
+}
+
+.toggle.toggle-custom-magenta input:checked + .toggle-track {
+  border-color: #bb2d92;
+  background-color: #bb2d92;
+}
+
+.toggle.toggle-custom-magenta input:checked:hover + .toggle-track {
+  border-color: #bb5aa8;
+  background-color: #bb5aa8;
+}
+
+.toggle input:checked + .toggle-track .toggle-handle {
+  transform: translateX(20px);
+}
+
+.toggle:hover .toggle-track {
+  border-color: #888;
+}
+
+.toggle-label {
+  font-size: 14px;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+/* Dividers */
+hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 16px 0;
+}
+
+
+/* Canvas Container */
+.canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+#mainCanvas {
+  position: absolute;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+#overlayCanvas {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Center mode cursor */
+.canvas-container.center-mode #mainCanvas {
+  cursor: cell;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  :root {
+    --sidebar-width: 100%;
+  }
+
+  .menu-toggle {
+    top: 8px;
+    left: 8px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Scrollbar */
+.sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Modal/Popup Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal.show {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  position: relative;
+  background: var(--bg-sidebar);
+  border-radius: 12px;
+  max-width: 90%;
+  width: 400px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal.show .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.modal-body {
+  padding: 24px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-body p {
+  margin: 0 0 12px 0;
+  text-align: center;
+}
+
+.modal-body p:last-child {
+  margin-bottom: 0;
+}
+
+.modal-body strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.modal-body a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.modal-body a:hover {
+  text-decoration: underline;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-footer .btn {
+  min-width: 80px;
+}
+
+@media (max-width: 600px) {
+  .modal-content {
+    width: 95%;
+    max-height: 85vh;
+  }
+
+  .modal-header {
+    padding: 16px 20px;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-footer {
+    padding: 12px 20px;
+  }
 }
