@@ -22,8 +22,8 @@ VerticalLines.getStaticBrushPoints = function(params, pointer) {
   var d2 = pointer.getY();
   
   return [
-    new Point(d1 + i, d2),
-    new Point(d1 - i, d2)
+    new Point(d1, d2 - i),
+    new Point(d1, d2 + i)
   ];
 };
 

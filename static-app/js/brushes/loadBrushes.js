@@ -13,7 +13,43 @@
     'Squares',
     'Circles',
     'Chain',
-    'Tangent'
+    'Tangent',
+    'Lines',
+    'Radiant',
+    'Diamond',
+    'Hexagon',
+    'Snowflake',
+    'Flower',
+    'Moon',
+    'Insignia',
+    'FourStar',
+    'SixStar',
+    'EightStar',
+    'Lightning',
+    'Hourglass',
+    'Pinwheel',
+    'Tiles',
+    'Saw',
+    'Seal',
+    'Present',
+    'Arrowhead',
+    'Force',
+    'Window',
+    'XXXXXXX',
+    'ZZZZZZZ',
+    'Comet',
+    'Rectangle',
+    'Parallelogram',
+    'FiveStar',
+    'Pentagon',
+    'Fairy',
+    'Heart',
+    'Wave',
+    'Peak',
+    'Trapeze',
+    'Inwards',
+    'Outwards',
+    'FourSides'
   ];
   
   // Write script tags synchronously using document.write
@@ -21,4 +57,3 @@
     document.write('<script src="js/brushes/shapes/' + brushFiles[i] + '.js"></script>');
   }
 })();
-

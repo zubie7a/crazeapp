@@ -16,14 +16,14 @@ HorizontalLines.prototype.getBrushPoints = function(pointer) {
 };
 
 HorizontalLines.getStaticBrushPoints = function(params, pointer) {
-  var brushSize = params.brushSize;
-  var i = brushSize / 2;
-  var d1 = pointer.getX();
-  var d2 = pointer.getY();
-  
-  return [
-    new Point(d1, d2 - i),
-    new Point(d1, d2 + i)
-  ];
+    var brushSize = params.brushSize;
+    var i = brushSize / 2;
+    var d1 = pointer.getX();
+    var d2 = pointer.getY();
+    
+    return [
+      new Point(d1 + i, d2),
+      new Point(d1 - i, d2)
+    ];
 };
 

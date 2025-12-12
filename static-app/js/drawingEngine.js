@@ -1,18 +1,54 @@
 // Drawing Engine - Ported from original CraZe app
 // No modules - plain JavaScript that works with file:// URLs
 
-// Brush types
+// Brush types - matching iOS indices (0-42)
 var BRUSHES = {
-  REGULAR_LINE: 1,
-  LINES_FROM_START: 2,
-  VERTICAL_LINES: 3,
-  HORIZONTAL_LINES: 4,
-  GREAT_CROSS: 5,
-  TRIANGLES: 6,
-  SQUARES: 7,
-  CIRCLES: 8,
-  CHAIN: 9,
-  TANGENT: 10,
+  LINES: 0,
+  RADIANT: 1,
+  VERTICAL_LINES: 2,
+  HORIZONTAL_LINES: 3,
+  GREAT_CROSS: 4,
+  TRIANGLES: 5,
+  SQUARES: 6,
+  DIAMOND: 7,
+  HEXAGON: 8,
+  SNOWFLAKE: 9,
+  FLOWER: 10,
+  MOON: 11,
+  CIRCLES: 12,
+  CHAIN: 13,
+  INSIGNIA: 14,
+  FOUR_STAR: 15,
+  SIX_STAR: 16,
+  EIGHT_STAR: 17,
+  LIGHTNING: 18,
+  TANGENT: 19,
+  HOURGLASS: 20,
+  PINWHEEL: 21,
+  TILES: 22,
+  SAW: 23,
+  SEAL: 24,
+  PRESENT: 25,
+  ARROWHEAD: 26,
+  FORCE: 27,
+  WINDOW: 28,
+  XXXXXXX: 29,
+  ZZZZZZZ: 30,
+  COMET: 31,
+  RECTANGLE: 32,
+  PARALLELOGRAM: 33,
+  FIVE_STAR: 34,
+  PENTAGON: 35,
+  FAIRY: 36,
+  HEART: 37,
+  WAVE: 38,
+  PEAK: 39,
+  TRAPEZE: 40,
+  INWARDS: 41,
+  OUTWARDS: 42,
+  // Legacy names for compatibility
+  REGULAR_LINE: 0,
+  LINES_FROM_START: 1,
 };
 
 // Palette types - matching iOS indices
@@ -168,7 +204,7 @@ function DrawingEngine(canvas) {
 
   // Default settings
   this.settings = {
-    brush: BRUSHES.REGULAR_LINE,
+    brush: BRUSHES.LINES,  // 0 = Lines in iOS
     brushSize: 50,
     thickness: 2,
     rotationAmount: 6,
@@ -311,7 +347,7 @@ DrawingEngine.prototype.varyRotation = function() {
 };
 
 DrawingEngine.prototype.fadeDrawing = function() {
-  if (this.settings.brush === BRUSHES.REGULAR_LINE && this.settings.fillShape) return;
+  if (this.settings.brush === BRUSHES.LINES && this.settings.fillShape) return;
   this.fadeCount++;
   if (this.fadeCount > 30 && this.settings.fadingImage) {
     var imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
@@ -472,7 +508,7 @@ DrawingEngine.prototype.liner = function() {
     this.drawr(x2new + this.centerX, y2new + this.centerY, x1new + this.centerX, y1new + this.centerY);
 
     if (settings.connectBorders || settings.fillShape) {
-      if (settings.brush === BRUSHES.REGULAR_LINE) {
+      if (settings.brush === BRUSHES.LINES) {
         this.store(x1new + this.centerX, y1new + this.centerY, x2new + this.centerX, y2new + this.centerY);
       } else {
         this.store(x2new + this.centerX, y2new + this.centerY, x1new + this.centerX, y1new + this.centerY);
@@ -676,7 +712,7 @@ DrawingEngine.prototype.onMouseDown = function(x, y) {
 
 DrawingEngine.prototype.onMouseUp = function() {
   var settings = this.settings;
-  if (settings.brush === BRUSHES.REGULAR_LINE && settings.fillShape) {
+  if (settings.brush === BRUSHES.LINES && settings.fillShape) {
     var len = this.posX.length / 2;
     this.filler(len);
     this.posX = [];
@@ -720,7 +756,7 @@ DrawingEngine.prototype.onMouseMove = function(x, y) {
 
 // Helper to check if brush should use fit to grid
 DrawingEngine.prototype.shouldFitToGrid = function(brushType) {
-  return [BRUSHES.LINES_FROM_START, BRUSHES.VERTICAL_LINES, BRUSHES.HORIZONTAL_LINES,
+  return [BRUSHES.RADIANT, BRUSHES.VERTICAL_LINES, BRUSHES.HORIZONTAL_LINES,
           BRUSHES.GREAT_CROSS, BRUSHES.TRIANGLES, BRUSHES.SQUARES, BRUSHES.CIRCLES].indexOf(brushType) !== -1;
 };
 
