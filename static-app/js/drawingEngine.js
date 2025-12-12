@@ -113,8 +113,11 @@ function DrawingEngine(canvas) {
   this.x2 = 0; this.y2 = 0;
   this.aX = 0; this.aY = 0;
   
-  // Current brush instance
+  // Current brush instance (for default mouse/touch drawing)
   this.currentBrush = null;
+  
+  // Active strokes map for multi-hand drawing (strokeId -> { brush, x1, y1, aX, aY })
+  this.activeStrokes = {};
 
   // Rotation state (kept for perspectiveSize calculation)
   this.currentBrushSize = this.settings.brushSize;
@@ -171,6 +174,32 @@ DrawingEngine.prototype.updateSetting = function(key, value) {
   }
   if (key === 'thickness') {
     this.ctx.lineWidth = value;
+  }
+  
+  // Recreate brushes for all active strokes when parameters change
+  this.recreateActiveBrushes();
+};
+
+// Recreate brushes for all active strokes when parameters change
+DrawingEngine.prototype.recreateActiveBrushes = function() {
+  // Update center coordinates in settings
+  this.settings.centerX = this.centerX;
+  this.settings.centerY = this.centerY;
+  
+  // Recreate default brush if drawing
+  if (this.drawing && this.currentBrush) {
+    var currentPointer = new Point(this.x1, this.y1);
+    this.currentBrush = BrushGenerator.buildBrush(this.settings, currentPointer);
+  }
+  
+  // Recreate brushes for all active multi-hand strokes
+  for (var strokeId in this.activeStrokes) {
+    var stroke = this.activeStrokes[strokeId];
+    if (stroke) {
+      var pointer = new Point(stroke.aX, stroke.aY);
+      var newBrush = BrushGenerator.buildBrush(this.settings, pointer);
+      stroke.brush = newBrush;
+    }
   }
 };
 
@@ -322,54 +351,113 @@ DrawingEngine.prototype.redo = function() {
 };
 
 // Mouse handlers
-DrawingEngine.prototype.onMouseDown = function(x, y) {
-  this.pushUndo();
-  this.clearRedo();
+DrawingEngine.prototype.onMouseDown = function(x, y, strokeId) {
+  strokeId = strokeId || 'default';
+  
+  // Only push undo once when first stroke starts (for default stroke or first hand)
+  if (strokeId === 'default') {
+    this.pushUndo();
+    this.clearRedo();
+  } else {
+    // For multi-hand drawing, only push undo if no other strokes are active
+    var hasActiveStrokes = Object.keys(this.activeStrokes).length > 0;
+    if (!hasActiveStrokes && !this.drawing) {
+      this.pushUndo();
+      this.clearRedo();
+    }
+  }
 
   this.x2 = this.x1 = x;
   this.y2 = this.y1 = y;
 
   this.currentBrushSize = this.settings.brushSize;
-  this.drawing = true;
+  
+  if (strokeId === 'default') {
+    this.drawing = true;
+  }
 
   // Create brush instance
   var pointer = new Point(x, y);
   // Add center coordinates to settings for brushes
   this.settings.centerX = this.centerX;
   this.settings.centerY = this.centerY;
-  this.currentBrush = BrushGenerator.buildBrush(this.settings, pointer);
+  var brush = BrushGenerator.buildBrush(this.settings, pointer);
+  
+  if (strokeId === 'default') {
+    this.currentBrush = brush;
+  } else {
+    // Store brush for this stroke ID
+    this.activeStrokes[strokeId] = {
+      brush: brush,
+      x1: x, y1: y,
+      x2: x, y2: y,
+      aX: x, aY: y
+    };
+  }
 
-  this.onMouseMove(x, y);
+  this.onMouseMove(x, y, strokeId);
 };
 
-DrawingEngine.prototype.onMouseUp = function() {
-  // Finish stroke on brush if needed (handles filling for Lines brush)
-  if (this.currentBrush && this.currentBrush.finishStroke) {
-    this.currentBrush.finishStroke(this.ctx, this);
+DrawingEngine.prototype.onMouseUp = function(strokeId) {
+  strokeId = strokeId || 'default';
+  
+  var brush = null;
+  if (strokeId === 'default') {
+    brush = this.currentBrush;
+    this.drawing = false;
+    this.currentBrush = null;
+  } else {
+    var stroke = this.activeStrokes[strokeId];
+    if (stroke) {
+      brush = stroke.brush;
+      delete this.activeStrokes[strokeId];
+    }
   }
   
-  this.drawing = false;
-  this.currentBrush = null;
+  // Finish stroke on brush if needed (handles filling for Lines brush)
+  if (brush && brush.finishStroke) {
+    brush.finishStroke(this.ctx, this);
+  }
 };
 
-DrawingEngine.prototype.onMouseMove = function(x, y) {
-  if (!this.drawing) return;
+DrawingEngine.prototype.onMouseMove = function(x, y, strokeId) {
+  strokeId = strokeId || 'default';
+  
+  var brush = null;
+  var stroke = null;
+  
+  if (strokeId === 'default') {
+    if (!this.drawing) return;
+    brush = this.currentBrush;
+    this.aX = this.x1 = x;
+    this.aY = this.y1 = y;
+  } else {
+    stroke = this.activeStrokes[strokeId];
+    if (!stroke) return;
+    brush = stroke.brush;
+    stroke.aX = stroke.x1 = x;
+    stroke.aY = stroke.y1 = y;
+  }
 
-  this.aX = this.x1 = x;
-  this.aY = this.y1 = y;
-
-  this.modifier();
+  // Only call modifier for default stroke (to avoid multiple color shifts)
+  // But always call fadeDrawing for all strokes (fading should work for all)
+  if (strokeId === 'default') {
+    this.modifier();
+  } else {
+    // For multi-hand strokes, only call fadeDrawing (not shiftColor/varySize)
+    this.fadeDrawing();
+  }
 
   // Use brush system - just call draw() like iOS
-  if (this.currentBrush) {
+  if (brush) {
     var pointer = new Point(x, y);
     // Update center coordinates in brush params
-    this.currentBrush.params.centerX = this.centerX;
-    this.currentBrush.params.centerY = this.centerY;
-    this.currentBrush.move(pointer);
+    brush.params.centerX = this.centerX;
+    brush.params.centerY = this.centerY;
+    brush.move(pointer);
     
     // Draw the brush (handles all rotation, symmetry, fit to grid, etc.)
-    this.currentBrush.draw(this.ctx, this);
+    brush.draw(this.ctx, this);
   }
 };
 
