@@ -132,6 +132,10 @@
         }
       }
       
+      if (engine.settings.thickness) {
+        engine.ctx.lineWidth = engine.settings.thickness;
+      }
+
       if (showToast) {
         showToast('Parameters RandomiZed!');
       }

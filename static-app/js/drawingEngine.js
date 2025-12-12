@@ -308,6 +308,7 @@ DrawingEngine.prototype.drawLine = function(xi, yi, xf, yf, fill) {
   this.ctx.strokeStyle = this.getColor();
   this.ctx.shadowColor = this.getColor();
   this.ctx.shadowBlur = fill ? 0 : 0;
+  this.ctx.lineWidth = this.settings.thickness;
   this.ctx.beginPath();
   this.ctx.moveTo(xi, yi);
   this.ctx.lineTo(xf, yf);
@@ -319,6 +320,7 @@ DrawingEngine.prototype.drawCircle = function(x, y, radius, fill) {
   this.ctx.strokeStyle = this.getColor();
   this.ctx.shadowColor = this.getColor();
   this.ctx.shadowBlur = fill ? 0 : 2;
+  this.ctx.lineWidth = this.settings.thickness;
   this.ctx.beginPath();
   this.ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
   this.ctx.closePath();
@@ -338,6 +340,7 @@ DrawingEngine.prototype.drawShape = function(points, fill) {
   this.ctx.strokeStyle = this.getColor();
   this.ctx.shadowColor = this.getColor();
   this.ctx.shadowBlur = fill ? 0 : 0;
+  this.ctx.lineWidth = this.settings.thickness;
   this.ctx.beginPath();
   
   var firstPoint = points[0];
