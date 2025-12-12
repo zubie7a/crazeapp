@@ -284,7 +284,9 @@ Brush.prototype.drawPath = function(points, rotAngle, symmetry, ctx, color, engi
     var p2 = path.points[1];
     var centerX = (p1.getX() + p2.getX()) / 2;
     var centerY = (p1.getY() + p2.getY()) / 2;
-    var radius = this.params.brushSize / 2;
+    // Calculate radius from distance between points (like iOS)
+    // This ensures variableSize works correctly - points are already scaled
+    var radius = Maths.distance([p1, p2]) / 2;
     engine.drawCircle(centerX, centerY, radius, this.params.fillShape);
     return;
   }

@@ -24,16 +24,8 @@ var HandsFree = (function() {
   var elements = null;
   var crazeController = null;
 
-  // Draw hand skeletons on overlay canvas
-  function drawHandsOnOverlay(landmarks) {
-    if (!elements || !elements.overlayCanvas) return;
-    
-    var canvas = elements.overlayCanvas;
-    var ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (!landmarks || landmarks.length === 0) return;
-
+  // Calculate letterboxed/pillarboxed area dimensions for video aspect ratio
+  function getLetterboxedArea(canvasWidth, canvasHeight) {
     // Get video aspect ratio (typically 16:9 or 4:3 for webcams)
     // Try to get it from HandsFree video element, or default to 16:9
     var videoAspectRatio = 16 / 9; // Default to 16:9
@@ -44,8 +36,6 @@ var HandsFree = (function() {
       }
     }
     
-    var canvasWidth = canvas.width;
-    var canvasHeight = canvas.height;
     var canvasAspectRatio = canvasWidth / canvasHeight;
     
     // Calculate letterboxed/pillarboxed area to maintain video aspect ratio
@@ -64,6 +54,32 @@ var HandsFree = (function() {
       offsetX = 0;
       offsetY = (canvasHeight - drawHeight) / 2;
     }
+    
+    return {
+      drawWidth: drawWidth,
+      drawHeight: drawHeight,
+      offsetX: offsetX,
+      offsetY: offsetY
+    };
+  }
+
+  // Draw hand skeletons on overlay canvas
+  function drawHandsOnOverlay(landmarks) {
+    if (!elements || !elements.overlayCanvas) return;
+    
+    var canvas = elements.overlayCanvas;
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!landmarks || landmarks.length === 0) return;
+
+    var canvasWidth = canvas.width;
+    var canvasHeight = canvas.height;
+    var letterbox = getLetterboxedArea(canvasWidth, canvasHeight);
+    var drawWidth = letterbox.drawWidth;
+    var drawHeight = letterbox.drawHeight;
+    var offsetX = letterbox.offsetX;
+    var offsetY = letterbox.offsetY;
 
     for (var handIndex = 0; handIndex < landmarks.length; handIndex++) {
       var hand = landmarks[handIndex];
@@ -170,12 +186,20 @@ var HandsFree = (function() {
               var mainRect = mainCanvas.getBoundingClientRect();
               var overlayRect = overlay.getBoundingClientRect();
               
+              // Calculate letterboxed area for overlay (same as used for drawing hands)
+              var letterbox = getLetterboxedArea(overlayRect.width, overlayRect.height);
+              
+              // Map normalized video coordinates (0-1) to letterboxed area (not full overlay)
               var videoX = 1 - drawingPoint.x;
               var videoY = drawingPoint.y;
-              var overlayX = videoX * overlayRect.width;
-              var overlayY = videoY * overlayRect.height;
+              var overlayX = letterbox.offsetX + videoX * letterbox.drawWidth;
+              var overlayY = letterbox.offsetY + videoY * letterbox.drawHeight;
+              
+              // Convert overlay coordinates to viewport coordinates
               var viewportX = overlayRect.left + overlayX;
               var viewportY = overlayRect.top + overlayY;
+              
+              // Convert viewport coordinates to canvas coordinates
               var relativeX = viewportX - mainRect.left;
               var relativeY = viewportY - mainRect.top;
               var scaleX = mainCanvas.width / mainRect.width;
