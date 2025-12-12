@@ -119,12 +119,6 @@ function DrawingEngine(canvas) {
   // Rotation state (kept for perspectiveSize calculation)
   this.currentBrushSize = this.settings.brushSize;
 
-  // Shape storage (only used by filler() for LINES brush with fillShape)
-  this.posX = [];
-  this.posY = [];
-  this.preX = [];
-  this.preY = [];
-
   // Palette state
   this.currentPalette = null;
   this.fadeCount = 0;
@@ -230,7 +224,6 @@ DrawingEngine.prototype.fadeDrawing = function() {
 DrawingEngine.prototype.modifier = function() {
   this.shiftColor();
   this.varySize(); // Only handles perspectiveSize now
-  // varyRotation removed - brushes handle rotatingShape internally
   this.fadeDrawing();
 };
 
@@ -289,75 +282,6 @@ DrawingEngine.prototype.drawShape = function(points, fill) {
   this.ctx.stroke();
 };
 
-DrawingEngine.prototype.drawr = function(xi, yi, xf, yf) {
-  var settings = this.settings;
-
-  if (settings.brush !== BRUSHES.CIRCLES && settings.brush !== BRUSHES.CHAIN) {
-    this.drawLine(xi, yi, xf, yf, settings.fillShape);
-    if (settings.symmetry) {
-      this.drawLine(2 * this.centerX - xf, yf, 2 * this.centerX - xi, yi, settings.fillShape);
-    }
-  }
-
-  if (settings.brush === BRUSHES.CIRCLES || settings.brush === BRUSHES.CHAIN) {
-    var xx = (xi + xf) / 2;
-    var yy = (yi + yf) / 2;
-    var radius;
-    if (settings.brush === BRUSHES.CIRCLES) {
-      radius = this.currentBrushSize / 2;
-    } else {
-      var dx = xi - xf;
-      var dy = yi - yf;
-      radius = Math.sqrt(dx * dx + dy * dy) / 2;
-    }
-    this.drawCircle(xx, yy, radius, settings.fillShape);
-    if (settings.symmetry) {
-      this.drawCircle(2 * this.centerX - xx, yy, radius, settings.fillShape);
-    }
-  }
-};
-
-DrawingEngine.prototype.filler = function(fillnum) {
-  var settings = this.settings;
-  if (!settings.fillShape) return;
-
-  var filX = this.posX.slice();
-  var filY = this.posY.slice();
-
-  var fillbak = this.ctx.fillStyle;
-  this.ctx.fillStyle = this.ctx.strokeStyle;
-
-  for (var j = 0; j < settings.rotationAmount; j++) {
-    this.ctx.beginPath();
-    var f = 0;
-    for (var i = j * 2; f < fillnum; i += settings.rotationAmount * 2) {
-      this.ctx.lineTo(filX[i], filY[i]);
-      this.ctx.lineTo(filX[i + 1], filY[i + 1]);
-      f++;
-    }
-    this.ctx.closePath();
-    this.ctx.fill();
-    this.ctx.stroke();
-  }
-
-  if (settings.symmetry) {
-    for (var j = 0; j < settings.rotationAmount; j++) {
-      this.ctx.beginPath();
-      var f = 0;
-      for (var i = j * 2; f < fillnum; i += settings.rotationAmount * 2) {
-        this.ctx.lineTo(2 * this.centerX - filX[i], filY[i]);
-        this.ctx.lineTo(2 * this.centerX - filX[i + 1], filY[i + 1]);
-        f++;
-      }
-      this.ctx.closePath();
-      this.ctx.fill();
-      this.ctx.stroke();
-    }
-  }
-
-  this.ctx.fillStyle = fillbak;
-};
-
 // Undo/Redo
 DrawingEngine.prototype.pushUndo = function() {
   var undoCnv = document.createElement('canvas');
@@ -408,11 +332,6 @@ DrawingEngine.prototype.onMouseDown = function(x, y) {
   this.currentBrushSize = this.settings.brushSize;
   this.drawing = true;
 
-  this.posX = [];
-  this.posY = [];
-  this.preX = [];
-  this.preY = [];
-
   // Create brush instance
   var pointer = new Point(x, y);
   // Add center coordinates to settings for brushes
@@ -431,12 +350,6 @@ DrawingEngine.prototype.onMouseUp = function() {
   
   this.drawing = false;
   this.currentBrush = null;
-  
-  // Clear point storage arrays
-  this.posX = [];
-  this.posY = [];
-  this.preX = [];
-  this.preY = [];
 };
 
 DrawingEngine.prototype.onMouseMove = function(x, y) {
