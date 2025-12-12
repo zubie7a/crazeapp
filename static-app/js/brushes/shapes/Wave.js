@@ -72,6 +72,7 @@ Wave.prototype.getPath = function(points, rotAngle, symmetry) {
   var sectorEnd2 = fixSector4ths(1, symmetry);
   
   // Build arcs in reverse order (for web Canvas compatibility)
+  // Note: Lines need to be inserted between arcs, not at the end
   var arcs = [
     {
       center: c4,
@@ -88,6 +89,10 @@ Wave.prototype.getPath = function(points, rotAngle, symmetry) {
       clockwise: symmetry
     },
     {
+      type: 'line',
+      point: points[2]
+    },
+    {
       center: c2,
       radius: radius,
       startAngle: (sectorEnd2 * radians4th) - radians8th - offset,
@@ -100,13 +105,16 @@ Wave.prototype.getPath = function(points, rotAngle, symmetry) {
       startAngle: (sectorEnd1 * radians4th) - radians8th - offset,
       endAngle: (sectorStart1 * radians4th) - radians8th - offset,
       clockwise: symmetry
+    },
+    {
+      type: 'line',
+      point: points[0]
     }
   ];
   
   return {
     type: 'arcs',
     arcs: arcs,
-    lines: [points[2], points[0]],
     close: true
   };
 };

@@ -413,12 +413,20 @@ Brush.prototype.drawArcPath = function(pathData, rotAngle, symmetry, ctx, color,
   currentY = firstArc.center.getY() + firstArc.radius * Math.sin(firstArc.startAngle);
   ctx.moveTo(currentX, currentY);
   
-  // Draw each arc
+  // Draw each arc (or line)
   // Note: Canvas arc() uses anticlockwise (true = counter-clockwise), iOS uses clockwise (true = clockwise)
   // So we need to invert the boolean
   // Canvas arc() automatically adds a line from current point to arc start, then draws the arc
   for (var i = 0; i < arcs.length; i++) {
     var arc = arcs[i];
+    
+    // Handle line segments (for Wave brush)
+    if (arc.type === 'line') {
+      ctx.lineTo(arc.point.getX(), arc.point.getY());
+      currentX = arc.point.getX();
+      currentY = arc.point.getY();
+      continue;
+    }
     
     // Calculate where this arc should start
     var arcStartX = arc.center.getX() + arc.radius * Math.cos(arc.startAngle);
@@ -426,9 +434,16 @@ Brush.prototype.drawArcPath = function(pathData, rotAngle, symmetry, ctx, color,
     
     // If we're not already at the start of this arc, move there
     // (This handles cases where arcs don't connect end-to-end, like in Heart)
+    // But only if close is true - for open paths like Flower, don't auto-connect
     var dist = Math.sqrt(Math.pow(arcStartX - currentX, 2) + Math.pow(arcStartY - currentY, 2));
-    if (dist > 0.1) {  // If more than 0.1 pixels away, move there
-      ctx.lineTo(arcStartX, arcStartY);
+    if (dist > 0.1) {  // If more than 0.1 pixels away
+      if (pathData.close) {
+        // For closed paths, connect with a line
+        ctx.lineTo(arcStartX, arcStartY);
+      } else {
+        // For open paths, move to the start (creates a break in the path)
+        ctx.moveTo(arcStartX, arcStartY);
+      }
       currentX = arcStartX;
       currentY = arcStartY;
     }
@@ -448,15 +463,7 @@ Brush.prototype.drawArcPath = function(pathData, rotAngle, symmetry, ctx, color,
     currentY = arc.center.getY() + arc.radius * Math.sin(arc.endAngle);
   }
   
-  // Add lines if needed (after all arcs)
-  if (pathData.lines) {
-    for (var i = 0; i < pathData.lines.length; i++) {
-      var line = pathData.lines[i];
-      ctx.lineTo(line.getX(), line.getY());
-    }
-  }
-  
-  // Close path if needed
+  // Close path if needed (only for closed shapes like Heart, Wave)
   if (pathData.close) {
     ctx.closePath();
   }
