@@ -151,14 +151,7 @@ function getPaletteGenerator(paletteType) {
   }
 }
 
-// Point class
-function Point(px, py) {
-  this._x = px;
-  this._y = py;
-}
-Point.prototype.x = function() { return this._x; };
-Point.prototype.y = function() { return this._y; };
-
+// Point class is now defined in brushes/Point.js
 // Bresenham Line Algorithm
 function bresenhamLine(xa, ya, xb, yb) {
   var x1 = xa, x2 = xb, y1 = ya, y2 = yb;
@@ -285,6 +278,9 @@ function DrawingEngine(canvas) {
   this.x1 = 0; this.y1 = 0;
   this.x2 = 0; this.y2 = 0;
   this.aX = 0; this.aY = 0;
+  
+  // Current brush instance
+  this.currentBrush = null;
 
   // Rotation state
   this.brushRotD = 0;
@@ -444,6 +440,33 @@ DrawingEngine.prototype.drawCircle = function(x, y, radius, fill) {
   } else {
     this.ctx.stroke();
   }
+};
+
+DrawingEngine.prototype.drawShape = function(points, fill) {
+  if (points.length < 3) return;
+  
+  this.ctx.strokeStyle = this.getColor();
+  this.ctx.shadowColor = this.getColor();
+  this.ctx.shadowBlur = fill ? 0 : 0;
+  this.ctx.beginPath();
+  
+  var firstPoint = points[0];
+  this.ctx.moveTo(firstPoint.getX(), firstPoint.getY());
+  
+  for (var i = 1; i < points.length; i++) {
+    var p = points[i];
+    this.ctx.lineTo(p.getX(), p.getY());
+  }
+  
+  this.ctx.closePath();
+  
+  if (fill) {
+    var fillbak = this.ctx.fillStyle;
+    this.ctx.fillStyle = this.ctx.strokeStyle;
+    this.ctx.fill();
+    this.ctx.fillStyle = fillbak;
+  }
+  this.ctx.stroke();
 };
 
 DrawingEngine.prototype.store = function(mx2, my2, mx1, my1) {
@@ -725,6 +748,10 @@ DrawingEngine.prototype.onMouseDown = function(x, y) {
   this.preX = [];
   this.preY = [];
 
+  // Create brush instance
+  var pointer = new Point(x, y);
+  this.currentBrush = BrushGenerator.buildBrush(this.settings, pointer);
+
   this.onMouseMove(x, y);
 };
 
@@ -736,7 +763,14 @@ DrawingEngine.prototype.onMouseUp = function() {
     this.posX = [];
     this.posY = [];
   }
+  
+  // Finish stroke on brush if needed
+  if (this.currentBrush && this.currentBrush.finishStroke) {
+    this.currentBrush.finishStroke(this.ctx);
+  }
+  
   this.drawing = false;
+  this.currentBrush = null;
 };
 
 DrawingEngine.prototype.onMouseMove = function(x, y) {
@@ -747,93 +781,28 @@ DrawingEngine.prototype.onMouseMove = function(x, y) {
 
   this.modifier();
 
-  var settings = this.settings;
-  var t = Math.sqrt(4.0 / 3.0);
-
-  switch (settings.brush) {
-    case BRUSHES.REGULAR_LINE:
-      this.liner();
-      this.setSeed(0, 0, 0, 0);
-      break;
-
-    case BRUSHES.LINES_FROM_START:
+  // Use brush system - just call draw() like iOS
+  if (this.currentBrush) {
+    var pointer = new Point(x, y);
+    this.currentBrush.move(pointer);
+    
+    // Apply fit to grid if needed (before drawing)
+    if (this.settings.fitToGrid && this.shouldFitToGrid(this.settings.brush)) {
       this.fitToGrid();
-      this.liner();
-      this.connecter();
-      if (settings.fitToGrid) this.setSeed(0, 0, 0, 0);
-      break;
-
-    case BRUSHES.VERTICAL_LINES:
-      this.fitToGrid();
-      this.setSeed(1, 0, -1, 0);
-      this.liner();
-      this.connecter();
-      break;
-
-    case BRUSHES.HORIZONTAL_LINES:
-      this.fitToGrid();
-      this.setSeed(0, 1, 0, -1);
-      this.liner();
-      this.connecter();
-      break;
-
-    case BRUSHES.GREAT_CROSS:
-      this.fitToGrid();
-      this.setSeed(0, 1, 0, -1);
-      this.liner();
-      this.setSeed(1, 0, -1, 0);
-      this.liner();
-      this.connecter();
-      break;
-
-    case BRUSHES.TRIANGLES:
-      this.fitToGrid();
-      this.setSeed(-1 * this.triDir, 0, 1 * this.triDir, -t * this.triDir);
-      this.liner();
-      this.setSeed(1 * this.triDir, -t * this.triDir, 1 * this.triDir, t * this.triDir);
-      this.liner();
-      this.setSeed(1 * this.triDir, t * this.triDir, -1 * this.triDir, 0);
-      this.liner();
-      this.filler(3);
-      this.connecter();
-      break;
-
-    case BRUSHES.SQUARES:
-      this.fitToGrid();
-      this.setSeed(-1, -1, -1, 1);
-      this.liner();
-      this.setSeed(-1, 1, 1, 1);
-      this.liner();
-      this.setSeed(1, 1, 1, -1);
-      this.liner();
-      this.setSeed(1, -1, -1, -1);
-      this.liner();
-      this.filler(4);
-      this.connecter();
-      break;
-
-    case BRUSHES.CIRCLES:
-      this.fitToGrid();
-      this.setSeed(0, 1, 0, -1);
-      this.liner();
-      this.setSeed(1, 0, -1, 0);
-      this.liner();
-      this.connecter();
-      break;
-
-    case BRUSHES.CHAIN:
-      this.liner();
-      this.setSeed(0, 0, 0, 0);
-      break;
-
-    case BRUSHES.TANGENT:
-      var _x1 = this.x1, _y1 = this.y1, _x2 = this.x2, _y2 = this.y2;
-      this.parallels(true, 0);
-      this.liner();
-      this.x1 = _x1; this.y1 = _y1; this.x2 = _x2; this.y2 = _y2;
-      this.setSeed(0, 0, 0, 0);
-      break;
+      // Recalculate points after grid fitting
+      pointer = new Point(this.aX, this.aY);
+      this.currentBrush.move(pointer);
+    }
+    
+    // Draw the brush (handles all rotation, symmetry, etc.)
+    this.currentBrush.draw(this.ctx, this);
   }
+};
+
+// Helper to check if brush should use fit to grid
+DrawingEngine.prototype.shouldFitToGrid = function(brushType) {
+  return [BRUSHES.LINES_FROM_START, BRUSHES.VERTICAL_LINES, BRUSHES.HORIZONTAL_LINES,
+          BRUSHES.GREAT_CROSS, BRUSHES.TRIANGLES, BRUSHES.SQUARES, BRUSHES.CIRCLES].indexOf(brushType) !== -1;
 };
 
 DrawingEngine.prototype.clearCanvas = function() {
