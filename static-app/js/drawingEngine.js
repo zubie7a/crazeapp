@@ -99,11 +99,6 @@ var PALETTES = {
   LIME: 43,
 };
 
-// Palette system is now in palettes/ folder - using PaletteGenerator
-
-// Point class is now defined in brushes/Point.js
-// Bresenham algorithms are now in crazeMode.js
-
 // Drawing Engine Class
 function DrawingEngine(canvas) {
   this.canvas = canvas;
@@ -121,12 +116,10 @@ function DrawingEngine(canvas) {
   // Current brush instance
   this.currentBrush = null;
 
-  // Rotation state
-  this.brushRotD = 0;
-  this.dir = true;
+  // Rotation state (kept for perspectiveSize calculation)
   this.currentBrushSize = this.settings.brushSize;
 
-  // Shape storage
+  // Shape storage (only used by filler() for LINES brush with fillShape)
   this.posX = [];
   this.posY = [];
   this.preX = [];
@@ -204,34 +197,17 @@ DrawingEngine.prototype.shiftColor = function() {
   }
 };
 
+// Note: variableSize and rotatingShape are now handled by brushes internally
+// This function only handles perspectiveSize (not yet implemented in brushes)
 DrawingEngine.prototype.varySize = function() {
-  var settings = this.settings;
-  if (settings.variableSize) {
-    var maxSize = settings.brushSize * 1.5;
-    var minSize = settings.brushSize * 0.5;
-    if (this.currentBrushSize < maxSize && this.dir) {
-      this.currentBrushSize++;
-    } else if (this.dir) {
-      this.dir = false;
-    }
-    if (this.currentBrushSize > minSize && !this.dir) {
-      this.currentBrushSize--;
-    } else if (!this.dir) {
-      this.dir = true;
-    }
-  }
-  if (settings.perspectiveSize) {
-    this.currentBrushSize = settings.brushSize;
+  // PerspectiveSize is not yet handled by brushes, so we keep this for now
+  // TODO: Move perspectiveSize logic to Brush class
+  if (this.settings.perspectiveSize) {
+    this.currentBrushSize = this.settings.brushSize;
     var dx = this.x1 - this.centerX;
     var dy = this.y1 - this.centerY;
     var dist = Math.sqrt(dx * dx + dy * dy) / 200;
     this.currentBrushSize *= dist;
-  }
-};
-
-DrawingEngine.prototype.varyRotation = function() {
-  if (this.settings.rotatingShape) {
-    this.brushRotD = (this.brushRotD + 1) % 359;
   }
 };
 
@@ -253,8 +229,8 @@ DrawingEngine.prototype.fadeDrawing = function() {
 
 DrawingEngine.prototype.modifier = function() {
   this.shiftColor();
-  this.varySize();
-  this.varyRotation();
+  this.varySize(); // Only handles perspectiveSize now
+  // varyRotation removed - brushes handle rotatingShape internally
   this.fadeDrawing();
 };
 
@@ -313,37 +289,6 @@ DrawingEngine.prototype.drawShape = function(points, fill) {
   this.ctx.stroke();
 };
 
-DrawingEngine.prototype.store = function(mx2, my2, mx1, my1) {
-  this.posX.push(mx1);
-  this.posY.push(my1);
-  this.posX.push(mx2);
-  this.posY.push(my2);
-};
-
-DrawingEngine.prototype.rotateLine = function() {
-  var settings = this.settings;
-  var rotable = [BRUSHES.VERTICAL_LINES, BRUSHES.HORIZONTAL_LINES, BRUSHES.GREAT_CROSS,
-    BRUSHES.TRIANGLES, BRUSHES.SQUARES, BRUSHES.CIRCLES, BRUSHES.CHAIN].indexOf(settings.brush) !== -1;
-
-  if (settings.rotatingShape && rotable) {
-    var brushRotR = this.brushRotD * Math.PI / 180;
-    var x1rot = this.x1 - this.aX;
-    var y1rot = this.y1 - this.aY;
-    var y2rot = this.y2 - this.aY;
-    var x2rot = this.x2 - this.aX;
-
-    var x1new = x1rot * Math.cos(brushRotR) - y1rot * Math.sin(brushRotR);
-    var y1new = x1rot * Math.sin(brushRotR) + y1rot * Math.cos(brushRotR);
-    var x2new = x2rot * Math.cos(brushRotR) - y2rot * Math.sin(brushRotR);
-    var y2new = x2rot * Math.sin(brushRotR) + y2rot * Math.cos(brushRotR);
-
-    this.x1 = x1new + this.aX;
-    this.y1 = y1new + this.aY;
-    this.x2 = x2new + this.aX;
-    this.y2 = y2new + this.aY;
-  }
-};
-
 DrawingEngine.prototype.drawr = function(xi, yi, xf, yf) {
   var settings = this.settings;
 
@@ -370,52 +315,6 @@ DrawingEngine.prototype.drawr = function(xi, yi, xf, yf) {
       this.drawCircle(2 * this.centerX - xx, yy, radius, settings.fillShape);
     }
   }
-};
-
-DrawingEngine.prototype.liner = function() {
-  var settings = this.settings;
-  var angle = 2 * Math.PI / settings.rotationAmount;
-
-  var x1rot = this.x1 - this.centerX;
-  var y1rot = this.y1 - this.centerY;
-  var x2rot = this.x2 - this.centerX;
-  var y2rot = this.y2 - this.centerY;
-
-  this.rotateLine();
-
-  for (var i = 0; i < settings.rotationAmount; ++i) {
-    var x1new = x1rot * Math.cos(angle) - y1rot * Math.sin(angle);
-    var y1new = x1rot * Math.sin(angle) + y1rot * Math.cos(angle);
-    var x2new = x2rot * Math.cos(angle) - y2rot * Math.sin(angle);
-    var y2new = x2rot * Math.sin(angle) + y2rot * Math.cos(angle);
-
-    x1rot = x1new;
-    y1rot = y1new;
-    x2rot = x2new;
-    y2rot = y2new;
-
-    this.drawr(x2new + this.centerX, y2new + this.centerY, x1new + this.centerX, y1new + this.centerY);
-
-    if (settings.connectBorders || settings.fillShape) {
-      if (settings.brush === BRUSHES.LINES) {
-        this.store(x1new + this.centerX, y1new + this.centerY, x2new + this.centerX, y2new + this.centerY);
-      } else {
-        this.store(x2new + this.centerX, y2new + this.centerY, x1new + this.centerX, y1new + this.centerY);
-      }
-    }
-  }
-};
-
-DrawingEngine.prototype.connecter = function() {
-  if (this.settings.connectBorders) {
-    for (var i = 0; i < this.preX.length; ++i) {
-      this.drawr(this.preX[i], this.preY[i], this.posX[i], this.posY[i]);
-    }
-  }
-  this.preX = this.posX.slice();
-  this.preY = this.posY.slice();
-  this.posX = [];
-  this.posY = [];
 };
 
 DrawingEngine.prototype.filler = function(fillnum) {
@@ -457,82 +356,6 @@ DrawingEngine.prototype.filler = function(fillnum) {
   }
 
   this.ctx.fillStyle = fillbak;
-};
-
-DrawingEngine.prototype.setSeed = function(h1, w1, h2, w2) {
-  this.y1 = this.aY + h1 * this.currentBrushSize / 2;
-  this.x1 = this.aX + w1 * this.currentBrushSize / 2;
-  this.y2 = this.aY + h2 * this.currentBrushSize / 2;
-  this.x2 = this.aX + w2 * this.currentBrushSize / 2;
-};
-
-DrawingEngine.prototype.fitToGrid = function() {
-  if (!this.settings.fitToGrid) return;
-
-  var settings = this.settings;
-  var cY = this.canvas.height / 2;
-  var cX = this.canvas.width / 2;
-  var height = settings.brushSize;
-  var base = height;
-
-  if (settings.brush === BRUSHES.TRIANGLES) {
-    base = height * Math.sqrt(4.0 / 3.0);
-  }
-
-  var dY = this.aY - cY;
-  var dX = this.aX - cX;
-
-  this.aY = Math.floor(dY / height) * height + cY;
-  this.aX = Math.floor(dX / base) * base + cX;
-
-  if (this.aY + height / 2 < this.aY + dY % height) {
-    this.aY += height;
-  }
-  if (this.aX + base / 2 < this.aX + dX % base) {
-    this.aX += base;
-  }
-
-  var heightMultiple = Math.abs((this.aY - cY) / height);
-  if (settings.brush === BRUSHES.TRIANGLES && !settings.rotatingShape) {
-    this.triDir = heightMultiple % 2 === 0 ? 1 : -1;
-  } else {
-    this.triDir = 1;
-  }
-};
-
-DrawingEngine.prototype.parallels = function(dir, dist) {
-  var sign = dir ? 1 : -1;
-  var pt = { x: this.x1, y: this.y1 };
-  var sl = 0;
-
-  if (this.y1 === this.y2) sl = 100000;
-  else if (this.x1 === this.x2) sl = -100000;
-  else sl = (this.y1 - this.y2) / (this.x1 - this.x2);
-
-  var point = this.alongLine(dist, sl, pt, sign, true);
-  var p1 = this.alongLine(this.currentBrushSize, sl, point, 1, false);
-  var p2 = this.alongLine(this.currentBrushSize, sl, point, -1, false);
-
-  this.x1 = p1.x; this.y1 = p1.y;
-  this.x2 = p2.x; this.y2 = p2.y;
-};
-
-DrawingEngine.prototype.alongLine = function(distance, slope, point, sign, part) {
-  var p = { x: null, y: null };
-  if (100000 !== Math.abs(slope)) {
-    var s = part ? 1 / slope : slope;
-    p.x = point.x - (sign * distance) / Math.sqrt(1 + s * s);
-    p.y = s * (p.x - point.x) + point.y;
-  } else {
-    if (part) {
-      if (slope > 0) { p.x = point.x; p.y = point.y + sign * distance; }
-      else { p.y = point.y; p.x = point.x + sign * distance; }
-    } else {
-      if (slope > 0) { p.y = point.y; p.x = point.x + sign * distance; }
-      else { p.x = point.x; p.y = point.y + sign * distance; }
-    }
-  }
-  return p;
 };
 
 // Undo/Redo
@@ -583,8 +406,6 @@ DrawingEngine.prototype.onMouseDown = function(x, y) {
   this.y2 = this.y1 = y;
 
   this.currentBrushSize = this.settings.brushSize;
-  this.brushRotD = 0;
-  this.dir = true;
   this.drawing = true;
 
   this.posX = [];
@@ -639,13 +460,6 @@ DrawingEngine.prototype.onMouseMove = function(x, y) {
     // Draw the brush (handles all rotation, symmetry, fit to grid, etc.)
     this.currentBrush.draw(this.ctx, this);
   }
-};
-
-// Helper to check if brush should use fit to grid
-// Note: All brushes now handle fit to grid internally via transformAlign
-DrawingEngine.prototype.shouldFitToGrid = function(brushType) {
-  // All brushes support fit to grid now (handled in Brush.transformAlign)
-  return true;
 };
 
 DrawingEngine.prototype.clearCanvas = function() {

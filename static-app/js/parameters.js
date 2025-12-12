@@ -6,7 +6,7 @@
 
   // Default parameters for drawing engine
   var DEFAULT_PARAMETERS = {
-    brush: BRUSHES.HEART, 
+    brush: BRUSHES.LINES, 
     brushSize: 50,
     thickness: 2,
     rotationAmount: 6,
