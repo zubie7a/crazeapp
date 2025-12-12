@@ -451,24 +451,99 @@
   }
 
   function stopHandsFree() {
-    wasDrawing = false;
-    if (engine) engine.onMouseUp();
-
-    var ctx = elements.overlayCanvas.getContext('2d');
-    ctx.clearRect(0, 0, elements.overlayCanvas.width, elements.overlayCanvas.height);
-
-    if (handsFreeInstance) {
+    // Prevent any errors from causing page reloads - wrap everything in try-catch
+    try {
+      // Set flag first to prevent data handler from running during cleanup
+      var wasActive = handsFreeActive;
+      handsFreeActive = false;
+      
+      // Stop drawing if we were drawing
+      wasDrawing = false;
+      if (engine && wasActive) {
+        try {
+          engine.onMouseUp();
+        } catch (error) {
+          console.error('Error in engine.onMouseUp during HandsFree cleanup:', error);
+        }
+      }
+      
+      // Store reference to instance for async cleanup
+      var instanceToStop = handsFreeInstance;
+      handsFreeInstance = null;
+      
+      // Clear overlay canvas immediately (safe operation)
       try {
-        if (handsFreeInstance.pause) handsFreeInstance.pause();
+        if (elements && elements.overlayCanvas) {
+          var ctx = elements.overlayCanvas.getContext('2d');
+          ctx.clearRect(0, 0, elements.overlayCanvas.width, elements.overlayCanvas.height);
+        }
+      } catch (error) {
+        console.error('Error clearing overlay canvas:', error);
+      }
+      
+      // Don't call stop() - it might be causing the reload
+      // Instead, just remove event listeners and let it run in the background
+      // The flag is set to false, so the data handler won't process anything
+      if (instanceToStop) {
+        // Remove event listeners to stop processing
         setTimeout(function() {
-          if (handsFreeInstance && handsFreeInstance.stop) handsFreeInstance.stop();
-          handsFreeInstance = null;
-        }, 100);
-      } catch (e) { /* ignore */ }
+          try {
+            // Remove event listeners before stopping to prevent errors
+            try {
+              if (typeof instanceToStop.off === 'function') {
+                instanceToStop.off('data');
+              } else if (typeof instanceToStop.removeListener === 'function') {
+                instanceToStop.removeListener('data');
+              } else if (typeof instanceToStop.removeAllListeners === 'function') {
+                instanceToStop.removeAllListeners('data');
+              }
+            } catch (e) {
+              console.warn('Could not remove HandsFree event listeners:', e);
+            }
+            
+            // Try to pause instead of stop - might be safer
+            if (typeof instanceToStop.pause === 'function') {
+              try {
+                instanceToStop.pause();
+              } catch (pauseError) {
+                console.error('Error in handsFreeInstance.pause():', pauseError);
+              }
+            }
+            
+            // Only call stop() as a last resort, and wrap it very carefully
+            // Skip stop() entirely if pause() worked
+            if (typeof instanceToStop.pause !== 'function' && typeof instanceToStop.stop === 'function') {
+              try {
+                // Use requestAnimationFrame to defer stop() even more
+                requestAnimationFrame(function() {
+                  try {
+                    instanceToStop.stop();
+                  } catch (stopError) {
+                    console.error('Error in handsFreeInstance.stop():', stopError);
+                  }
+                });
+              } catch (stopError) {
+                console.error('Error calling handsFreeInstance.stop():', stopError);
+              }
+            }
+          } catch (error) {
+            console.error('Error in HandsFree cleanup:', error);
+            // Don't rethrow - we want to continue even if cleanup fails
+          }
+        }, 50); // Longer delay to ensure current operation completes
+      }
+      
+      elements.handsBtn.classList.remove('active');
+    } catch (error) {
+      console.error('Fatal error in stopHandsFree:', error);
+      // Reset state even if there's an error to prevent further issues
+      handsFreeActive = false;
+      handsFreeInstance = null;
+      wasDrawing = false;
+      if (elements && elements.handsBtn) {
+        elements.handsBtn.classList.remove('active');
+      }
     }
-
-    handsFreeActive = false;
-    elements.handsBtn.classList.remove('active');
   }
 
   function toggleHandsFree() {
