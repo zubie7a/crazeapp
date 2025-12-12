@@ -15,141 +15,55 @@ var BRUSHES = {
   TANGENT: 10,
 };
 
-// Palette types
+// Palette types - matching iOS indices
 var PALETTES = {
-  MANUAL: 1,
-  RAINBOW: 2,
-  FIRE: 3,
-  ICE: 4,
-  NATURE: 5,
-  MYSTIC: 6,
-  BOREALIS: 7,
-  GRAYSCALE: 8,
-  FOXES: 9,
+  MANUAL: 0,
+  RAINBOW: 1,
+  BLAZE: 2,      // was FIRE
+  GLACIER: 3,    // was ICE
+  OCEAN: 4,
+  NATURAL: 5,    // was NATURE
+  BLUESKY: 6,
+  GRAYSCALE: 7,
+  SEPIA: 8,
+  MYSTICAL: 9,   // was MYSTIC
+  TROPICAL: 10,
+  AURORA: 11,
+  NEON: 12,
+  BRAZIL: 13,
+  MEXICO: 14,
+  COLOMBIA: 15,
+  GERMANY: 16,
+  NETHERLANDS: 17,
+  INDIA: 18,
+  SUNSET: 19,
+  BEACH: 20,
+  FUTURE: 21,
+  SUNNY: 22,
+  PASTEL: 23,
+  INTENSE: 24,
+  DASH: 25,
+  RUNNER: 26,
+  MINT: 27,
+  VIRIDIS: 28,
+  HAPPY: 29,
+  COMFY: 30,
+  SHINY: 31,
+  CYBER: 32,
+  JUPITER: 33,
+  BLOSSOM: 34,
+  HOLIDAY: 35,
+  SUNRISE: 36,
+  FLORAL: 37,
+  CMYK: 38,
+  DAYDREAM: 39,
+  COSMOS: 40,
+  HYPERSPACE: 41,
+  GOLDEN: 42,
+  LIME: 43,
 };
 
-// Palette generators
-function generateRainbowPalette() {
-  var rr = 255, gg = 0, bb = 0;
-  var colArray = [];
-  for (var i = 0; i < 1536; ++i) {
-    if (rr === 255 && gg !== 255 && bb === 0) gg++;
-    if (rr !== 0 && gg === 255 && bb === 0) rr--;
-    if (rr === 0 && gg === 255 && bb !== 255) bb++;
-    if (rr === 0 && gg !== 0 && bb === 255) gg--;
-    if (rr !== 255 && gg === 0 && bb === 255) rr++;
-    if (rr === 255 && gg === 0 && bb !== 0) bb--;
-    colArray.push({ r: rr, g: gg, b: bb });
-  }
-  return colArray;
-}
-
-function generateFirePalette() {
-  var rr = 255, gg = 0, bb = 0;
-  var colArray = [];
-  for (var i = 0; i < 512; ++i) {
-    if (i < 255) gg++;
-    if (i >= 255) gg--;
-    colArray.push({ r: rr, g: gg, b: bb });
-  }
-  return colArray;
-}
-
-function generateIcePalette() {
-  var rr = 0, gg = 0, bb = 255;
-  var colArray = [];
-  for (var i = 0; i < 1024; ++i) {
-    if (i < 255) gg++;
-    else if (i < 512) rr++;
-    else if (i < 768) rr--;
-    else if (i < 1024) gg--;
-    colArray.push({ r: rr, g: gg, b: bb });
-  }
-  return colArray;
-}
-
-function generateNaturePalette() {
-  var rr = 0, gg = 255, bb = 128;
-  var colArray = [];
-  for (var i = 0; i < 256; ++i) {
-    if (i < 64) gg--;
-    else if (i < 128) gg++;
-    else if (i < 192) gg--;
-    else gg++;
-    if (i < 128) { rr++; bb--; }
-    if (i >= 128) { rr--; bb++; }
-    colArray.push({ r: rr, g: gg, b: bb });
-  }
-  return colArray;
-}
-
-function generateMysticPalette() {
-  var rr = 128, gg = 0, bb = 255;
-  var colArray = [];
-  for (var i = 0; i < 768; ++i) {
-    if (i < 128) rr++;
-    else if (i < 384) gg++;
-    else if (i < 640) gg--;
-    else if (i < 768) rr--;
-    colArray.push({ r: rr, g: gg, b: bb });
-  }
-  return colArray;
-}
-
-function generateBorealisPalette() {
-  var rr = 0, gg = 255, bb = 0;
-  var colArray = [];
-  for (var i = 0; i < 1024; ++i) {
-    if (i < 255) bb++;
-    else if (i < 512) { gg--; rr++; }
-    else if (i < 768) { gg++; rr--; }
-    else bb--;
-    colArray.push({ r: rr, g: gg, b: bb });
-  }
-  return colArray;
-}
-
-function generateGrayscalePalette() {
-  var rr = 255, gg = 255, bb = 255;
-  var colArray = [];
-  for (var i = 0; i < 512; ++i) {
-    if (i < 255) { rr--; gg--; bb--; }
-    if (i >= 255) { rr++; gg++; bb++; }
-    colArray.push({ r: rr, g: gg, b: bb });
-  }
-  return colArray;
-}
-
-function generateFoxesPalette() {
-  var rr = 127, gg = 0, bb = 255;
-  var colArray = [];
-  for (var i = 0; i < 1280; ++i) {
-    if (i < 128) rr++;
-    else if (i < 640) {
-      if (rr === 255 && gg === 0 && bb !== 0) bb--;
-      if (rr === 255 && gg !== 255 && bb === 0) gg++;
-    } else if (i < 1152) {
-      if (rr === 255 && gg === 0 && bb !== 255) bb++;
-      if (rr === 255 && gg !== 0 && bb === 0) gg--;
-    } else rr--;
-    colArray.push({ r: rr, g: gg, b: bb });
-  }
-  return colArray;
-}
-
-function getPaletteGenerator(paletteType) {
-  switch (paletteType) {
-    case PALETTES.RAINBOW: return generateRainbowPalette;
-    case PALETTES.FIRE: return generateFirePalette;
-    case PALETTES.ICE: return generateIcePalette;
-    case PALETTES.NATURE: return generateNaturePalette;
-    case PALETTES.MYSTIC: return generateMysticPalette;
-    case PALETTES.BOREALIS: return generateBorealisPalette;
-    case PALETTES.GRAYSCALE: return generateGrayscalePalette;
-    case PALETTES.FOXES: return generateFoxesPalette;
-    default: return null;
-  }
-}
+// Palette system is now in palettes/ folder - using PaletteGenerator
 
 // Point class is now defined in brushes/Point.js
 // Bresenham Line Algorithm
@@ -258,7 +172,7 @@ function DrawingEngine(canvas) {
     brushSize: 50,
     thickness: 2,
     rotationAmount: 6,
-    palette: PALETTES.RAINBOW,
+    palette: PALETTES.RAINBOW,  // 1 = Rainbows in iOS
     r: 255,
     g: 0,
     b: 0,
@@ -294,8 +208,7 @@ function DrawingEngine(canvas) {
   this.preY = [];
 
   // Palette state
-  this.colArray = [];
-  this.place = 0;
+  this.currentPalette = null;
   this.fadeCount = 0;
   this.triDir = 1;
 
@@ -312,19 +225,36 @@ function DrawingEngine(canvas) {
   this.ctx.lineWidth = this.settings.thickness;
 }
 
-DrawingEngine.prototype.initializePalette = function() {
-  var generator = getPaletteGenerator(this.settings.palette);
-  if (generator) {
-    this.colArray = generator();
-    this.place = 0;
+DrawingEngine.prototype.getColor = function() {
+  var settings = this.settings;
+  var alpha = settings.alpha / 100;
+  
+  if (settings.palette === PALETTES.MANUAL) {
+    return 'rgba(' + settings.r + ',' + settings.g + ',' + settings.b + ',' + alpha + ')';
   }
+  
+  if (this.currentPalette && this.currentPalette.colors.length > 0) {
+    // Get color without shifting (shifting happens in shiftColor())
+    var RGB = this.currentPalette.colors[this.currentPalette.colorIndex];
+    return 'rgba(' + RGB[0] + ',' + RGB[1] + ',' + RGB[2] + ',' + alpha + ')';
+  }
+  
+  return 'rgba(' + settings.r + ',' + settings.g + ',' + settings.b + ',' + alpha + ')';
+};
+
+DrawingEngine.prototype.initializePalette = function() {
+  var settings = this.settings;
+  var rgb = settings.palette === PALETTES.MANUAL ? [settings.r / 255, settings.g / 255, settings.b / 255] : [];
+  this.currentPalette = PaletteGenerator.buildPalette(settings.palette, rgb);
 };
 
 DrawingEngine.prototype.updateSetting = function(key, value) {
   var paletteChanged = key === 'palette' && this.settings.palette !== value;
+  var manualColorChanged = key === 'r' || key === 'g' || key === 'b';
+  
   this.settings[key] = value;
 
-  if (paletteChanged) {
+  if (paletteChanged || (manualColorChanged && this.settings.palette === PALETTES.MANUAL)) {
     this.initializePalette();
   }
   if (key === 'thickness') {
@@ -342,21 +272,10 @@ DrawingEngine.prototype.resetCenter = function() {
   this.centerY = this.canvas.height / 2;
 };
 
-DrawingEngine.prototype.getColor = function() {
-  var settings = this.settings;
-  if (settings.palette === PALETTES.MANUAL) {
-    return 'rgba(' + settings.r + ',' + settings.g + ',' + settings.b + ',' + (settings.alpha / 100) + ')';
-  }
-  if (this.colArray.length > 0) {
-    var col = this.colArray[this.place];
-    return 'rgba(' + col.r + ',' + col.g + ',' + col.b + ',' + (settings.alpha / 100) + ')';
-  }
-  return 'rgba(' + settings.r + ',' + settings.g + ',' + settings.b + ',' + (settings.alpha / 100) + ')';
-};
-
 DrawingEngine.prototype.shiftColor = function() {
-  if (this.settings.palette > 1 && this.colArray.length > 0) {
-    this.place = (this.place + 5) % this.colArray.length;
+  // Shift color once per drawing operation
+  if (this.settings.palette !== PALETTES.MANUAL && this.currentPalette && this.currentPalette.colors.length > 0) {
+    this.currentPalette.shiftIndex();
   }
 };
 
