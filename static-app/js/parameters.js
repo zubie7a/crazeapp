@@ -23,6 +23,7 @@
     fadingImage: true,
     fitToGrid: false,
     perspectiveSize: false,
+    persistentRandomize: false,
   };
 
   // Expose functions globally

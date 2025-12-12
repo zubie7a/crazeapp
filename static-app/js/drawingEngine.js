@@ -195,12 +195,25 @@ DrawingEngine.prototype.recreateActiveBrushes = function() {
   // Recreate brushes for all active multi-hand strokes
   for (var strokeId in this.activeStrokes) {
     var stroke = this.activeStrokes[strokeId];
-    if (stroke) {
+    if (stroke && stroke.brush) {
       var pointer = new Point(stroke.aX, stroke.aY);
       var newBrush = BrushGenerator.buildBrush(this.settings, pointer);
       stroke.brush = newBrush;
     }
   }
+};
+
+// Randomize active brushes (for persistent randomize)
+DrawingEngine.prototype.randomizeActiveBrushes = function() {
+  if (!this.settings.persistentRandomize) return;
+  
+  // Randomize parameters (but preserve persistentRandomize setting)
+  var persistentRandomize = this.settings.persistentRandomize;
+  Randomizer.randomizeParameters(this);
+  this.settings.persistentRandomize = persistentRandomize;
+  
+  // Recreate all active brushes with new randomized settings
+  this.recreateActiveBrushes();
 };
 
 DrawingEngine.prototype.setCenter = function(x, y) {
@@ -456,8 +469,19 @@ DrawingEngine.prototype.onMouseMove = function(x, y, strokeId) {
     brush.params.centerY = this.centerY;
     brush.move(pointer);
     
+    // Store steps before drawing (to check if we crossed a 30-step boundary)
+    var stepsBefore = brush.steps;
+    
     // Draw the brush (handles all rotation, symmetry, fit to grid, etc.)
+    // This will increment brush.steps in transform()
     brush.draw(this.ctx, this);
+    
+    // Check for persistent randomize after drawing
+    // brush.steps is incremented in transform() which is called in draw()
+    // Check if we've crossed a 30-step boundary (but not at step 0)
+    if (this.settings.persistentRandomize && brush.steps > 0 && brush.steps % 30 === 0 && stepsBefore % 30 !== 0) {
+      this.randomizeActiveBrushes();
+    }
   }
 };
 

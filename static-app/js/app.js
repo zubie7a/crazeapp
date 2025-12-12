@@ -62,6 +62,7 @@
       fadeToggle: $('fadeToggle'),
       gridToggle: $('gridToggle'),
       perspectiveToggle: $('perspectiveToggle'),
+      persistentRandomizeToggle: $('persistentRandomizeToggle'),
 
       colorPicker: $('colorPicker'),
       colorInput: $('colorInput'),
@@ -484,6 +485,10 @@
 
     elements.perspectiveToggle.addEventListener('change', function(e) {
       if (engine) engine.updateSetting('perspectiveSize', e.target.checked);
+    });
+
+    elements.persistentRandomizeToggle.addEventListener('change', function(e) {
+      if (engine) engine.updateSetting('persistentRandomize', e.target.checked);
     });
 
     // Color picker
