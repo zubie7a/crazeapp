@@ -487,13 +487,14 @@ DrawingEngine.prototype.onMouseMove = function(x, y, strokeId) {
     stroke.aY = stroke.y1 = y;
   }
 
-  // Only call modifier for default stroke (to avoid multiple color shifts)
-  // But always call fadeDrawing for all strokes (fading should work for all)
+  // Shift color for all strokes (each stroke shifts the palette independently)
+  // But only call varySize for default stroke (to avoid multiple size variations)
+  this.shiftColor();
+  this.fadeDrawing();
+  
+  // Only call varySize for default stroke (perspectiveSize logic)
   if (strokeId === 'default') {
-    this.modifier();
-  } else {
-    // For multi-hand strokes, only call fadeDrawing (not shiftColor/varySize)
-    this.fadeDrawing();
+    this.varySize();
   }
 
   // Use brush system - just call draw() like iOS
@@ -556,21 +557,85 @@ CrazeModeController.prototype.start = function() {
   this.point.y = this.engine.canvas.height / 2;
   this.engine.onMouseDown(this.point.x, this.point.y);
 
-  var self = this;
-  this.intervalId = setInterval(function() { self.move(); }, 1);
+  // Start the move loop with delay
+  this.moveWithDelay();
   return true;
 };
 
 CrazeModeController.prototype.stop = function() {
   if (this.intervalId) {
-    clearInterval(this.intervalId);
+    clearTimeout(this.intervalId);
     this.intervalId = null;
   }
   this.active = false;
   this.engine.onMouseUp();
 };
 
+CrazeModeController.prototype.moveWithDelay = function() {
+  if (!this.active) return;
+  
+  var startTime = performance.now();
+  this.move();
+  var elapsed = performance.now() - startTime;
+  
+  // Wait at least 100ms (0.1 seconds) between steps, or until step is done (whichever is longer)
+  var minDelay = 25; // 100ms = 0.1 seconds
+  var delay = Math.max(minDelay, elapsed);
+  
+  var self = this;
+  this.intervalId = setTimeout(function() {
+    self.moveWithDelay();
+  }, delay);
+};
+
 CrazeModeController.prototype.move = function() {
+  var centerX = this.engine.centerX;
+  var centerY = this.engine.centerY;
+  var x1 = this.point.x;
+  var y1 = this.point.y;
+  
+  // Calculate distance from center
+  var dxFromCenter = x1 - centerX;
+  var dyFromCenter = y1 - centerY;
+  var distanceFromCenter = Math.sqrt(dxFromCenter * dxFromCenter + dyFromCenter * dyFromCenter);
+  
+  // If exceeds 500px from center, move halfway to center using bresenhamLine
+  if (distanceFromCenter > 500) {
+    // Calculate midpoint between current position and center
+    var halfwayX = Math.floor((x1 + centerX) / 2);
+    var halfwayY = Math.floor((y1 + centerY) / 2);
+    
+    var centerPoints = CrazeMode.bresenhamLine(x1, y1, halfwayX, halfwayY);
+    if (centerPoints.length > 0) {
+      var step = 3;
+      var width = this.engine.canvas.width;
+      var height = this.engine.canvas.height;
+      
+      // Move along the line halfway to center
+      for (var i = 0; i < centerPoints.length; i += step) {
+        var p = centerPoints[i];
+        if (p.x() > width || p.y() > height || p.x() < 0 || p.y() < 0) break;
+        this.point.x = p.x();
+        this.point.y = p.y();
+        this.engine.onMouseMove(this.point.x, this.point.y);
+        
+        // Check if we've reached the halfway point (within a small threshold)
+        var newDx = this.point.x - halfwayX;
+        var newDy = this.point.y - halfwayY;
+        var newDist = Math.sqrt(newDx * newDx + newDy * newDy);
+        if (newDist < 10) {
+          // Close enough to halfway point, stop
+          this.point.x = halfwayX;
+          this.point.y = halfwayY;
+          this.engine.onMouseMove(this.point.x, this.point.y);
+          break;
+        }
+      }
+    }
+    this.stage = !this.stage;
+    return;
+  }
+  
   var fade = this.engine.settings.fadingImage;
   var dis = fade ? 20 : 11;
   if (!this.stage) dis *= 3;
@@ -585,9 +650,6 @@ CrazeModeController.prototype.move = function() {
 
   if (this.point.x + dx >= width || this.point.x + dx <= 0) dx *= -1;
   if (this.point.y + dy >= height || this.point.y + dy <= 0) dy *= -1;
-
-  var x1 = this.point.x;
-  var y1 = this.point.y;
 
     var points = this.stage
       ? CrazeMode.bresenhamCircle(x1, y1, x1 + dx, y1 + dy)
